@@ -1,5 +1,8 @@
 # Gravações baixadas do PhysioNet (o notebook baixa de novo)
 mitdb/
 
+# Ambiente virtual do projeto (recriar com requirements.txt)
+.venv/
+
 .ipynb_checkpoints/
 __pycache__/

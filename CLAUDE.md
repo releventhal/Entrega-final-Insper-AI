@@ -119,7 +119,7 @@ Recall, precision e F1 **por classe**, F1 macro, matriz de confusão. **Acuráci
 - Arquitetura da MLP e hiperparâmetros (seguir o método da Aula 6: mudar uma coisa por vez e manter tabela de experimentos).
 - **Proposta (Claude da Renata, 05/11), aguardando a dupla:** tirar a Conv1D do bônus e colocar como E6 no núcleo, porque CNNs foram vistas nas Aulas 9 e 10.
 - **Proposta (Claude da Renata, 05/11), aguardando a dupla:** no E5, usar o RR **normalizado pelo RR médio do próprio paciente** (ex.: RR atual ÷ média local), além do RR cru. Motivo: um RR "curto" depende da frequência cardíaca de cada pessoa, então o valor cru tende a não generalizar entre pacientes.
-- **Proposta (Claude da Renata, 05/11), aguardando a dupla:** no split por paciente, rodar 3 a 5 seeds e reportar média ± desvio, porque o resultado inter-paciente oscila bastante.
+- **Proposta (Claude da Renata, 05/11), aguardando a dupla:** no split por paciente, rodar 3 a 5 seeds e reportar média ± desvio, porque o resultado inter-paciente oscila bastante. Ficou mais importante depois do E2: com o treino parando na época 1, o resultado pode variar bastante entre seeds.
 - **Confirmado nos dados (05/11):** a gravação 232 tem **75% dos batimentos S do DS2** (1.381 de 1.836); 6 das 22 gravações do DS2 não têm nenhum S. No DS1, a 209 tem 41% dos S. O recall de S no DS2 depende muito de um paciente só, então a análise por paciente é obrigatória.
 - **Escolhas provisórias da montagem (Claude da Renata, 05/11), a confirmar com o Tom:** derivação MLII; janela larga de 0,5 s antes + 0,5 s depois do pico R guardada no dataset (o tamanho final é recortado na hora do modelo); sinal em mV sem normalização (decidir na seção 5); RR com todos os batimentos da gravação; 44 gravações usadas nos dois splits. Detalhes na seção 3 do notebook.
 
@@ -164,7 +164,7 @@ Recall, precision e F1 **por classe**, F1 macro, matriz de confusão. **Acuráci
 | INCART: 75 gravações, 32 pacientes, ODC-By 1.0 | Visto na página do PhysioNet |
 | Grad-CAM e focal loss nas aulas | Grad-CAM não encontrado; focal loss não verificado |
 | Acesso ao PhysioNet pelo ambiente de cada IA | **Desconhecido**; o Colab da dupla é o caminho seguro |
-| Python no computador da Renata | Anaconda em `C:\Users\rehle\anaconda3` (Python 3.12.7), **fora do PATH**: chamar pelo caminho completo. Tem numpy 1.26.4, pandas 2.2.2, scikit-learn, Jupyter e `wfdb` 4.1.2. **Sem TensorFlow ainda.** O Claude da Renata roda o notebook com `python -m jupyter nbconvert --execute --inplace` |
+| Python no computador da Renata | Anaconda em `C:\Users\rehle\anaconda3` (Python 3.12.7), **fora do PATH**. O projeto **não usa mais o Anaconda base**: roda num ambiente virtual próprio, `.venv/` (criado a partir desse Python, fora do git), com as versões do `requirements.txt` (TensorFlow 2.21, numpy 2.5, pandas 3.1, wfdb 4.3.1). O Claude da Renata roda o notebook com `.venv/Scripts/python.exe -m jupyter nbconvert --to notebook --execute --inplace projeto_arritmia.ipynb` (~2 min, só CPU) |
 
 ---
 
@@ -181,6 +181,13 @@ Recall, precision e F1 **por classe**, F1 macro, matriz de confusão. **Acuráci
 - 2026-11-05 (Claude da Renata): **cuidado com `pip install` no ambiente local.** Instalar o `wfdb` mais novo atualizou numpy/pandas e quebrou o Anaconda base; as versões originais foram restauradas. Regra: instalar pacotes com `-c` (arquivo de restrições gerado por `pip list --format=freeze`) para não atualizar nada. A célula de instalação do notebook só instala o `wfdb` se ele não existir.
 - 2026-11-05 (Claude da Renata): **etapa 2 concluída (seções 3 e 4 do notebook, rodadas).** Dataset montado (`df` com os metadados + `X` com as janelas, 100.645 × 360). EDA: contagens por classe comparadas com a literatura, batimentos S por paciente, batimento médio por classe e RR por classe. Achados: (1) S tem formato quase igual ao N; (2) com o RR **relativo ao ritmo da gravação**, S fica bem separado de N, o que reforça a proposta do RR normalizado no E5; (3) a 232 concentra 75% dos S do teste.
 - 2026-11-05 (Claude da Renata): adicionado um **Glossário** no começo do notebook (classes N/S/V/F/Q explicadas em linguagem simples, pico R, RR, MLII, DS1/DS2, tipos de split) e um "como ler" nos gráficos 4.3 e 4.4, a pedido da Renata.
+- 2026-11-05 (Claude da Renata): criado o ambiente `.venv/` + `requirements.txt` para o projeto. Motivo: o TensorFlow não instalava no Anaconda base sem atualizar pacotes dele (o pip travava tentando resolver as versões). Com o `.venv`, nada do Anaconda da Renata é alterado. `.venv/` está no `.gitignore`.
+- 2026-11-05 (Claude da Renata): **seção 5 (divisão dos dados) e E0, E1, E2 rodados (uma seed, 42).** Escolhas provisórias, a confirmar com o Tom: entrada de 0,25 s antes + 0,45 s depois do pico R (252 amostras); normalização por batimento (z-score de cada janela, sem estatística global, então sem vazamento); split aleatório = os mesmos batimentos sorteados 50/50 estratificado; validação por paciente = gravações **118, 119, 124, 205, 220** do DS1, escolhidas olhando só o DS1 para ter as 4 classes sem tirar a 208 (90% dos F do DS1) e a 209 (41% dos S) do treino. MLP base: 252 → Dense 128 ReLU → Dropout 0,3 → Dense 64 ReLU → Dropout 0,3 → 4 softmax; Adam 1e-3; batch 256; até 50 épocas com early stopping (paciência 5 na val_loss, restaura os melhores pesos).
+- 2026-11-05 (Claude da Renata): **resultados E0-E2 (seed 42, teste = DS2 no E0/E2):**
+  - E0 sempre N: acurácia 0,890 / F1 macro 0,236 / recall S, V, F = 0.
+  - E1 aleatório: acurácia 0,985 / F1 macro 0,893 / recall N 0,997, S 0,752, V 0,957, F 0,676 (31 épocas).
+  - E2 por paciente: acurácia 0,864 / F1 macro 0,385 / recall N 0,907, S 0,046, V 0,848, F 0,000; precisão V 0,381.
+  - No E2 a val_loss é mínima na **época 1** e só sobe depois (o modelo decora os pacientes do treino). Na matriz de confusão do E2, 56% dos S viram N e 39% viram V; 92% dos F viram N.
 
 ## 8. Divisão de tarefas (a preencher)
 
