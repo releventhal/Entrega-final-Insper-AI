@@ -120,7 +120,8 @@ Recall, precision e F1 **por classe**, F1 macro, matriz de confusão. **Acuráci
 - **Proposta (Claude da Renata, 05/11), aguardando a dupla:** tirar a Conv1D do bônus e colocar como E6 no núcleo, porque CNNs foram vistas nas Aulas 9 e 10.
 - **Proposta (Claude da Renata, 05/11), aguardando a dupla:** no E5, usar o RR **normalizado pelo RR médio do próprio paciente** (ex.: RR atual ÷ média local), além do RR cru. Motivo: um RR "curto" depende da frequência cardíaca de cada pessoa, então o valor cru tende a não generalizar entre pacientes.
 - **Proposta (Claude da Renata, 05/11), aguardando a dupla:** no split por paciente, rodar 3 a 5 seeds e reportar média ± desvio, porque o resultado inter-paciente oscila bastante.
-- **A conferir nos dados:** a gravação 232 (DS2) parece concentrar boa parte dos batimentos S do teste (lembrança da literatura, **não verificado**). Se confirmar, o recall de S no DS2 depende muito de um paciente só.
+- **Confirmado nos dados (05/11):** a gravação 232 tem **75% dos batimentos S do DS2** (1.381 de 1.836); 6 das 22 gravações do DS2 não têm nenhum S. No DS1, a 209 tem 41% dos S. O recall de S no DS2 depende muito de um paciente só, então a análise por paciente é obrigatória.
+- **Escolhas provisórias da montagem (Claude da Renata, 05/11), a confirmar com o Tom:** derivação MLII; janela larga de 0,5 s antes + 0,5 s depois do pico R guardada no dataset (o tamanho final é recortado na hora do modelo); sinal em mV sem normalização (decidir na seção 5); RR com todos os batimentos da gravação; 44 gravações usadas nos dois splits. Detalhes na seção 3 do notebook.
 
 ---
 
@@ -154,10 +155,11 @@ Recall, precision e F1 **por classe**, F1 macro, matriz de confusão. **Acuráci
 | Item | Status |
 |---|---|
 | Listas DS1/DS2 e exclusão de 102, 104, 107, 217 | Visto em vários artigos |
-| Contagens por classe nos splits | Visto em artigos, ±1-2 entre fontes |
+| Contagens por classe nos splits | **Conferido em 05/11**: nosso dataset tem DS1 = N 45.824 / S 943 / V 3.788 / F 414 / Q 8 e DS2 = N 44.218 / S 1.836 / V 3.219 / F 388 / Q 7 (100.645 batimentos). S/V/F/Q a ±2 da literatura; N ~40 a menos por descartarmos o 1º e o último batimento de cada gravação. Nessas 44 gravações, **89,5% são N** (o "83%" da seção 3 inclui as de marcapasso) |
 | Kaggle sem id de paciente | **Não confirmado** |
 | Licença do MIT-BIH | **Não verificada** |
-| Mapeamento exato símbolo → classe AAMI | Parcialmente visto; **conferir no PhysioNet** |
+| Mapeamento exato símbolo → classe AAMI | Significado de cada símbolo **conferido** na tabela de anotações da `wfdb` (05/11). Os 15 símbolos da tabela são os únicos de batimento nas 44 gravações; o resto (`+ ~ ! " x \| [ ]`) não é batimento e foi descartado. O agrupamento em classes AAMI segue a literatura; a norma EC57 em si não foi consultada |
+| Gravação 114 | MLII é o **2º canal** (V5 é o 1º). O código escolhe o canal pelo nome |
 | `wfdb` lê gravações e anotações | **Testado em 05/11** (gravação 100, baixada direto do PhysioNet): 360 Hz, MLII + V5, anotações no pico R |
 | INCART: 75 gravações, 32 pacientes, ODC-By 1.0 | Visto na página do PhysioNet |
 | Grad-CAM e focal loss nas aulas | Grad-CAM não encontrado; focal loss não verificado |
@@ -177,6 +179,8 @@ Recall, precision e F1 **por classe**, F1 macro, matriz de confusão. **Acuráci
 - 2026-11-05 (Claude da Renata): criado `projeto_arritmia.ipynb` com a estrutura de seções e o código do teste de 30 minutos (seções 1 e 2).
 - 2026-11-05 (Claude da Renata): **teste de 30 minutos concluído** no Anaconda da Renata. A leitura funciona; resultado registrado no fim da seção 2 do notebook. Criado `.gitignore` (a pasta `mitdb/` com os dados baixados não vai para o repositório).
 - 2026-11-05 (Claude da Renata): **cuidado com `pip install` no ambiente local.** Instalar o `wfdb` mais novo atualizou numpy/pandas e quebrou o Anaconda base; as versões originais foram restauradas. Regra: instalar pacotes com `-c` (arquivo de restrições gerado por `pip list --format=freeze`) para não atualizar nada. A célula de instalação do notebook só instala o `wfdb` se ele não existir.
+- 2026-11-05 (Claude da Renata): **etapa 2 concluída (seções 3 e 4 do notebook, rodadas).** Dataset montado (`df` com os metadados + `X` com as janelas, 100.645 × 360). EDA: contagens por classe comparadas com a literatura, batimentos S por paciente, batimento médio por classe e RR por classe. Achados: (1) S tem formato quase igual ao N; (2) com o RR **relativo ao ritmo da gravação**, S fica bem separado de N, o que reforça a proposta do RR normalizado no E5; (3) a 232 concentra 75% dos S do teste.
+- 2026-11-05 (Claude da Renata): adicionado um **Glossário** no começo do notebook (classes N/S/V/F/Q explicadas em linguagem simples, pico R, RR, MLII, DS1/DS2, tipos de split) e um "como ler" nos gráficos 4.3 e 4.4, a pedido da Renata.
 
 ## 8. Divisão de tarefas (a preencher)
 
