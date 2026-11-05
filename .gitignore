@@ -1,0 +1,5 @@
+# Gravações baixadas do PhysioNet (o notebook baixa de novo)
+mitdb/
+
+.ipynb_checkpoints/
+__pycache__/
