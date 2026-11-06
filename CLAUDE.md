@@ -6,6 +6,17 @@
 
 ## 0. Comece aqui
 
+### Primeira vez neste computador? Faça isto ANTES de qualquer tarefa
+A IA pode rodar estes comandos ela mesma (pedindo permissão), ou passar para a pessoa rodar. Conferir cada item; se já estiver feito, pular.
+1. **Código atualizado:** `git pull` (ou `git clone` se o repositório ainda não existir aqui).
+2. **Ambiente:** se não existir a pasta `.venv/` na raiz, criar com Python 3.12 (`python -m venv .venv`) e instalar `requirements.txt` **com o Python do `.venv`** (Windows: `.venv\Scripts\python -m pip install -r requirements.txt`; Mac/Linux: `.venv/bin/python -m pip install -r requirements.txt`). **Nunca** instalar no Python global ou no Anaconda base (regra 11). Outras versões de Python: não testadas.
+3. **Dados:** a pasta `code15/` **não vem pelo git**. Rodar o `projeto_ecg.ipynb` com o kernel `.venv`: a seção 2 baixa sozinha o `exams.csv` e a parte 0 (~2,7 GB, ~20 min, ~7 GB livres durante o download).
+4. **Conferir:** depois de rodar, as saídas das seções 3-5 devem bater com as que já estão salvas no notebook (ex.: "exames: 345,779 | pacientes: 233,770" e "pacientes em mais de um grupo: 0").
+5. **Registrar** no log (seção 10) que o ambiente foi montado nesse computador e, na seção 6, as características dele (sistema, RAM, GPU).
+
+### Antes de cada sessão de trabalho
+`git pull` → ver a tabela de tarefas abaixo → marcar a tarefa como "em andamento (nome)" → commit + push dessa marcação → só então mexer no notebook (seção 7, coordenação).
+
 ### Ordem de leitura
 1. Esta seção (estado atual e próximas tarefas).
 2. Seção 2 (a ideia) e seção 3 (**por que** cada escolha foi feita). Sem a seção 3, as decisões parecem arbitrárias.
@@ -289,6 +300,7 @@ Usar ECGs de 12 derivações de **233.770 pacientes brasileiros** (CODE-15%, Red
 - 2026-11-06 (Claude da Renata): **criado `projeto_ecg.ipynb`**, com as seções 1-5 rodadas (parte 0) e as seções 6-9 como estrutura. Achados da exploração na seção 4 deste arquivo e no notebook (prevalências, efeito da idade, horizontes, paradoxo de Simpson com a idade do ECG).
 - 2026-11-06 (Claude da Renata): **split por paciente implementado** (provisório 70/10/20; seção 5.2).
 - 2026-11-06 (Claude da Renata): `CLAUDE.md` reorganizado para a outra dupla conseguir continuar sozinha: seção 0 (comece aqui + tarefas), seção 3 (linhas de raciocínio), seção 6 (ambiente), seção 7 (processo de trabalho e coordenação no git), armadilhas conhecidas, tabela de decisões em aberto com propostas. Conferido que os exames curtos têm zeros dos dois lados (581 + 581). `h5py==3.14.0` adicionado ao `requirements.txt`.
+- 2026-11-06 (Claude da Renata): seção 0 ganhou o checklist "Primeira vez neste computador?" (pull, `.venv`, dados, conferência, registro) e a rotina "Antes de cada sessão", para a IA do Tom montar o ambiente antes de começar.
 
 ## 11. Divisão de tarefas
 
