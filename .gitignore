@@ -6,3 +6,6 @@ mitdb/
 
 .ipynb_checkpoints/
 __pycache__/
+
+# Dados da CODE-15% (baixados do Zenodo)
+code15/

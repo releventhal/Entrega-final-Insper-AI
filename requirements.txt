@@ -1,10 +1,12 @@
-# Versões usadas para rodar o notebook localmente (05/11/2026).
-# Criar o ambiente: python -m venv .venv  e depois  .venv\Scripts\python -m pip install -r requirements.txt
+# Versões usadas para rodar os notebooks localmente (atualizado em 06/11/2026).
+# Criar o ambiente (Windows):  python -m venv .venv   e depois   .venv\Scripts\python -m pip install -r requirements.txt
+# Mac/Linux:                   python3 -m venv .venv  e depois   .venv/bin/python -m pip install -r requirements.txt
 tensorflow==2.21.0
 numpy==2.5.4
 pandas==3.1.1
 scikit-learn==1.9.1
 matplotlib==3.11.2
+h5py==3.14.0
 wfdb==4.3.1
 ipykernel
 nbconvert

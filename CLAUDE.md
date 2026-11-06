@@ -1,195 +1,295 @@
-# PROJETO: Classificação de batimentos cardíacos (arritmia) avaliada do jeito honesto
+# PROJETO: O que o ECG diz sobre o paciente, avaliado do jeito honesto
 
-> **Para qualquer IA que ler este arquivo:** este é o documento único de contexto do projeto. Leia inteiro antes de responder ou escrever código. Ele existe para que duas duplas de pessoa+IA (Tom e Renata, cada um com a sua IA) sigam o MESMO plano. Se algo aqui conflitar com o que o usuário pedir na hora, avise o conflito e pergunte, não mude o plano em silêncio. Este arquivo pode ser renomeado para `CLAUDE.md` quando o projeto estiver num repositório.
+> **Para qualquer IA (ou pessoa) que abrir este repositório:** este é o documento único de contexto do projeto. **Leia inteiro antes de responder ou escrever código.** Ele existe para que duas duplas de pessoa+IA (Tom e Renata, cada um com a sua IA) trabalhem no MESMO plano, sem uma depender da conversa da outra. Tudo o que foi decidido, verificado ou aprendido está aqui. Se algo aqui conflitar com o que o usuário pedir na hora, **avise o conflito e pergunte**; não mude o plano em silêncio.
+
+---
+
+## 0. Comece aqui
+
+### Ordem de leitura
+1. Esta seção (estado atual e próximas tarefas).
+2. Seção 2 (a ideia) e seção 3 (**por que** cada escolha foi feita). Sem a seção 3, as decisões parecem arbitrárias.
+3. Seção 7 (como trabalhar) e seção 8 (regras de ouro) **antes de mexer em qualquer arquivo**.
+4. O notebook `projeto_ecg.ipynb`, que já tem as seções 1-5 rodadas e comentadas.
+
+### Estado em 06/11/2026 (fim do dia)
+- **Projeto atual:** CODE-15% (ECG de 12 derivações, 233 mil pacientes brasileiros). Escolhido em 06/11 por Renata e Tom.
+- **Pronto e rodado** em `projeto_ecg.ipynb` (só com a parte 0 dos sinais): configuração, download, exploração da tabela inteira, leitura dos sinais, split por paciente.
+- **Ainda não feito:** nenhum modelo da Parte A ou B; testes externos; slides.
+- **Dados:** baixados **só no computador da Renata** (pasta `code15/`, fora do git). Quem clonar o repositório precisa baixar os seus (o notebook faz isso sozinho; ver seção 6).
+- **Fase 1 (MIT-BIH, arritmia por batimento):** pausada e arquivada. Notebook `projeto_arritmia.ipynb` e plano antigo `arquivo/CLAUDE_fase1_arritmia.md`. **Não apagar.** Os resultados dela são a motivação da apresentação (seção 3.1).
+
+### Próximas tarefas (atualizar o status ao começar e ao terminar cada uma)
+| # | Tarefa | Depende de | Status | Quem |
+|---|---|---|---|---|
+| T1 | Decidir as questões em aberto da seção 5.6 | — | **Pendente (dupla)** | Tom + Renata |
+| T2 | Baixar mais partes dos sinais (proposta: 1-3) | T1 (quantas partes) | Pendente | cada um no seu computador |
+| T3 | Seção 6 do notebook: baselines A0 (sempre negativo; idade + sexo) | — | Pendente | a definir |
+| T4 | Seção 6: CNN A1, função de métricas multi-rótulo, limiar na validação | T1 (pré-processamento) | Pendente | a definir |
+| T5 | Seção 7: carregar PTB-XL (reamostrar, mapear rótulos) e CODE-TEST; testar o modelo escolhido | T4 | Pendente | a definir |
+| T6 | Slides da intermediária (11/11), com a fase 1 como motivação | T4 (T5 se der) | Pendente | a definir |
+| T7 | Parte B (seção 8 do notebook): B0-B3 | T4 | Pendente (após 11/11) | a definir |
 
 ---
 
 ## 1. Contexto
 
-- **Quem:** Tom (Tomaz Santos Almeida), estudante de Ciência da Computação no Insper, e sua dupla, Renata.
-- **Onde:** Trilha de Trainees da liga estudantil **Insper AI** (IA, Machine Learning, Deep Learning).
-- **O quê:** projeto final da trilha, em dupla. Segundo as orientações oficiais (`entrega_final.pdf`):
-  - Cada grupo propõe, desenvolve e apresenta um projeto de **deep learning** em UMA área: **saúde, segurança ou transporte público e mobilidade**.
-  - Objetivo: achar uma boa ideia, planejar a solução, **justificar as escolhas** e **criá-la até o fim**.
-  - Entrega intermediária: primeira versão, não precisa estar 100%, apresentada presencialmente com feedback.
-  - Entrega final: **notebook + paper (relatório)**. A nota final é baseada na **apresentação**.
-  - Não há exigência de demo, aplicativo ou câmera.
-  - A lista de "cases de sucesso" é **só inspiração, NÃO pode ser copiada**.
-- **Prazos:** intermediária **11/11** (o PDF diz 12/11, mas a dupla confirmou que a nossa é dia 11), entrega (notebook + paper) **17/11**, apresentação final **18/11** (membros, diretores e trainees). Documento escrito em 04/11/2026.
-- **Confirmado pelo Tom:** usar MLP é permitido dentro do que o projeto pede.
-
-### O que a dupla já viu nas aulas (use SÓ isso no núcleo)
-Regressão linear (A1), escalando o modelo (A2), classificação (A3), do neurônio à rede (A4), MLP + backpropagation (A5), treinando na prática: epoch, batch, otimizadores, curvas de loss (A6), análise de modelos: métricas, matriz de confusão, erros, regularização (A7), Claude Code (A8), CNNs (A9, A10) e transfer learning (A10).
-**Ainda NÃO foi visto:** modelos de sequência (RNN/LSTM), linguagem, aprendizado por reforço, Grad-CAM. Qualquer coisa que dependa disso é **bônus** e deve ser marcada como tal.
-Experiência prévia: MLP em Keras no desafio MNIST; projeto em grupo de modelagem de carros usados (EDA, regressão, classificação).
-
-### Regra da trilha sobre uso de IA (Aula 8)
-Pode usar IA para escrever código. **Não dá para delegar a decisão.** Arquitetura, métricas, divisão dos dados e interpretação são da dupla e precisam ser entendidas e explicadas por elas. Portanto: explique cada escolha técnica em linguagem simples antes ou junto do código.
+- **Quem:** Tom (Tomaz Santos Almeida) e Renata, estudantes do Insper, Trilha de Trainees da liga **Insper AI**.
+- **O quê:** projeto final de **deep learning** em uma área (saúde, segurança ou mobilidade; escolhemos **saúde**), conforme `entrega_final.pdf`. Objetivo: achar uma boa ideia, planejar, **justificar as escolhas** e fazer até o fim. Entrega final = **notebook + paper**; **a nota vem da apresentação**. Os "cases de sucesso" do PDF são só inspiração e não podem ser copiados.
+- **Prazos:** intermediária **11/11** (o PDF diz 12/11, mas a nossa é dia 11), entrega **17/11**, apresentação **18/11** (membros, diretores e trainees).
+- **Feedback dos diretores (05/11):** a fase 1 tinha **dados demais de poucos pacientes** (44) para um modelo robusto. Querem um projeto **robusto e mais complexo**. É por isso que a base mudou e que técnicas fora das aulas estão liberadas (regra 5).
+- **Aulas vistas:** regressão linear (A1), escalando o modelo (A2), classificação (A3), neurônio → rede (A4), MLP + backprop (A5), treino na prática: época, batch, otimizadores, curvas de loss (A6), métricas, matriz de confusão, erros, regularização (A7), Claude Code (A8), CNNs (A9, A10), transfer learning (A10). **Não vistos:** RNN/LSTM, linguagem, aprendizado por reforço, Grad-CAM, análise de sobrevivência.
+- **Experiência prévia da dupla:** MLP em Keras no MNIST; projeto de carros usados (EDA, regressão, classificação).
+- **Regra da trilha (Aula 8):** pode usar IA para escrever código; **não dá para delegar a decisão**. Arquitetura, métricas, divisão dos dados e interpretação são da dupla, que precisa entender e explicar tudo.
 
 ---
 
-## 2. A ideia em uma frase
+## 2. A ideia
 
-Modelos que classificam tipos de batimento cardíaco costumam mostrar ~98-99% de acerto, mas isso é em boa parte ilusório: batimentos do mesmo paciente caem no treino e no teste, e o modelo aprende o **paciente**, não a **arritmia**. O projeto **mostra essa diferença** e tenta **melhorar o resultado honesto**.
+Usar ECGs de 12 derivações de **233.770 pacientes brasileiros** (CODE-15%, Rede de Telessaúde de Minas Gerais) em duas partes:
 
-### Pergunta de pesquisa
-Quanto do desempenho "bonito" some quando o teste usa pacientes que o modelo nunca viu, principalmente nas classes raras e clinicamente importantes? E o que ajuda a recuperar parte dessa queda?
+- **Parte A (núcleo, até a intermediária):** uma CNN 1D detecta **6 alterações** no ECG (multi-rótulo). Avaliada (1) em pacientes que nunca viu (split por paciente), (2) **em outro país** (PTB-XL, Alemanha) e (3) contra um **gabarito de especialistas** (CODE-TEST).
+- **Parte B (pergunta principal do paper final):** **o ECG prevê morte em até X anos além do que a idade e o sexo já dizem?** Comparar a CNN com um modelo só de idade + sexo e com a "idade do ECG" do artigo de Lima et al. (2021).
 
-### Hipótese a testar
-O split aleatório dá número alto; o split por paciente (protocolo de de Chazal et al.) derruba o desempenho, principalmente na classe **S (supraventricular)**. Técnicas como peso por classe, oversampling e o intervalo entre batimentos recuperam parte disso.
+### Perguntas de pesquisa
+1. Um modelo treinado na atenção primária de Minas Gerais funciona em pacientes novos, em outro país e contra o gabarito de especialistas? Onde ele falha?
+2. O ECG traz informação sobre risco de morte que a idade e o sexo não trazem? Quanto?
 
 ### Narrativa da apresentação
-"Mostramos por que os resultados populares são enganosos e construímos um classificador avaliado do jeito que importaria num hospital."
+"Começamos com uma base pequena (MIT-BIH) e mostramos que, com poucos pacientes, o modelo decora as pessoas: F1 macro de 0,89 com split aleatório e de 0,39 em pacientes novos. Por isso migramos para 233 mil pacientes, mantendo a mesma exigência: avaliar sempre em pessoas, lugares e perguntas que o modelo nunca viu."
+
+### Relação com a literatura (não copiar; diferenciar)
+- **Ribeiro et al., Nat. Commun. 2020** ("Automatic diagnosis of the 12-lead ECG using a deep neural network"): mesmo grupo de Minas, mesmas 6 alterações, CODE-TEST como teste. A Parte A **reproduz em menor escala**. O diferencial é o teste externo no PTB-XL e a análise honesta dos erros.
+- **Lima et al., Nat. Commun. 2021** ("Deep neural network-estimated electrocardiographic age as a mortality predictor", DOI 10.1038/s41467-021-25351-7): previu a **idade** pelo ECG com uma ResNet 1D treinada nos outros 85% da CODE (~1,3 milhão de pacientes, 70 épocas, GPU NVIDIA Titan V). **A CODE-15% foi o conjunto de teste deles.** MAE de 8,38 anos na CODE-15%. "Idade do ECG" mais de 8 anos acima da real → HR ~1,79 de morte (ajustado por idade e sexo). **Eles não treinaram um modelo para prever morte direto do ECG**: a morte só foi usada para validar a idade. A Parte B entra aí. Código deles: github.com/antonior92/ecg-age-prediction.
+- Pelo que o Claude da Renata lembra (**não verificado**), já existe trabalho americano prevendo morte em 1 ano direto do ECG, com outra base. A Parte B não é inédita no mundo, mas é nova nesta base e na comparação com a idade do ECG.
 
 ---
 
-## 3. Dados
+## 3. Por que cada escolha foi feita (linhas de raciocínio)
 
-### Fonte escolhida: MIT-BIH Arrhythmia Database (PhysioNet), versão ORIGINAL
-- 48 gravações de ~30 min, de 47 pacientes, 360 Hz, 2 derivações por gravação. A literatura costuma usar a derivação II (MLII).
-- Cada gravação tem arquivo de anotações (`.atr`) com a posição e o tipo de cada batimento, marcado por cardiologistas.
-- **Por que não o Kaggle:** a versão pré-processada (`mitbih_train.csv` / `mitbih_test.csv`) tem batimentos soltos de 187 valores, 5 classes, 87.554 treino / 21.892 teste. **Não confirmado**, mas pelo que foi visto ela não traz o identificador do paciente, então não permite split por paciente. Por isso o dataset é montado a partir dos arquivos originais.
-- Leitura em Python: biblioteca `wfdb` (`wfdb.rdrecord`, `wfdb.rdann`). Existe também a biblioteca `pyheartlib`, que gera datasets de batimentos com split inter-paciente; é uma alternativa a testar no "teste de 30 minutos", mas a dupla precisa entender o que ela faz antes de usá-la.
+### 3.1 Por que saímos do MIT-BIH (fase 1)
+- O MIT-BIH tem 48 gravações de 47 pacientes. Na fase 1, a mesma MLP teve F1 macro de 0,893 com split aleatório e de 0,385 com split por paciente. O recall da classe S caiu de 0,752 para 0,046, e a perda de validação piorava já depois da 1ª época, porque o modelo decorava os pacientes do treino.
+- A análise por paciente mostrou que 75% dos batimentos S do teste vinham de **uma** gravação (232). Ou seja, o resultado dependia de uma pessoa.
+- Os diretores concluíram que eram poucos pacientes para um modelo robusto. Concordamos. A lição ("avaliar por paciente, desconfiar de número bonito") foi mantida.
 
-### Classes (padrão AAMI EC57)
-| Classe | Significado | Símbolos originais (conferir na documentação do PhysioNet) |
+### 3.2 Bases consideradas e descartadas
+- **Competição Kaggle "RSNA Knee Abnormality Detection":** já encerrada (prazo final 22/10/2026); ressonância 3D (~800 mil arquivos DICOM); os rótulos precisariam ser extraídos de laudos em 9-12 idiomas (processamento de linguagem, não visto). Inviável em 12 dias.
+- **MIMIC (UTI):** exige curso e credenciamento que podem levar dias ou semanas.
+- **Raio-X de tórax (NIH/CheXpert) e pele (ISIC):** viáveis, mas são temas muito explorados e com rótulos ruidosos (raio-X). Ficaram como reserva.
+- **MIT-BIH como teste externo do modelo da CODE-15%:** **não serve.** Ele tem só 2 derivações (o modelo usa 12), gravações de 30 min com rótulo por batimento (a CODE tem exames de 7-10 s com rótulo por exame), e as 6 alterações não existem lá do mesmo jeito. O teste externo certo é o PTB-XL.
+
+### 3.3 Por que a CODE-15%
+- Muitos pacientes (233.770), acesso aberto e imediato (CC BY 4.0), dados brasileiros, rótulos prontos, `patient_id` (permite split por paciente) e dados de óbito com tempo de acompanhamento.
+- Aproveita o que a dupla aprendeu sobre ECG na fase 1 (inclusive bloqueios de ramo, que causaram erros lá e aqui são classes).
+- Um modelo pequeno treina no computador da Renata (~1 min por época com 16 mil exames), então não dependemos de GPU.
+
+### 3.4 Por que a Parte A vem antes da Parte B
+- A Parte A tem resultado quase garantido: no teste de viabilidade, 2 épocas já deram AUROC ~0,98-0,99 em 4 das 6 alterações. Ela monta todo o "encanamento" (dados, split, treino, métricas) que a Parte B reaproveita.
+- A Parte B é a pergunta mais interessante, mas o resultado é incerto: óbitos são raros e boa parte do sinal pode ser só a idade. **"O ECG acrescenta pouco além da idade" também é um resultado válido**, se bem medido.
+
+### 3.5 Por que a Parte B compara com idade + sexo (e a lição do paradoxo de Simpson)
+- O óbito depende muito da idade: 0,5% antes dos 40 e 13,9% aos 80+. Um modelo que só "adivinha a idade" pelo ECG já pareceria bom. Por isso a pergunta certa é **quanto o ECG acrescenta ao B0 (idade + sexo)**.
+- Na exploração apareceu um paradoxo de Simpson. **Comparando direto**, quem tem o ECG "8+ anos mais velho" morre **menos** (3,0%) do que quem tem o ECG "8+ anos mais jovem" (4,6%), o contrário do artigo. Isso acontece porque os grupos têm idades reais muito diferentes (média de 42 vs 63 anos): o modelo de idade provavelmente "puxa para o meio". **Dentro de cada faixa de idade**, o resultado do artigo aparece em todas as faixas (60-69 anos: 3,0% / 3,6% / 6,5%). Lição: **toda comparação de risco tem que levar a idade em conta**. É um ótimo exemplo para a apresentação.
+
+### 3.6 Outras escolhas
+- **Split sorteado sobre a lista completa de pacientes do `exams.csv`, e não sobre os exames carregados:** assim, adicionar partes depois não muda o grupo de ninguém, e resultados com 1 ou 4 partes ficam comparáveis.
+- **Só o primeiro exame de cada paciente na Parte B:** é o único que tem `death`/`timey` (seção 4).
+- **Regra do horizonte:** para "morreu em até X anos", só entra quem morreu dentro do prazo ou foi acompanhado o prazo inteiro. Alguém vivo e acompanhado por só 1 ano não diz nada sobre 3 anos.
+- **`nn_predicted_age` como baseline B1:** é (provavelmente) a saída do modelo de Lima et al., treinado nos outros 85% da CODE. Na CODE-15% essas previsões são "fora da amostra", então servem como comparação justa com o "estado da arte".
+- **CODE-TEST como gabarito:** os rótulos da CODE-15% vêm da rotina de laudos (origem exata **não verificada**) e podem ter erros. O CODE-TEST foi revisado por vários médicos.
+- **float16 para os sinais:** metade da memória; perda de precisão irrelevante para ECG.
+- **CNN pequena primeiro:** roda no computador da Renata. Modelos maiores (ResNet como nos artigos) ficam como extensão, com GPU.
+
+---
+
+## 4. Dados (tudo conferido nos arquivos oficiais em 05-06/11)
+
+### CODE-15% (treino e teste interno)
+- Zenodo **10.5281/zenodo.4916206**, **CC BY 4.0**. 345.779 exames, 233.770 pacientes, 18 partes `exams_partN.zip` (N = 0-17; ~2,7 GB cada zip, ~3,9 GB cada `.hdf5`; 46,3 GB no total) + `exams.csv` (35 MB).
+- **`exams.csv`**: `exam_id, age, is_male, nn_predicted_age, 1dAVb, RBBB, LBBB, SB, ST, AF, patient_id, death, timey, normal_ecg, trace_file` (`trace_file` diz em que parte está o sinal).
+- **Rótulos** (exames positivos): 1dAVb 5.716 · RBBB 9.672 · LBBB 6.026 · SB 5.605 · ST 7.584 · AF 7.033 · `normal_ecg` 134.657 (38,9%). **Multi-rótulo:** 89% dos exames não têm nenhuma das 6; ~1% tem duas ou mais.
+- **HDF5:** `tracings` (N × 4.096 × 12, float32, 400 Hz, valores em mV aparentemente) e `exam_id`. Derivações nesta ordem: **DI, DII, DIII, AVR, AVL, AVF, V1, V2, V3, V4, V5, V6**.
+  - Durações: 7,3 s (2.934 amostras; 58% dos exames da parte 0), 10,2 s (4.096; 38%) e 9,7 s (raros). **Os exames curtos são centralizados, com zeros dos dois lados** (581 amostras no começo e 581 no fim).
+  - Cada parte tem 1 linha extra com `exam_id` = 0 (preenchimento). Na parte 0, 38 de 20.000 exames são todos zero e 61 têm alguma derivação zerada (estes 61 ainda **não** são descartados; decidir).
+- **As partes NÃO são separadas por paciente.** 29% dos pacientes têm mais de um exame (até 38) e somam 52% dos exames; metade dos pacientes da parte 0 aparece em outras partes. **O split é feito por `patient_id`.**
+- **Óbito:** `death` e `timey` (anos de acompanhamento a partir do exame) só estão preenchidos em **um exame por paciente** (233.647), que é o **primeiro exame** (em 99,3% dos casos, o de menor idade). 8.341 óbitos (3,6%). `timey`: mediana 3,5 anos (p5 1,0; p95 6,9).
+- **Horizontes possíveis:** 1 ano → 224.869 pacientes, 2.812 óbitos (1,3%); 2 anos → 185.106, 4.716 (2,5%); 3 anos → 143.779, 6.173 (4,3%).
+- **`nn_predicted_age`:** MAE de 8,53 anos (r = 0,83) contra a idade real, quase o número do artigo (8,38; r = 0,84). **Muito provavelmente** é a saída do modelo de Lima et al. (não documentado).
+- **Idade e sexo:** 17 a 100 anos (média 53), 40% homens. Bloqueios de ramo, bloqueio AV e FA crescem muito com a idade (FA: ~0,1% antes dos 30, ~7% aos 80+); SB e ST quase não mudam.
+- **Download:** o Zenodo limita ~0,3 MB/s por conexão. Com 16 conexões em paralelo (função `baixar` no notebook), ~2 MB/s, ~20 min por parte no computador da Renata. **Atenção:** uma versão antiga do downloader gerou um arquivo truncado silenciosamente; a versão atual confere o tamanho de cada pedaço e o total.
+
+### PTB-XL (teste externo, Alemanha)
+- PhysioNet `ptb-xl/1.0.3`. 21.799 ECGs, 18.869 pacientes, 10 folds (`strat_fold`), 500 Hz (pasta `records500`) ou 100 Hz, **10 s**, **mesmas 12 derivações na mesma ordem** (I, II, III, AVR, AVL, AVF, V1-V6), em mV.
+- Metadados: `ptbxl_database.csv` (coluna `scp_codes`, um dicionário em texto; usar `ast.literal_eval`) e `scp_statements.csv`.
+- Leitura testada: `wfdb.rdrecord('00001_hr', pn_dir='ptb-xl/1.0.3/records500/00000')` → (5000, 12). **O `pn_dir` precisa incluir a subpasta**; passar o caminho inteiro no nome do registro dá erro 404.
+- **Equivalência de rótulos** (códigos SCP): 1dAVb ↔ `1AVB` (793), RBBB ↔ `CRBBB` (541), LBBB ↔ `CLBBB` (536), SB ↔ `SBRAD` (637), ST ↔ `STACH` (826), AF ↔ `AFIB` (1.514); NORM 9.514. **A decidir:** se `AFLT` (flutter) e `IRBBB`/`ILBBB` (bloqueios incompletos) contam como positivos, negativos ou ficam fora; e se usamos a confiança (`likelihood`) dos códigos.
+- **Para usar no modelo:** reamostrar de 500 para 400 Hz (ex.: `scipy.signal.resample_poly(x, 4, 5)` → 4.000 amostras) e **centralizar com zeros** até 4.096 (48 de cada lado), igual à CODE. Escala: as duas bases parecem estar em mV, mas **conferir as amplitudes** antes de testar.
+- Tamanho total do `records500`: **não verificado**. Licença: **não verificada** (conferir na página do PhysioNet).
+
+### CODE-TEST (gabarito)
+- Zenodo **10.5281/zenodo.3765780**, **CC BY 4.0**, aberto, 218 MB (`data.zip`). 827 ECGs de pacientes diferentes, anotados por vários cardiologistas, residentes e estudantes, nas mesmas 6 classes. Companion code: github.com/antonior92/automatic-ecg-diagnosis.
+- **Conteúdo do zip ainda não aberto** (formato, ordem das derivações e frequência a conferir).
+- **Risco não verificado:** os pacientes do CODE-TEST podem estar também na CODE-15%. Se estiverem no nosso treino, o teste fica "contaminado". Verificar se dá para cruzar ids; se não der, citar como limitação.
+
+---
+
+## 5. Plano técnico
+
+### 5.1 Cronograma
+| Data | O quê |
+|---|---|
+| 06/11 | ✅ Plano novo, notebook novo, dados + exploração, split por paciente |
+| 07/11 | T1 (decisões), T2 (mais partes), T3 (baselines A0) |
+| 08/11 | T4: CNN A1, métricas por rótulo, limiar escolhido na validação |
+| 09/11 | T5: PTB-XL e CODE-TEST |
+| 10/11 | Análise de erros + T6 (slides, com a fase 1 como motivação) |
+| **11/11** | **Apresentação intermediária** |
+| 12-14/11 | T7: Parte B (horizonte, B0-B3) |
+| 15/11 | Robustez (várias seeds, subgrupos de idade e sexo) e extensões |
+| 16/11 | Notebook e paper finais |
+| **17/11 / 18/11** | **Entrega / apresentação** |
+
+### 5.2 Divisão dos dados
+- Cada `patient_id` da tabela inteira é sorteado uma vez: `np.random.default_rng(42).random(n)` sobre `np.sort(tabela["patient_id"].unique())`; < 0,7 → treino, < 0,8 → validação, resto → teste. **Proporção 70/10/20 provisória.**
+- Na parte 0: treino 13.866 exames / validação 2.069 / teste 4.027; 0 pacientes em mais de um grupo (o notebook confere isso).
+- **Validação** = escolher épocas, limiares e hiperparâmetros. **Teste interno, PTB-XL e CODE-TEST** = só no fim, nunca para escolher nada.
+
+### 5.3 Parte A: 6 alterações (multi-rótulo)
+- **Saída:** 6 neurônios **sigmoid** (um "sim/não" por alteração), perda `binary_crossentropy`. Não é softmax, porque um exame pode ter várias alterações.
+- **A0:** (a) "sempre negativo" (mostra que acurácia engana) e (b) regressão logística só com idade + sexo (mostra quanto a idade sozinha já explica). A CNN precisa ganhar do A0b.
+- **A1:** CNN 1D base, a mesma do teste de viabilidade: entrada 4.096 × 12 → 4 × [Conv1D (32, 64, 128, 128 filtros; kernel 15; `padding="same"`; ReLU) + MaxPool 4 nas três primeiras] → GlobalAveragePooling → Dense 6 sigmoid. ~406 mil parâmetros. Adam, batch 64. Usar early stopping na perda de validação (como na fase 1).
+- **A2+:** uma mudança por vez (ex.: peso por classe, mais partes, normalização, arquitetura maior), sempre na tabela de experimentos.
+- **Limiar:** a sigmoid dá uma nota de 0 a 1. Para virar "sim/não", escolher um limiar **por rótulo na validação** (proposta: o que maximiza o F1).
+- **Testes externos:** o modelo escolhido na validação é aplicado, **sem retreinar e com os mesmos limiares**, no teste interno, no PTB-XL e no CODE-TEST.
+
+### 5.4 Parte B: óbito em até X anos (binário)
+- Só o primeiro exame de cada paciente (o que tem `death`/`timey`), aplicando a regra do horizonte (seção 3.6). Horizonte X a decidir (1, 2 ou 3 anos).
+- **B0:** regressão logística com idade + sexo.
+- **B1:** B0 + `nn_predicted_age` e a diferença `nn_predicted_age − age`.
+- **B2:** CNN só com o ECG.
+- **B3:** CNN com ECG + idade + sexo (ex.: concatenar idade e sexo depois do GlobalAveragePooling).
+- A pergunta é **quanto B2/B3 ganham de B0**. Também vale olhar o resultado por faixa de idade (por causa do paradoxo de Simpson).
+
+### 5.5 Métricas
+- **Parte A:** por rótulo: AUROC e AUPRC (não dependem de limiar) e, com o limiar da validação, sensibilidade (recall), precisão, F1 e especificidade. Médias macro. Acurácia só como referência.
+- **Parte B:** AUROC e AUPRC, sempre lado a lado com o B0. Curva de calibração se der tempo.
+- Seeds fixas (42). Nos resultados finais, idealmente várias seeds com média ± desvio.
+
+### 5.6 Decisões em aberto (T1: decidir com a dupla e registrar na seção 10)
+| Decisão | Proposta do Claude da Renata | Por quê |
 |---|---|---|
-| N | Normal e equivalentes | N, L, R, e, j |
-| S | Supraventricular ectópico | A, a, J, S |
-| V | Ventricular ectópico | V, E |
-| F | Fusão ventricular + normal | F |
-| Q | Desconhecido / marcapasso | /, f, Q |
-
-Contagem total na literatura (MIT-BIH completo): N 90.631, S 2.781, V 7.236, F 803, Q 8.043 (Q inclui batimentos de marcapasso). **Cerca de 83% são normais**, daí o desbalanceamento forte.
-
-### Split por paciente (de Chazal et al., 2004)
-44 gravações (excluídas as 4 de marcapasso: **102, 104, 107, 217**).
-- **DS1 (treino):** 101, 106, 108, 109, 112, 114, 115, 116, 118, 119, 122, 124, 201, 203, 205, 207, 208, 209, 215, 220, 223, 230
-- **DS2 (teste):** 100, 103, 105, 111, 113, 117, 121, 123, 200, 202, 210, 212, 213, 214, 219, 221, 222, 228, 231, 232, 233, 234
-- Observação da literatura: as gravações 201 e 202 são do mesmo paciente e ficam em conjuntos diferentes; todas as outras são de pacientes únicos.
-- Contagens aproximadas (variam em 1-2 entre artigos): DS1 = N 45.866 / S 944 / V 3.788 / F 415 / Q 8. DS2 = N 44.259 / S 1.837 / V 3.221 / F 388 / Q 7.
-- A classe Q some nesse split. **Avaliar N, S, V, F.**
-- Validação: precisa ser separada **por paciente** dentro do DS1 (nunca por batimento).
-
-### Tabela final (um único dataset, usado nos dois splits)
-Uma linha por batimento. Colunas mínimas: `paciente` (id da gravação), `classe` (N/S/V/F), `sinal` (janela do batimento), e opcionalmente `rr_anterior`, `rr_posterior` (intervalos entre batimentos).
+| Quantas partes usar | Desenvolver com a parte 0; resultados com 3-4 partes (~60-80 mil exames) | Cabe na RAM (16 GB) e em ~4 min por época |
+| Proporção do split | 70/10/20 | Teste grande o bastante para alterações raras |
+| Normalização do sinal | Nenhuma no A1 (os valores já estão em mV, numa faixa razoável); testar depois como A2 | Uma coisa por vez |
+| Exames com alguma derivação zerada (61 na parte 0) | Descartar | Poucos, e podem confundir o modelo |
+| Limiar por rótulo | Maximizar o F1 na validação | Simples de explicar |
+| Horizonte da Parte B | 2 anos (4.716 óbitos, 2,5%) | Equilíbrio entre número de óbitos e pacientes elegíveis |
+| `AFLT`, `IRBBB`, `ILBBB` no PTB-XL | Ficam fora da avaliação (nem positivo nem negativo) | Não existem como classe na CODE |
+| Extensões (fora das aulas) | Saliency/Grad-CAM, peso por classe/focal loss, ResNet 1D maior (GPU), análise de sobrevivência (Cox) | Depois do núcleo |
 
 ---
 
-## 4. Plano técnico
+## 6. Ambiente e como rodar
 
-### Etapas
-> Cronograma ajustado em 05/11 porque a intermediária passou para **11/11** (ver log, seção 7).
+### Montar o ambiente (quem acabou de clonar)
+1. Python 3.12. Criar o ambiente virtual **na raiz do repositório**: `python -m venv .venv`.
+2. Instalar: `.venv\Scripts\python -m pip install -r requirements.txt` (Windows) ou `.venv/bin/python -m pip install -r requirements.txt` (Mac/Linux).
+3. No VS Code, abrir `projeto_ecg.ipynb` e escolher o kernel `.venv`.
+4. Rodar tudo. A seção 2 baixa sozinha o `exams.csv` e as partes listadas em `PARTES` para a pasta `code15/` (~20 min por parte; precisa de ~7 GB livres por parte durante o download, porque o zip só é apagado depois de extraído).
 
-1. **Teste de 30 minutos (05/11):** instalar `wfdb`, baixar uma gravação (ex.: 100), plotar alguns segundos com as anotações, confirmar que dá para ler símbolo e posição de cada batimento. Se travar, parar e reportar ANTES de seguir.
-2. **Montar a tabela (06-07/11):** cortar uma janela ao redor de cada pico R, mapear os símbolos para as 5 classes, guardar o id do paciente, aplicar as listas DS1/DS2. Fazer EDA: contagem por classe e batimento médio de cada tipo.
-3. **Baselines e primeiros modelos (08-09/11):** (a) baseline ingênuo que sempre chuta "N"; (b) MLP com **split aleatório** (reproduzir o resultado "bonito"); (c) a MESMA MLP com **split por paciente**.
-4. **Métricas e intermediária (10-11/11):** métricas por classe, matriz de confusão, slides. Apresentação intermediária **11/11**.
-5. **Reforço (12-15/11):** peso por classe, oversampling, intervalo RR como entrada, análise dos erros da classe S.
-6. **Fechamento (16/11):** notebook e paper finais. Entrega 17/11. Ensaiar para 18/11.
+### Rodar o notebook pela linha de comando (como o Claude da Renata faz)
+`.venv/Scripts/python.exe -m jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=1800 projeto_ecg.ipynb` (com a parte 0 já baixada, leva poucos minutos). As saídas ficam salvas no notebook e vão para o git, para a outra pessoa ver os resultados sem rodar.
 
-### Experimentos obrigatórios (núcleo)
-- E0: baseline "sempre N".
-- E1: MLP, split aleatório por batimento.
-- E2: MLP, split por paciente (DS1 → DS2).
-- E3: E2 + peso por classe.
-- E4: E2 + oversampling (**só no treino, depois do split**).
-- E5: E2 + features de ritmo (intervalo RR).
-- Análise de erros: onde a classe S falha, por paciente e por tipo de confusão.
-
-### Métricas (obrigatório)
-Recall, precision e F1 **por classe**, F1 macro, matriz de confusão. **Acurácia geral não pode ser a métrica principal** (83% dos batimentos são N). Mostrar também o desempenho por paciente quando possível.
-
-### Bônus (só se o núcleo estiver pronto; marcar como bônus no texto)
-- Conv1D (CNN 1D).
-- Grad-CAM / saliency para mostrar que parte da onda o modelo usou. **Não visto nas aulas.**
-- Focal loss (não verificado se é compatível com o que foi visto).
-- Teste em segundo dataset: **INCART** (PhysioNet; 75 gravações de 30 min, 32 pacientes, 12 derivações, 257 Hz, licença ODC-By 1.0). Exige reamostrar para 360 Hz, escolher derivação e mapear rótulos.
-- Alternativa descartada por ora: PTB-XL (21.837 ECGs de 18.885 pacientes, 10 s, multi-label, com folds já separados por paciente). É outro problema, mais próximo de laudo.
-
-### Stack
-- Python no Google Colab (um notebook só, na entrega final).
-- `wfdb` (leitura), `numpy`, `pandas`, `matplotlib`, `scikit-learn` (métricas, class weights), `Keras/TensorFlow` (MLP; a dupla já usou Keras no MNIST).
-- Seeds fixas em tudo. Um repositório só, um notebook principal.
-
-### Decisões ainda abertas (decidir junto com a dupla, e registrar na seção 7)
-- Derivação do sinal (sugestão inicial: MLII; a validar).
-- Tamanho da janela ao redor do pico R (a literatura varia; a validar com a dupla).
-- Normalização por batimento ou global (se global, calcular estatísticas SÓ no treino).
-- Arquitetura da MLP e hiperparâmetros (seguir o método da Aula 6: mudar uma coisa por vez e manter tabela de experimentos).
-- **Proposta (Claude da Renata, 05/11), aguardando a dupla:** tirar a Conv1D do bônus e colocar como E6 no núcleo, porque CNNs foram vistas nas Aulas 9 e 10.
-- **Proposta (Claude da Renata, 05/11), aguardando a dupla:** no E5, usar o RR **normalizado pelo RR médio do próprio paciente** (ex.: RR atual ÷ média local), além do RR cru. Motivo: um RR "curto" depende da frequência cardíaca de cada pessoa, então o valor cru tende a não generalizar entre pacientes.
-- **Proposta (Claude da Renata, 05/11), aguardando a dupla:** no split por paciente, rodar 3 a 5 seeds e reportar média ± desvio, porque o resultado inter-paciente oscila bastante. Ficou mais importante depois do E2: com o treino parando na época 1, o resultado pode variar bastante entre seeds.
-- **Confirmado nos dados (05/11):** a gravação 232 tem **75% dos batimentos S do DS2** (1.381 de 1.836); 6 das 22 gravações do DS2 não têm nenhum S. No DS1, a 209 tem 41% dos S. O recall de S no DS2 depende muito de um paciente só, então a análise por paciente é obrigatória.
-- **Escolhas provisórias da montagem (Claude da Renata, 05/11), a confirmar com o Tom:** derivação MLII; janela larga de 0,5 s antes + 0,5 s depois do pico R guardada no dataset (o tamanho final é recortado na hora do modelo); sinal em mV sem normalização (decidir na seção 5); RR com todos os batimentos da gravação; 44 gravações usadas nos dois splits. Detalhes na seção 3 do notebook.
+### Recursos
+- **Computador da Renata:** Windows, i5-1235U, 16 GB de RAM, sem GPU utilizável (a Intel Iris Xe integrada não serve para o TensorFlow, e o TensorFlow ≥ 2.11 nem usa GPU no Windows nativo). Uma CNN de ~406 mil parâmetros leva ~0,2 s por batch de 64 (~1 min por época com 16 mil exames). Cada parte ocupa ~2 GB de RAM em float16.
+- **Colab/Kaggle (GPU):** opção para modelos maiores. `teste_viabilidade_code15_colab.ipynb` (descartável) mede download e treino com GPU; **ainda não rodado no Colab**. No Colab, os dados somem quando a sessão fecha (precisa baixar de novo ou usar o Google Drive).
+- **Computador do Tom:** desconhecido. Se for Mac com chip Apple ou tiver GPU NVIDIA com Linux/WSL, pode ser mais rápido; registrar aqui.
 
 ---
 
-## 5. Regras de ouro (qualquer IA deve obedecer)
+## 7. Como trabalhar (processo que as IAs seguem)
 
-1. **Nunca misturar batimentos do mesmo paciente entre treino, validação e teste** nos experimentos "por paciente". Isso inclui oversampling, normalização e seleção de hiperparâmetros.
-2. **Nunca usar só acurácia.** Sempre reportar por classe.
-3. **Oversampling, peso por classe e qualquer ajuste só no treino.** O teste (DS2) nunca é usado para escolher nada.
-4. **Não inventar dataset, número, licença ou resultado.** Se não verificou, escreva "não verificado". Não afirmar resultados antes de rodar.
-5. **Não usar técnica fora das aulas no núcleo.** Se usar, rotular como bônus.
-6. **Explicar cada escolha em linguagem simples.** A dupla precisa defender na apresentação.
-7. **Não mudar o plano em silêncio.** Qualquer mudança vira uma linha na seção 7 (log de decisões).
-8. **O texto do paper é da dupla.** A IA pode ajudar a estruturar e revisar, mas os resultados e interpretações precisam bater com o que foi realmente rodado.
-9. **Uma coisa por vez** nos experimentos, com tabela de experimentos (configuração, epochs, métricas por classe).
+### A cada etapa
+1. **Explicar antes** à pessoa, em linguagem simples, o que vai ser feito e por quê. Se envolver uma decisão da seção 5.6, **perguntar** em vez de decidir sozinha.
+2. Escrever o código no `projeto_ecg.ipynb`, na seção certa, seguindo as convenções abaixo.
+3. **Rodar** e **olhar as saídas e os gráficos** (não só conferir se não deu erro).
+4. **Conferir com código todo número antes de escrevê-lo no texto.** Na fase 1, um número lido "a olho" num gráfico estava errado e só foi pego porque foi conferido.
+5. Escrever as conclusões na célula de texto da subseção, separando o que foi **verificado** do que é **hipótese**.
+6. Atualizar a **tabela de status** (seção 0 do notebook), a **tabela de tarefas** (seção 0 deste arquivo) e o **log** (seção 10).
+7. Avisar a pessoa que **pode commitar** e sugerir uma mensagem curta.
+
+### Convenções do notebook
+- Cada título de seção numa **célula markdown só com o título** (`##` seção, `###` subseção) e o texto na célula de baixo, para recolher no VS Code e ver só os títulos.
+- Cada seção abre com 1-3 frases sobre o que faz e por quê. Direto, completo, sem prolixidade.
+- A tabela de resultados é **gerada pelo código**, nunca digitada à mão.
+- Código não rodado é marcado como tal. Nenhum número entra no texto antes de rodar.
+- Cores fixas por rótulo (definidas na seção 1 do notebook), iguais em todos os gráficos.
+
+### Coordenação entre Tom e Renata (git)
+- **A IA nunca faz commit nem push.** As pessoas commitam (combinado da Renata em 05/11; vale para as duas IAs, a menos que o Tom decida outra coisa e registre aqui).
+- **Antes de começar:** `git pull`. **Ao terminar uma etapa:** commit + push logo, com mensagem curta.
+- **Nunca editar o mesmo notebook ao mesmo tempo.** Conflito de git em `.ipynb` é difícil de resolver. Antes de mexer no `projeto_ecg.ipynb`, marcar a tarefa como "em andamento (nome)" na tabela da seção 0, commitar e avisar o outro. Para trabalhar em paralelo, usar um notebook de rascunho próprio (ex.: `rascunho_tom.ipynb`) e passar as células prontas para o principal depois.
+- Os dados (`code15/`, `mitdb/`) e o `.venv/` ficam **fora do git**. Cada um baixa ou cria os seus.
+
+---
+
+## 8. Regras de ouro (qualquer IA deve obedecer)
+
+1. **Split por paciente sempre.** Nenhum paciente pode ter exames em mais de um grupo. Isso vale também para normalização, oversampling e escolha de hiperparâmetros.
+2. **Nunca só acurácia.** Métricas por rótulo; na Parte B, sempre comparadas com o baseline de idade + sexo.
+3. **Nada é escolhido olhando os testes** (teste interno, PTB-XL, CODE-TEST). Se algo for descoberto olhando o teste, registrar, mas não usar para mudar o modelo sem uma justificativa que use só treino e validação. Isso aconteceu na fase 1 (validação que tirou do treino um tipo de batimento).
+4. **Não inventar dataset, número, licença ou resultado.** Se não verificou, escreva "não verificado".
+5. **Técnica fora das aulas pode entrar** (decisão da Renata em 05/11, confirmada pelo Tom em 06/11), mas **sempre marcada como "fora das aulas"** no notebook e explicada em linguagem simples. O núcleo vem primeiro.
+6. **Explicar cada escolha em linguagem simples.** A dupla precisa defender tudo na apresentação.
+7. **Não mudar o plano em silêncio.** Toda mudança vira uma linha no log (seção 10).
+8. **O texto do paper é da dupla.** A IA ajuda a estruturar e revisar; os resultados precisam bater com o que foi rodado.
+9. **Uma coisa por vez** nos experimentos, com tabela de experimentos (configuração, épocas, métricas).
 10. Responder em **português**, tom natural e direto. O Tom gosta de ser chamado de "mestre". A Renata é chamada de Renata.
-
-### Combinados de trabalho (definidos pela Renata em 05/11)
-- **A IA nunca faz commit nem push.** Quem commita são as pessoas. Quando terminar uma etapa, a IA avisa ("pode commitar") e sugere uma mensagem de commit curta. A ideia é ter commits frequentes e pequenos.
-- **Toda mudança que a IA fizer no repositório vira uma linha no log (seção 7)**, com data e quem fez (ex.: "Claude da Renata"). Assim a IA da outra pessoa entende o que mudou ao abrir o projeto.
-- **Notebook principal:** `projeto_arritmia.ipynb`. Regras de organização:
-  - Cada título de seção fica numa **célula markdown própria, só com o título** (`##` para seção, `###` para subseção). O texto explicativo vai na célula de baixo. Assim dá para recolher a seção no VS Code e ver só os títulos.
-  - Seções numeradas na ordem do plano. Cada seção abre com 1-3 frases dizendo o que ela faz e por quê.
-  - Direto e completo, sem prolixidade. Explicações em linguagem simples, para a dupla defender na apresentação.
-  - A seção 0 tem uma tabela de **status** (o que está pronto, o que falta) e a seção de experimentos tem a **tabela de experimentos**. As duas precisam ser atualizadas sempre que algo mudar.
-  - Código não rodado é marcado como tal. Nenhum número entra no texto antes de ter sido rodado.
+11. **Instalar pacotes só dentro do `.venv/`.** Em 05/11, um `pip install` no Anaconda base da Renata atualizou numpy/pandas e quebrou o ambiente dela (foi restaurado).
 
 ---
 
-## 6. Estado de verificação
+## 9. Estado de verificação e armadilhas conhecidas
 
+### Verificação
 | Item | Status |
 |---|---|
-| Listas DS1/DS2 e exclusão de 102, 104, 107, 217 | Visto em vários artigos |
-| Contagens por classe nos splits | **Conferido em 05/11**: nosso dataset tem DS1 = N 45.824 / S 943 / V 3.788 / F 414 / Q 8 e DS2 = N 44.218 / S 1.836 / V 3.219 / F 388 / Q 7 (100.645 batimentos). S/V/F/Q a ±2 da literatura; N ~40 a menos por descartarmos o 1º e o último batimento de cada gravação. Nessas 44 gravações, **89,5% são N** (o "83%" da seção 3 inclui as de marcapasso) |
-| Kaggle sem id de paciente | **Não confirmado** |
-| Licença do MIT-BIH | **Não verificada** |
-| Mapeamento exato símbolo → classe AAMI | Significado de cada símbolo **conferido** na tabela de anotações da `wfdb` (05/11). Os 15 símbolos da tabela são os únicos de batimento nas 44 gravações; o resto (`+ ~ ! " x \| [ ]`) não é batimento e foi descartado. O agrupamento em classes AAMI segue a literatura; a norma EC57 em si não foi consultada |
-| Gravação 114 | MLII é o **2º canal** (V5 é o 1º). O código escolhe o canal pelo nome |
-| `wfdb` lê gravações e anotações | **Testado em 05/11** (gravação 100, baixada direto do PhysioNet): 360 Hz, MLII + V5, anotações no pico R |
-| INCART: 75 gravações, 32 pacientes, ODC-By 1.0 | Visto na página do PhysioNet |
-| Grad-CAM e focal loss nas aulas | Grad-CAM não encontrado; focal loss não verificado |
-| Acesso ao PhysioNet pelo ambiente de cada IA | **Desconhecido**; o Colab da dupla é o caminho seguro |
-| Python no computador da Renata | Anaconda em `C:\Users\rehle\anaconda3` (Python 3.12.7), **fora do PATH**. O projeto **não usa mais o Anaconda base**: roda num ambiente virtual próprio, `.venv/` (criado a partir desse Python, fora do git), com as versões do `requirements.txt` (TensorFlow 2.21, numpy 2.5, pandas 3.1, wfdb 4.3.1). O Claude da Renata roda o notebook com `.venv/Scripts/python.exe -m jupyter nbconvert --to notebook --execute --inplace projeto_arritmia.ipynb` (~2 min, só CPU) |
+| CODE-15%: contagens, colunas, licença, 18 partes | **Conferido** (Zenodo + `exams.csv`, 05/11) |
+| CODE-15%: formato do HDF5, durações, zeros centralizados, exames zerados | **Conferido** na parte 0 (05-06/11) |
+| Óbito só no primeiro exame de cada paciente | **Conferido** (06/11) |
+| `nn_predicted_age` = modelo de Lima et al. | **Provável** (MAE e r batem com o artigo); não documentado |
+| Origem dos rótulos da CODE-15% (laudo médico, sistema automático?) | **Não verificado** |
+| PTB-XL: tamanho, derivações, códigos das 6 classes, leitura com `wfdb` | **Conferido** (05/11) |
+| PTB-XL: licença, tamanho do download, escala das amplitudes vs CODE | **Não verificado** |
+| CODE-TEST: existe, aberto, CC BY 4.0, 827 ECGs, 6 classes | **Conferido** pela ficha do Zenodo; zip **não aberto** |
+| CODE-TEST × CODE-15%: pacientes em comum? | **Não verificado** |
+| Treino local (CPU) | **Medido**: ~1 min por época com 16 mil exames |
+| Treino no Colab (GPU) | **Não testado** |
+| Python da Renata | Anaconda em `C:\Users\rehle\anaconda3` (fora do PATH, **não usar para o projeto**). O projeto usa o `.venv/` (versões no `requirements.txt`) |
+
+### Armadilhas já encontradas (não repetir)
+- **`pip install` no Python errado:** quebrou o Anaconda base da Renata. Usar só o `.venv`.
+- **Download truncado em silêncio:** conexões do Zenodo caem sem erro. A função `baixar` atual retoma e confere o tamanho; o zip também é testado ao extrair.
+- **Soma em float16 estoura** (`np.abs(X).sum()` com milhões de valores vira infinito). Para checar exames zerados, usar `.max()`, ou converter para float32 antes de somar.
+- **`wfdb` com o PhysioNet:** o `pn_dir` tem que incluir a subpasta do registro.
+- **TensorFlow no Windows não usa GPU** (≥ 2.11). O aviso no treino é esperado.
+- **Terminal do Windows mostra acentos embaralhados** na saída de scripts. Os arquivos estão em UTF-8 e estão certos; é só a exibição.
+- **Conclusões "a olho":** conferir todo número com código antes de escrever.
+- **Comparações de risco sem controlar a idade enganam** (paradoxo de Simpson, seção 3.5).
 
 ---
 
-## 7. Log de decisões (qualquer IA ou pessoa acrescenta ao final, com data)
+## 10. Log de decisões (acrescentar ao final, com data e autor)
 
-- 2026-11-04: Projeto escolhido: arritmia por batimento, split aleatório vs por paciente. Um repositório, um notebook.
-- 2026-11-04: Dataset será montado a partir do MIT-BIH original; o notebook conterá o código de montagem (a dupla precisa entender e defender).
-- 2026-11-04: Liga confirmou (via Tom) que MLP é aceito como deep learning.
-- 2026-11-05 (Claude da Renata): intermediária passou de 12/11 para **11/11**. Cronograma da seção 4 puxado um dia para trás.
-- 2026-11-05 (Claude da Renata): criados os "Combinados de trabalho" na seção 5 (a IA não commita, toda mudança vai para este log, regras do notebook).
-- 2026-11-05 (Claude da Renata): adicionadas três propostas e um ponto a conferir em "Decisões ainda abertas" (Conv1D no núcleo, RR normalizado, várias seeds, gravação 232). **Ainda não decididas pela dupla.**
-- 2026-11-05 (Claude da Renata): criado `projeto_arritmia.ipynb` com a estrutura de seções e o código do teste de 30 minutos (seções 1 e 2).
-- 2026-11-05 (Claude da Renata): **teste de 30 minutos concluído** no Anaconda da Renata. A leitura funciona; resultado registrado no fim da seção 2 do notebook. Criado `.gitignore` (a pasta `mitdb/` com os dados baixados não vai para o repositório).
-- 2026-11-05 (Claude da Renata): **cuidado com `pip install` no ambiente local.** Instalar o `wfdb` mais novo atualizou numpy/pandas e quebrou o Anaconda base; as versões originais foram restauradas. Regra: instalar pacotes com `-c` (arquivo de restrições gerado por `pip list --format=freeze`) para não atualizar nada. A célula de instalação do notebook só instala o `wfdb` se ele não existir.
-- 2026-11-05 (Claude da Renata): **etapa 2 concluída (seções 3 e 4 do notebook, rodadas).** Dataset montado (`df` com os metadados + `X` com as janelas, 100.645 × 360). EDA: contagens por classe comparadas com a literatura, batimentos S por paciente, batimento médio por classe e RR por classe. Achados: (1) S tem formato quase igual ao N; (2) com o RR **relativo ao ritmo da gravação**, S fica bem separado de N, o que reforça a proposta do RR normalizado no E5; (3) a 232 concentra 75% dos S do teste.
-- 2026-11-05 (Claude da Renata): adicionado um **Glossário** no começo do notebook (classes N/S/V/F/Q explicadas em linguagem simples, pico R, RR, MLII, DS1/DS2, tipos de split) e um "como ler" nos gráficos 4.3 e 4.4, a pedido da Renata.
-- 2026-11-05 (Claude da Renata): criado o ambiente `.venv/` + `requirements.txt` para o projeto. Motivo: o TensorFlow não instalava no Anaconda base sem atualizar pacotes dele (o pip travava tentando resolver as versões). Com o `.venv`, nada do Anaconda da Renata é alterado. `.venv/` está no `.gitignore`.
-- 2026-11-05 (Claude da Renata): **seção 5 (divisão dos dados) e E0, E1, E2 rodados (uma seed, 42).** Escolhas provisórias, a confirmar com o Tom: entrada de 0,25 s antes + 0,45 s depois do pico R (252 amostras); normalização por batimento (z-score de cada janela, sem estatística global, então sem vazamento); split aleatório = os mesmos batimentos sorteados 50/50 estratificado; validação por paciente = gravações **118, 119, 124, 205, 220** do DS1, escolhidas olhando só o DS1 para ter as 4 classes sem tirar a 208 (90% dos F do DS1) e a 209 (41% dos S) do treino. MLP base: 252 → Dense 128 ReLU → Dropout 0,3 → Dense 64 ReLU → Dropout 0,3 → 4 softmax; Adam 1e-3; batch 256; até 50 épocas com early stopping (paciência 5 na val_loss, restaura os melhores pesos).
-- 2026-11-05 (Claude da Renata): **resultados E0-E2 (seed 42, teste = DS2 no E0/E2):**
-  - E0 sempre N: acurácia 0,890 / F1 macro 0,236 / recall S, V, F = 0.
-  - E1 aleatório: acurácia 0,985 / F1 macro 0,893 / recall N 0,997, S 0,752, V 0,957, F 0,676 (31 épocas).
-  - E2 por paciente: acurácia 0,864 / F1 macro 0,385 / recall N 0,907, S 0,046, V 0,848, F 0,000; precisão V 0,381.
-  - No E2 a val_loss é mínima na **época 1** e só sobe depois (o modelo decora os pacientes do treino). Na matriz de confusão do E2, 56% dos S viram N e 39% viram V; 92% dos F viram N.
+- 2026-11-04 a 2026-11-05: **fase 1 (MIT-BIH, arritmia por batimento)**. Log completo em `arquivo/CLAUDE_fase1_arritmia.md`. Resultados principais (seed 42): MLP com split aleatório F1 macro 0,893; mesma MLP com split por paciente 0,385 (recall de S 0,752 → 0,046). Pausada em 05/11 após o feedback dos diretores.
+- 2026-11-05 (Claude da Renata): avaliadas novas bases (seção 3.2). Viabilidade da CODE-15% testada: dados, PTB-XL, CODE-TEST e tempo de treino local (seções 4 e 6).
+- 2026-11-05 (Claude da Renata): criado `teste_viabilidade_code15_colab.ipynb` (descartável) para medir tempos no Colab.
+- 2026-11-06 (Renata e Tom): **novo projeto escolhido**: CODE-15% com Parte A (6 alterações + testes externos) e Parte B (óbito em X anos vs idade + sexo vs idade do ECG). MIT-BIH fora deste projeto.
+- 2026-11-06 (Claude da Renata): plano antigo copiado para `arquivo/CLAUDE_fase1_arritmia.md`; este `CLAUDE.md` reescrito. `code15/exams.csv` movido para a pasta de dados (fora do git).
+- 2026-11-06 (Claude da Renata): **criado `projeto_ecg.ipynb`**, com as seções 1-5 rodadas (parte 0) e as seções 6-9 como estrutura. Achados da exploração na seção 4 deste arquivo e no notebook (prevalências, efeito da idade, horizontes, paradoxo de Simpson com a idade do ECG).
+- 2026-11-06 (Claude da Renata): **split por paciente implementado** (provisório 70/10/20; seção 5.2).
+- 2026-11-06 (Claude da Renata): `CLAUDE.md` reorganizado para a outra dupla conseguir continuar sozinha: seção 0 (comece aqui + tarefas), seção 3 (linhas de raciocínio), seção 6 (ambiente), seção 7 (processo de trabalho e coordenação no git), armadilhas conhecidas, tabela de decisões em aberto com propostas. Conferido que os exames curtos têm zeros dos dois lados (581 + 581). `h5py==3.14.0` adicionado ao `requirements.txt`.
 
-## 8. Divisão de tarefas (a preencher)
+## 11. Divisão de tarefas
 
-- Tom: _a definir_
-- Renata: _a definir_
+- Ver a tabela de tarefas na seção 0. Preencher a coluna "Quem" ao combinar.
