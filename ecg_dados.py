@@ -7,9 +7,12 @@ from pathlib import Path
 import h5py
 import numpy as np
 import pandas as pd
+import wfdb
 from keras.utils import Sequence
+from scipy.signal import resample_poly
 
 DADOS = Path(__file__).parent / "code15"
+PTBXL = Path(__file__).parent / "ptbxl"  # PTB-XL 1.0.3 (PhysioNet), fora do git
 ROTULOS = ["1dAVb", "RBBB", "LBBB", "SB", "ST", "AF"]
 SEED = 42
 PARTES = [0, 1, 2, 3]
@@ -101,3 +104,43 @@ class GeradorECG(Sequence):
     def on_epoch_end(self):
         self.epoca += 1
         self._sortear()
+
+
+# ---------------------------------------------------------------------------------------------
+# PTB-XL (teste externo). Só sinal e metadados: nenhum rótulo é usado aqui.
+# ---------------------------------------------------------------------------------------------
+# Ordem das colunas do PTB-XL medida com Einthoven (07/11, 1.000 registros): I, II, III, AVR, AVL, AVF, V1-V6,
+# a mesma da CODE-15%. Então a permutação é a identidade (o CODE-TEST é que precisa reordenar).
+ORDEM_PTBXL = list(range(12))
+
+
+def ptbxl_indice():
+    """Uma linha por registro do PTB-XL (ordem de ecg_id): patient_id, idade, sexo, fold e caminho do registro de 500 Hz."""
+    db = pd.read_csv(PTBXL / "ptbxl_database.csv", index_col="ecg_id").sort_index()
+    return db[["patient_id", "age", "sex", "strat_fold", "scp_codes", "filename_hr"]]
+
+
+def preprocessar_ptbxl(x500):
+    """(5000, 12) float64 em 500 Hz -> (4096, 12) float32 em 400 Hz, no formato da CODE-15%.
+    500 -> 400 Hz = resample_poly(up=4, down=5) -> 4000 amostras (10 s); 48 zeros de cada lado -> 4096.
+    Sem nenhuma normalização de amplitude (decisão da dupla, ainda em aberto)."""
+    x = resample_poly(x500[:, ORDEM_PTBXL], up=4, down=5, axis=0)
+    assert x.shape == (4000, 12), x.shape
+    return np.pad(x, ((48, 48), (0, 0))).astype(np.float32)
+
+
+class GeradorPTBXL(Sequence):
+    """Lotes de `lote` registros do PTB-XL já no formato da CODE-15% (lote, 4096, 12) float32, lidos do disco.
+    Ordem fixa = ordem de `self.info` (a de `ptbxl_indice()` ou do subconjunto passado). Devolve só X (sem rótulos)."""
+
+    def __init__(self, info=None, lote=64, **kw):
+        super().__init__(**kw)
+        self.info = ptbxl_indice() if info is None else info
+        self.lote = lote
+
+    def __len__(self):
+        return int(np.ceil(len(self.info) / self.lote))
+
+    def __getitem__(self, i):
+        caminhos = self.info["filename_hr"].iloc[i * self.lote:(i + 1) * self.lote]
+        return np.stack([preprocessar_ptbxl(wfdb.rdrecord(str(PTBXL / c)).p_signal) for c in caminhos])

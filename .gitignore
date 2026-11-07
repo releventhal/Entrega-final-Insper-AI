@@ -12,3 +12,6 @@ code15/
 
 # CODE-TEST (gabarito, baixado do Zenodo)
 code_test/
+
+# PTB-XL (teste externo, baixado do PhysioNet)
+ptbxl/
