@@ -23,10 +23,11 @@ A IA pode rodar estes comandos ela mesma (pedindo permissão), ou passar para a 
 3. Seção 7 (como trabalhar) e seção 8 (regras de ouro) **antes de mexer em qualquer arquivo**.
 4. O notebook `projeto_ecg.ipynb`, que já tem as seções 1-5 rodadas e comentadas.
 
-### Estado em 06/11/2026 (fim do dia)
+### Estado em 07/11/2026 (parte do fim do dia 06/11, mais a atualização de 07/11 abaixo)
 - **Projeto atual:** CODE-15% (ECG de 12 derivações, 233 mil pacientes brasileiros). Escolhido em 06/11 por Renata e Tom.
 - **Pronto e rodado** em `projeto_ecg.ipynb` (só com a parte 0 dos sinais): configuração, download, exploração da tabela inteira, leitura dos sinais, split por paciente.
-- **Ainda não feito:** nenhum modelo da Parte A ou B; testes externos; slides.
+- **Rodado fora do notebook (07/11, Tom):** baselines A0 (`a0_baselines.py` → `resultados/experimentos.csv`), índice dos exames, lista de exames zerados e gerador em lotes (`ecg_dados.py`); ver seção 6, "Código fora do notebook". Ainda não estão na seção 6 do notebook.
+- **Ainda não feito:** nenhuma CNN (A1 em diante) nem modelo da Parte B; testes externos; slides. Sem decisão da dupla sobre os 411 exames zerados (T1): nada foi descartado.
 - **Dados:** baixados **só no computador da Renata** (pasta `code15/`, fora do git) (ver atualização de 07/11: o Tom também tem as partes 0 a 3). Quem clonar o repositório precisa baixar os seus (o notebook faz isso sozinho; ver seção 6).
 - **Fase 1 (MIT-BIH, arritmia por batimento):** pausada e arquivada. Notebook `projeto_arritmia.ipynb` e plano antigo `arquivo/CLAUDE_fase1_arritmia.md`. **Não apagar.** Os resultados dela são a motivação da apresentação (seção 3.1).
 
@@ -35,6 +36,7 @@ A IA pode rodar estes comandos ela mesma (pedindo permissão), ou passar para a 
 - **Computador do Tom:** ambiente montado (Python 3.12.10, `.venv`, clone em caminho curto fora do OneDrive), `exams.csv` e **partes 0 a 3** baixados e conferidos (tamanho e md5 dos zips contra o Zenodo; HDF5 com formato N × 4.096 × 12), CODE-TEST baixado e aberto. Hardware na seção 6. Treino: nada treinado ainda.
 - **Ordem das derivações, medida:** CODE-15% = DI, DII, DIII, AVR, AVL, AVF; CODE-TEST = DI, DII, DIII, **AVL, AVF, AVR** (precisa reordenar). PTB-XL: **não verificado** (seção 4).
 - **Pendências novas:** T8 (escala dos sinais entre as bases) e T9 (RAM: 4 partes em float32 ≈ 15,7 GB não cabem na memória do Computador do Tom).
+- **T3 e T9 avançaram (07/11):** A0 rodado (macro na validação: AUROC 0,705, AUPRC 0,046, F1 0,095 para idade + sexo). Decidido pelo Tom: gerador em lotes lendo o HDF5 em float32, sem float16; leitura de ~62 ms por lote de 64 (~1 min por época só de leitura); tempo de treino real **não medido**. Detalhes nas tarefas T3 e T9 e na seção 6.
 
 ### Próximas tarefas (atualizar o status ao começar e ao terminar cada uma)
 | # | Tarefa | Depende de | Status | Quem |
@@ -182,7 +184,7 @@ Usar ECGs de 12 derivações de **233.770 pacientes brasileiros** (CODE-15%, Red
 ### 5.3 Parte A: 6 alterações (multi-rótulo)
 - **Saída:** 6 neurônios **sigmoid** (um "sim/não" por alteração), perda `binary_crossentropy`. Não é softmax, porque um exame pode ter várias alterações.
 - **A0:** (a) "sempre negativo" (mostra que acurácia engana) e (b) regressão logística só com idade + sexo (mostra quanto a idade sozinha já explica). A CNN precisa ganhar do A0b.
-- **A1:** CNN 1D base, a mesma do teste de viabilidade: entrada 4.096 × 12 → 4 × [Conv1D (32, 64, 128, 128 filtros; kernel 15; `padding="same"`; ReLU) + MaxPool 4 nas três primeiras] → GlobalAveragePooling → Dense 6 sigmoid. ~406 mil parâmetros. Adam, batch 64. Usar early stopping na perda de validação (como na fase 1).
+- **A1:** CNN 1D base, a mesma do teste de viabilidade: entrada 4.096 × 12 → 4 × [Conv1D (32, 64, 128, 128 filtros; kernel 15; `padding="same"`; ReLU) + MaxPool 4 nas três primeiras] → GlobalAveragePooling → Dense 6 sigmoid. ~406 mil parâmetros. Adam, batch 64. Usar early stopping na perda de validação (como na fase 1). Os dados entram pelo `GeradorECG` de `ecg_dados.py` (lotes de 64 lidos do HDF5 em float32; treino embaralhado com seed 42; validação em ordem fixa), não por um array carregado inteiro na RAM.
 - **A2+:** uma mudança por vez (ex.: peso por classe, mais partes, normalização, arquitetura maior), sempre na tabela de experimentos.
 - **Limiar:** a sigmoid dá uma nota de 0 a 1. Para virar "sim/não", escolher um limiar **por rótulo na validação** (proposta: o que maximiza o F1).
 - **Testes externos:** o modelo escolhido na validação é aplicado, **sem retreinar e com os mesmos limiares**, no teste interno, no PTB-XL e no CODE-TEST. **PTB-XL é o teste externo principal e o CODE-TEST o secundário** (decisão de 07/11, com a limitação descrita na seção 4).
