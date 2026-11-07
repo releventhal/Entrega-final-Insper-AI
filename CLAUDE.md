@@ -27,7 +27,7 @@ A IA pode rodar estes comandos ela mesma (pedindo permissão), ou passar para a 
 - **Projeto atual:** CODE-15% (ECG de 12 derivações, 233 mil pacientes brasileiros). Escolhido em 06/11 por Renata e Tom.
 - **Pronto e rodado** em `projeto_ecg.ipynb` (só com a parte 0 dos sinais): configuração, download, exploração da tabela inteira, leitura dos sinais, split por paciente.
 - **Ainda não feito:** nenhum modelo da Parte A ou B; testes externos; slides.
-- **Dados:** baixados **só no computador da Renata** (pasta `code15/`, fora do git). Quem clonar o repositório precisa baixar os seus (o notebook faz isso sozinho; ver seção 6).
+- **Dados:** baixados **só no computador da Renata** (pasta `code15/`, fora do git) (ver atualização de 07/11: o Tom também tem as partes 0 a 3). Quem clonar o repositório precisa baixar os seus (o notebook faz isso sozinho; ver seção 6).
 - **Fase 1 (MIT-BIH, arritmia por batimento):** pausada e arquivada. Notebook `projeto_arritmia.ipynb` e plano antigo `arquivo/CLAUDE_fase1_arritmia.md`. **Não apagar.** Os resultados dela são a motivação da apresentação (seção 3.1).
 
 ### Atualização de 07/11 (Tom e Claude do Tom)
@@ -116,7 +116,7 @@ Usar ECGs de 12 derivações de **233.770 pacientes brasileiros** (CODE-15%, Red
 - **Regra do horizonte:** para "morreu em até X anos", só entra quem morreu dentro do prazo ou foi acompanhado o prazo inteiro. Alguém vivo e acompanhado por só 1 ano não diz nada sobre 3 anos.
 - **`nn_predicted_age` como baseline B1:** é (provavelmente) a saída do modelo de Lima et al., treinado nos outros 85% da CODE. Na CODE-15% essas previsões são "fora da amostra", então servem como comparação justa com o "estado da arte".
 - **CODE-TEST como gabarito:** os rótulos da CODE-15% vêm da rotina de laudos (origem exata **não verificada**) e podem ter erros. O CODE-TEST foi revisado por vários médicos.
-- **float16 para os sinais:** metade da memória; perda de precisão irrelevante para ECG.
+- **float16 para os sinais:** metade da memória; perda de precisão irrelevante para ECG; mesmo em float16, 4 partes ≈ 7,9 GB; ver T9.
 - **CNN pequena primeiro:** roda no computador da Renata. Modelos maiores (ResNet como nos artigos) ficam como extensão, com GPU.
 
 ---
@@ -164,7 +164,7 @@ Usar ECGs de 12 derivações de **233.770 pacientes brasileiros** (CODE-15%, Red
 | Data | O quê |
 |---|---|
 | 06/11 | ✅ Plano novo, notebook novo, dados + exploração, split por paciente |
-| 07/11 | T1 (decisões), T2 (mais partes), T3 (baselines A0) |
+| 07/11 | T2 (mais partes) **feito no computador do Tom (partes 0 a 3)**; T1 (decisões) e T3 (baselines A0) seguem pendentes |
 | 08/11 | T4: CNN A1, métricas por rótulo, limiar escolhido na validação |
 | 09/11 | T5: PTB-XL e CODE-TEST |
 | 10/11 | Análise de erros + T6 (slides, com a fase 1 como motivação) |
