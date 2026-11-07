@@ -9,3 +9,6 @@ __pycache__/
 
 # Dados da CODE-15% (baixados do Zenodo)
 code15/
+
+# CODE-TEST (gabarito, baixado do Zenodo)
+code_test/
