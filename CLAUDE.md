@@ -41,13 +41,13 @@ A IA pode rodar estes comandos ela mesma (pedindo permissão), ou passar para a 
 |---|---|---|---|---|
 | T1 | Decidir as questões em aberto da seção 5.6 | — | **Pendente (dupla)** | Tom + Renata |
 | T2 | Baixar mais partes dos sinais (proposta: 1-3) | T1 (quantas partes) | **Tom: feito em 07/11 (partes 1-3, md5 e HDF5 conferidos).** Renata: pendente | cada um no seu computador |
-| T3 | Seção 6 do notebook: baselines A0 (sempre negativo; idade + sexo) | — | Pendente | a definir |
+| T3 | Seção 6 do notebook: baselines A0 (sempre negativo; idade + sexo) | — | **A0 rodado em 07/11 fora do notebook** (`a0_baselines.py` → `resultados/experimentos.csv`; macro na validação: AUROC 0,705, AUPRC 0,046, F1 0,095). Falta passar para a seção 6 do notebook | a definir |
 | T4 | Seção 6: CNN A1, função de métricas multi-rótulo, limiar na validação | T1 (pré-processamento) | Pendente | a definir |
 | T5 | Seção 7: carregar PTB-XL (**principal**; reamostrar, mapear rótulos) e CODE-TEST (**secundário**; reordenar AVL/AVF/AVR, seção 4); testar o modelo escolhido | T4, T8 | Pendente | a definir |
 | T6 | Slides da intermediária (11/11), com a fase 1 como motivação | T4 (T5 se der) | Pendente | a definir |
 | T7 | Parte B (seção 8 do notebook): B0-B3 | T4 | Pendente (após 11/11) | a definir |
 | T8 | Comparar a escala (amplitude) dos sinais da CODE-15%, do CODE-TEST e do PTB-XL antes de qualquer teste externo (seção 4) | — | **Pendente (novo, 07/11)** | a definir |
-| T9 | Definir como alimentar a CNN sem carregar tudo na RAM (ex.: gerador lendo o HDF5 em lotes) | T1, T4 | **Pendente (novo, 07/11)** | a definir |
+| T9 | Definir como alimentar a CNN sem carregar tudo na RAM (ex.: gerador lendo o HDF5 em lotes) | T1, T4 | **Decidido (Tom, 07/11): gerador em lotes lendo o HDF5 em float32, sem converter para float16.** Pronto em `ecg_dados.py` (índice, lista de zerados, gerador); falta usá-lo no treino (T4). Leitura medida: ~62 ms por lote de 64 (~1 min por época só de leitura); tempo de treino real não medido | a definir |
 
 ---
 
@@ -129,7 +129,7 @@ Usar ECGs de 12 derivações de **233.770 pacientes brasileiros** (CODE-15%, Red
 - **Rótulos** (exames positivos): 1dAVb 5.716 · RBBB 9.672 · LBBB 6.026 · SB 5.605 · ST 7.584 · AF 7.033 · `normal_ecg` 134.657 (38,9%). **Multi-rótulo:** 89% dos exames não têm nenhuma das 6; ~1% tem duas ou mais.
 - **HDF5:** `tracings` (N × 4.096 × 12, float32, 400 Hz, valores em mV aparentemente) e `exam_id`. Derivações nesta ordem: **DI, DII, DIII, AVR, AVL, AVF, V1, V2, V3, V4, V5, V6**. **Medido** em 07/11 (Computador do Tom): em 2.997 exames sorteados da parte 0 (seed 42), as colunas 3, 4 e 5 têm correlação 1,000 com aVR = −(DI+DII)/2, aVL = (DI−DIII)/2 e aVF = (DII+DIII)/2, nessa ordem (2.997 de 2.997 exames; erro mediano 0,001-0,002). Em 361-538 exames há alguma amostra isolada com erro > 0,05 (até 18,7); causa **não investigada**.
   - Durações: 7,3 s (2.934 amostras; 58% dos exames da parte 0), 10,2 s (4.096; 38%) e 9,7 s (raros). **Os exames curtos são centralizados, com zeros dos dois lados** (581 amostras no começo e 581 no fim).
-  - Cada parte tem 1 linha extra com `exam_id` = 0 (preenchimento). Na parte 0, 38 de 20.000 exames são todos zero e 61 têm alguma derivação zerada (estes 61 ainda **não** são descartados; decidir).
+  - Cada parte tem 1 linha extra com `exam_id` = 0 (preenchimento). Na parte 0, 38 de 20.000 exames são todos zero e 61 têm alguma derivação zerada (estes 61 ainda **não** são descartados; decidir). **Medido em 07/11 nas partes 0 a 3** (passada única de 44 s; lista em `code15/exames_zerados_p0-3.npy`, fora do git): 411 exames com alguma derivação zerada, sendo 172 com as 12 derivações zeradas e 239 parciais (196 com 1 derivação, 15 com 2, 4 com 3, 18 com 5, 5 com 6, 1 com 9). Por parte: 99, 108, 124, 80. Por grupo: treino 294, validação 43, teste 74. **Listados e NÃO descartados** (decisão T1 da dupla). Causa das derivações zeradas parciais: **não investigada**.
   - **Memória (cálculo, 07/11):** a parte 0 tem 20.001 × 4.096 × 12 valores = ~3,93 GB em float32 (arquivo `.hdf5` de 3.932.518.664 bytes) e ~2 GB em float16 (medido no notebook). 4 partes = ~15,7 GB em float32 e ~7,9 GB em float16 (cálculo, não medido). Os 15,7 GB em float32 **não cabem na RAM do Computador do Tom** (15,7 GB no total); ver T9.
 - **As partes NÃO são separadas por paciente.** 29% dos pacientes têm mais de um exame (até 38) e somam 52% dos exames; metade dos pacientes da parte 0 aparece em outras partes. **O split é feito por `patient_id`.**
 - **Óbito:** `death` e `timey` (anos de acompanhamento a partir do exame) só estão preenchidos em **um exame por paciente** (233.647), que é o **primeiro exame** (em 99,3% dos casos, o de menor idade). 8.341 óbitos (3,6%). `timey`: mediana 3,5 anos (p5 1,0; p95 6,9).
@@ -164,7 +164,7 @@ Usar ECGs de 12 derivações de **233.770 pacientes brasileiros** (CODE-15%, Red
 | Data | O quê |
 |---|---|
 | 06/11 | ✅ Plano novo, notebook novo, dados + exploração, split por paciente |
-| 07/11 | T2 (mais partes) **feito no computador do Tom (partes 0 a 3)**; T1 (decisões) e T3 (baselines A0) seguem pendentes |
+| 07/11 | T2 (mais partes) **feito no computador do Tom (partes 0 a 3)**; T1 (decisões) segue pendente; **T3 (baselines A0) rodado fora do notebook** (`a0_baselines.py`); T9 (gerador em lotes) pronto em `ecg_dados.py` |
 | 08/11 | T4: CNN A1, métricas por rótulo, limiar escolhido na validação |
 | 09/11 | T5: PTB-XL e CODE-TEST |
 | 10/11 | Análise de erros + T6 (slides, com a fase 1 como motivação) |
@@ -206,13 +206,13 @@ Usar ECGs de 12 derivações de **233.770 pacientes brasileiros** (CODE-15%, Red
 | Quantas partes usar | Desenvolver com a parte 0; resultados com 3-4 partes (~60-80 mil exames) | Cabe na RAM (16 GB) e em ~4 min por época. (Tom, 07/11: **como array inteiro em float32 não cabe** no Computador do Tom: 4 partes ≈ 15,7 GB, e em float16 ≈ 7,9 GB; ver T9) |
 | Proporção do split | 70/10/20 | Teste grande o bastante para alterações raras |
 | Normalização do sinal | Nenhuma no A1 (os valores já estão em mV, numa faixa razoável); testar depois como A2 | Uma coisa por vez |
-| Exames com alguma derivação zerada (61 na parte 0) | Descartar | Poucos, e podem confundir o modelo |
+| Exames com alguma derivação zerada (411 nas partes 0 a 3: 172 todo zero e 239 parciais; na parte 0 são 99: 38 todo zero + 61 parciais) | Descartar | Poucos (0,5% dos 80.000 exames), e podem confundir o modelo. **Ainda não decidido: nada foi descartado** (T1) |
 | Limiar por rótulo | Maximizar o F1 na validação | Simples de explicar |
 | Horizonte da Parte B | 2 anos (4.716 óbitos, 2,5%) | Equilíbrio entre número de óbitos e pacientes elegíveis |
 | `AFLT`, `IRBBB`, `ILBBB` no PTB-XL | Ficam fora da avaliação (nem positivo nem negativo) | Não existem como classe na CODE |
 | Extensões (fora das aulas) | Saliency/Grad-CAM, peso por classe/focal loss, ResNet 1D maior (GPU), análise de sobrevivência (Cox) | Depois do núcleo |
 | Escala dos sinais entre CODE-15%, CODE-TEST e PTB-XL (T8) | Proposta do Claude do Tom: medir as amplitudes antes de qualquer teste externo | Desvio padrão por derivação difere (1,06-1,78 na CODE-15% vs 0,71-1,24 no CODE-TEST); causa **não verificada** |
-| Como alimentar a CNN sem carregar tudo na RAM (T9) | Proposta do Claude do Tom: gerador lendo o HDF5 em lotes, a decidir com a dupla | 4 partes em float32 ≈ 15,7 GB; em float16 ≈ 7,9 GB (cálculo) |
+| Como alimentar a CNN sem carregar tudo na RAM (T9) | **Decidido (Tom, 07/11):** gerador em lotes lendo o HDF5 em float32, sem converter para float16 (`ecg_dados.py`) | 4 partes em float32 ≈ 15,7 GB; em float16 ≈ 7,9 GB (cálculo). Leitura medida: ~62 ms por lote de 64, pico de RAM ~0,5 GB |
 
 ---
 
@@ -230,9 +230,15 @@ Usar ECGs de 12 derivações de **233.770 pacientes brasileiros** (CODE-15%, Red
 ### Recursos
 - **Computador da Renata:** Windows, i5-1235U, 16 GB de RAM, sem GPU utilizável (a Intel Iris Xe integrada não serve para o TensorFlow, e o TensorFlow ≥ 2.11 nem usa GPU no Windows nativo). Uma CNN de ~406 mil parâmetros leva ~0,2 s por batch de 64 (~1 min por época com 16 mil exames). Cada parte ocupa ~2 GB de RAM em float16.
 - **Colab/Kaggle (GPU):** opção para modelos maiores. `teste_viabilidade_code15_colab.ipynb` (descartável) mede download e treino com GPU; **ainda não rodado no Colab**. No Colab, os dados somem quando a sessão fecha (precisa baixar de novo ou usar o Google Drive).
-- **Computador do Tom** (medido em 07/11): Windows 11 Home, Intel Core i7-12700H (14 núcleos, 20 threads), **15,7 GB de RAM** (3,8 GB livres na hora da medida), placas de vídeo Intel UHD Graphics e **NVIDIA GeForce RTX 3060 Laptop**, disco C: de 953 GB com ~253 GB livres antes dos downloads. Python 3.12.10 (instalado com o winget). Pela limitação já registrada acima (TensorFlow ≥ 2.11 não usa GPU no Windows nativo), a RTX 3060 não deve ser usada; **não testado aqui**, e usar a GPU via WSL2 é **não verificado**. Tempo de treino neste computador: **não medido**. A RAM é o limite principal: ver T9.
+- **Computador do Tom** (medido em 07/11): Windows 11 Home, Intel Core i7-12700H (14 núcleos, 20 threads), **15,7 GB de RAM** (3,8 GB livres na hora da medida), placas de vídeo Intel UHD Graphics e **NVIDIA GeForce RTX 3060 Laptop**, disco C: de 953 GB com ~253 GB livres antes dos downloads. Python 3.12.10 (instalado com o winget). Pela limitação já registrada acima (TensorFlow ≥ 2.11 não usa GPU no Windows nativo), a RTX 3060 não deve ser usada; **não testado aqui**, e usar a GPU via WSL2 é **não verificado**. Tempo de treino neste computador: **não medido**. A RAM é o limite principal: ver T9. **Leitura pelo gerador (medido em 07/11, 5 lotes de treino):** ~62 ms por lote de 64 exames, ou seja ~1 min por época de 55.679 exames só de leitura; pico de RAM ~0,5 GB. A estimativa preliminar de 9 a 27 s por época (leitura de 1.000 exames aleatórios) era **otimista**. O cache do disco pode ter ajudado (leitura com cache frio: **não verificado**), e o **tempo de treino real não foi medido**.
 
 ---
+
+### Código fora do notebook (07/11)
+- **`ecg_dados.py`:** `tabela_com_grupo()` (mesmo split do notebook), `construir_indice()` (cada exame → parte e linha no HDF5; lê só `exam_id`), `listar_zerados()` (só lista) e `GeradorECG` (`keras.utils.Sequence`, lote de 64, float32; treino embaralhado com seed 42 + época, validação/teste em ordem fixa, previsões alinham com `g.info` e `g.Y`).
+- **`a0_baselines.py`:** baselines A0 (treino → validação; o teste não é aberto). Escreve `resultados/experimentos.csv`, que é a tabela de experimentos gerada pelo código.
+- **Como rodar** (na raiz do repositório): `.venv\Scripts\python a0_baselines.py`. **Sem a opção `-I`** do Python, porque ela tira a pasta do script do caminho de imports e o `import ecg_dados` falha.
+- O `.npy` de exames zerados fica em `code15/` (fora do git) e se refaz com `listar_zerados()` (~44 s para as partes 0 a 3).
 
 ## 7. Como trabalhar (processo que as IAs seguem)
 
@@ -298,6 +304,10 @@ Usar ECGs de 12 derivações de **233.770 pacientes brasileiros** (CODE-15%, Red
 | Treino no Colab (GPU) | **Não testado** |
 | Python da Renata | Anaconda em `C:\Users\rehle\anaconda3` (fora do PATH, **não usar para o projeto**). O projeto usa o `.venv/` (versões no `requirements.txt`) |
 | Python do Tom | 3.12.10 (winget), `.venv` criado com o comando do `requirements.txt` (07/11). O 3.11.9 que veio no Windows **falha** com o `requirements.txt` |
+| CODE-15%: exames com derivação zerada nas partes 0 a 3 | **Medido** (07/11): 411 (172 todo zero, 239 parciais); causa dos parciais **não investigada** |
+| Baselines A0 (validação, partes 0 a 3) | **Rodado** (07/11): macro AUROC 0,705, AUPRC 0,046, F1 0,095 (A0b); A0a AUROC 0,500, F1 0, acurácia 0,980 |
+| Gerador: sinal, rótulo e `exam_id` alinhados; pacientes em dois grupos | **Conferido** (07/11) em 640 exames contra leitura independente; 0 pacientes em mais de um grupo (índice e tabela inteira) |
+| Gerador: tempo de treino real com ele | **Não medido** (só a leitura: ~62 ms por lote) |
 
 ### Armadilhas já encontradas (não repetir)
 - **`pip install` no Python errado:** quebrou o Anaconda base da Renata. Usar só o `.venv`.
@@ -333,6 +343,7 @@ Usar ECGs de 12 derivações de **233.770 pacientes brasileiros** (CODE-15%, Red
 - 2026-11-07 (Claude do Tom): **ordem das derivações da CODE-15% medida** (Einthoven, 2.997 exames da parte 0): DI, DII, DIII, AVR, AVL, AVF. Confirma o registro anterior. No CODE-TEST a ordem é DI, DII, DIII, AVL, AVF, AVR.
 - 2026-11-07 (Claude do Tom): **pendências novas:** T8 (escala dos sinais entre as bases) e T9 (RAM: 4 partes em float32 ≈ 15,7 GB não cabem como array inteiro no Computador do Tom; alimentar a CNN em lotes lendo do HDF5).
 - 2026-11-07 (Claude do Tom): o Tom pediu, uma única vez, que a IA fizesse o commit e o push do `.gitignore` (commit `fc24f3d`). A regra "a IA nunca faz commit nem push" continua valendo.
+- 2026-11-07 (Claude do Tom): **T3 e T9 (parte técnica):** criados `ecg_dados.py`, `a0_baselines.py` e `resultados/experimentos.csv`. A0 rodado (treino → validação, partes 0 a 3, 55.679 e 8.180 exames; teste não aberto): macro A0b AUROC 0,705, AUPRC 0,046, F1 0,095; A0a AUROC 0,500, acurácia 0,980. Lista de exames zerados nas partes 0 a 3: 411, **só listados, nenhum descartado** (T1). Gerador em lotes testado: X (64, 4096, 12) float32, ~62 ms por lote, pico ~0,5 GB; 640 exames conferidos; 0 pacientes em mais de um grupo. Decisão do Tom: gerador lendo o HDF5 em float32, sem float16. Tempo de treino real: não medido.
 
 ## 11. Divisão de tarefas
 
