@@ -8,9 +8,9 @@
 
 ### Primeira vez neste computador? Faça isto ANTES de qualquer tarefa
 A IA pode rodar estes comandos ela mesma (pedindo permissão), ou passar para a pessoa rodar. Conferir cada item; se já estiver feito, pular.
-1. **Código atualizado:** `git pull` (ou `git clone` se o repositório ainda não existir aqui).
-2. **Ambiente:** se não existir a pasta `.venv/` na raiz, criar com Python 3.12 (`python -m venv .venv`) e instalar `requirements.txt` **com o Python do `.venv`** (Windows: `.venv\Scripts\python -m pip install -r requirements.txt`; Mac/Linux: `.venv/bin/python -m pip install -r requirements.txt`). **Nunca** instalar no Python global ou no Anaconda base (regra 11). Outras versões de Python: não testadas.
-3. **Dados:** a pasta `code15/` **não vem pelo git**. Rodar o `projeto_ecg.ipynb` com o kernel `.venv`: a seção 2 baixa sozinha o `exams.csv` e a parte 0 (~2,7 GB, ~20 min, ~7 GB livres durante o download).
+1. **Código atualizado:** `git pull` (ou `git clone` se o repositório ainda não existir aqui). **Clonar em um caminho curto e fora de pastas sincronizadas (OneDrive etc.)**: os dados passam de 46 GB e o sincronizador pode tentar enviá-los para a nuvem (se há problema de caminho longo: **não verificado**).
+2. **Ambiente:** se não existir a pasta `.venv/` na raiz, criar com Python 3.12 (`python -m venv .venv`) e instalar `requirements.txt` **com o Python do `.venv`** (Windows: `.venv\Scripts\python -m pip install -r requirements.txt`; Mac/Linux: `.venv/bin/python -m pip install -r requirements.txt`). **Nunca** instalar no Python global ou no Anaconda base (regra 11). Outras versões de Python: não testadas. **O Python 3.11 falha** (`numpy==2.5.4` exige 3.12 ou mais; erro visto em 07/11). No Windows o launcher `py` pode não existir; uma forma de instalar o 3.12 é `winget install Python.Python.3.12`. Depois de instalar, criar o `.venv` com o caminho completo do `python.exe` 3.12, porque o `python` do PATH pode continuar sendo o 3.11 até abrir um terminal novo.
+3. **Dados:** a pasta `code15/` **não vem pelo git**. Rodar o `projeto_ecg.ipynb` com o kernel `.venv`: a seção 2 baixa sozinha o `exams.csv` e a parte 0 (~2,7 GB, ~20 min no computador da Renata e ~6 min no do Tom, ~7 GB livres durante o download).
 4. **Conferir:** depois de rodar, as saídas das seções 3-5 devem bater com as que já estão salvas no notebook (ex.: "exames: 345,779 | pacientes: 233,770" e "pacientes em mais de um grupo: 0").
 5. **Registrar** no log (seção 10) que o ambiente foi montado nesse computador e, na seção 6, as características dele (sistema, RAM, GPU).
 
@@ -30,16 +30,24 @@ A IA pode rodar estes comandos ela mesma (pedindo permissão), ou passar para a 
 - **Dados:** baixados **só no computador da Renata** (pasta `code15/`, fora do git). Quem clonar o repositório precisa baixar os seus (o notebook faz isso sozinho; ver seção 6).
 - **Fase 1 (MIT-BIH, arritmia por batimento):** pausada e arquivada. Notebook `projeto_arritmia.ipynb` e plano antigo `arquivo/CLAUDE_fase1_arritmia.md`. **Não apagar.** Os resultados dela são a motivação da apresentação (seção 3.1).
 
+### Atualização de 07/11 (Tom e Claude do Tom)
+- **Decisão (Tom e Renata):** o **PTB-XL é o teste externo PRINCIPAL** e o **CODE-TEST é o SECUNDÁRIO**. Limitação declarada: o CODE-TEST não tem `patient_id` nem `exam_id`, então não dá para verificar se há sobreposição com a CODE-15% (**não verificado**; seção 4).
+- **Computador do Tom:** ambiente montado (Python 3.12.10, `.venv`, clone em caminho curto fora do OneDrive), `exams.csv` e **partes 0 a 3** baixados e conferidos (tamanho e md5 dos zips contra o Zenodo; HDF5 com formato N × 4.096 × 12), CODE-TEST baixado e aberto. Hardware na seção 6. Treino: nada treinado ainda.
+- **Ordem das derivações, medida:** CODE-15% = DI, DII, DIII, AVR, AVL, AVF; CODE-TEST = DI, DII, DIII, **AVL, AVF, AVR** (precisa reordenar). PTB-XL: **não verificado** (seção 4).
+- **Pendências novas:** T8 (escala dos sinais entre as bases) e T9 (RAM: 4 partes em float32 ≈ 15,7 GB não cabem na memória do Computador do Tom).
+
 ### Próximas tarefas (atualizar o status ao começar e ao terminar cada uma)
 | # | Tarefa | Depende de | Status | Quem |
 |---|---|---|---|---|
 | T1 | Decidir as questões em aberto da seção 5.6 | — | **Pendente (dupla)** | Tom + Renata |
-| T2 | Baixar mais partes dos sinais (proposta: 1-3) | T1 (quantas partes) | Pendente | cada um no seu computador |
+| T2 | Baixar mais partes dos sinais (proposta: 1-3) | T1 (quantas partes) | **Tom: feito em 07/11 (partes 1-3, md5 e HDF5 conferidos).** Renata: pendente | cada um no seu computador |
 | T3 | Seção 6 do notebook: baselines A0 (sempre negativo; idade + sexo) | — | Pendente | a definir |
 | T4 | Seção 6: CNN A1, função de métricas multi-rótulo, limiar na validação | T1 (pré-processamento) | Pendente | a definir |
-| T5 | Seção 7: carregar PTB-XL (reamostrar, mapear rótulos) e CODE-TEST; testar o modelo escolhido | T4 | Pendente | a definir |
+| T5 | Seção 7: carregar PTB-XL (**principal**; reamostrar, mapear rótulos) e CODE-TEST (**secundário**; reordenar AVL/AVF/AVR, seção 4); testar o modelo escolhido | T4, T8 | Pendente | a definir |
 | T6 | Slides da intermediária (11/11), com a fase 1 como motivação | T4 (T5 se der) | Pendente | a definir |
 | T7 | Parte B (seção 8 do notebook): B0-B3 | T4 | Pendente (após 11/11) | a definir |
+| T8 | Comparar a escala (amplitude) dos sinais da CODE-15%, do CODE-TEST e do PTB-XL antes de qualquer teste externo (seção 4) | — | **Pendente (novo, 07/11)** | a definir |
+| T9 | Definir como alimentar a CNN sem carregar tudo na RAM (ex.: gerador lendo o HDF5 em lotes) | T1, T4 | **Pendente (novo, 07/11)** | a definir |
 
 ---
 
@@ -119,28 +127,34 @@ Usar ECGs de 12 derivações de **233.770 pacientes brasileiros** (CODE-15%, Red
 - Zenodo **10.5281/zenodo.4916206**, **CC BY 4.0**. 345.779 exames, 233.770 pacientes, 18 partes `exams_partN.zip` (N = 0-17; ~2,7 GB cada zip, ~3,9 GB cada `.hdf5`; 46,3 GB no total) + `exams.csv` (35 MB).
 - **`exams.csv`**: `exam_id, age, is_male, nn_predicted_age, 1dAVb, RBBB, LBBB, SB, ST, AF, patient_id, death, timey, normal_ecg, trace_file` (`trace_file` diz em que parte está o sinal).
 - **Rótulos** (exames positivos): 1dAVb 5.716 · RBBB 9.672 · LBBB 6.026 · SB 5.605 · ST 7.584 · AF 7.033 · `normal_ecg` 134.657 (38,9%). **Multi-rótulo:** 89% dos exames não têm nenhuma das 6; ~1% tem duas ou mais.
-- **HDF5:** `tracings` (N × 4.096 × 12, float32, 400 Hz, valores em mV aparentemente) e `exam_id`. Derivações nesta ordem: **DI, DII, DIII, AVR, AVL, AVF, V1, V2, V3, V4, V5, V6**.
+- **HDF5:** `tracings` (N × 4.096 × 12, float32, 400 Hz, valores em mV aparentemente) e `exam_id`. Derivações nesta ordem: **DI, DII, DIII, AVR, AVL, AVF, V1, V2, V3, V4, V5, V6**. **Medido** em 07/11 (Computador do Tom): em 2.997 exames sorteados da parte 0 (seed 42), as colunas 3, 4 e 5 têm correlação 1,000 com aVR = −(DI+DII)/2, aVL = (DI−DIII)/2 e aVF = (DII+DIII)/2, nessa ordem (2.997 de 2.997 exames; erro mediano 0,001-0,002). Em 361-538 exames há alguma amostra isolada com erro > 0,05 (até 18,7); causa **não investigada**.
   - Durações: 7,3 s (2.934 amostras; 58% dos exames da parte 0), 10,2 s (4.096; 38%) e 9,7 s (raros). **Os exames curtos são centralizados, com zeros dos dois lados** (581 amostras no começo e 581 no fim).
   - Cada parte tem 1 linha extra com `exam_id` = 0 (preenchimento). Na parte 0, 38 de 20.000 exames são todos zero e 61 têm alguma derivação zerada (estes 61 ainda **não** são descartados; decidir).
+  - **Memória (cálculo, 07/11):** a parte 0 tem 20.001 × 4.096 × 12 valores = ~3,93 GB em float32 (arquivo `.hdf5` de 3.932.518.664 bytes) e ~2 GB em float16 (medido no notebook). 4 partes = ~15,7 GB em float32 e ~7,9 GB em float16 (cálculo, não medido). Os 15,7 GB em float32 **não cabem na RAM do Computador do Tom** (15,7 GB no total); ver T9.
 - **As partes NÃO são separadas por paciente.** 29% dos pacientes têm mais de um exame (até 38) e somam 52% dos exames; metade dos pacientes da parte 0 aparece em outras partes. **O split é feito por `patient_id`.**
 - **Óbito:** `death` e `timey` (anos de acompanhamento a partir do exame) só estão preenchidos em **um exame por paciente** (233.647), que é o **primeiro exame** (em 99,3% dos casos, o de menor idade). 8.341 óbitos (3,6%). `timey`: mediana 3,5 anos (p5 1,0; p95 6,9).
 - **Horizontes possíveis:** 1 ano → 224.869 pacientes, 2.812 óbitos (1,3%); 2 anos → 185.106, 4.716 (2,5%); 3 anos → 143.779, 6.173 (4,3%).
 - **`nn_predicted_age`:** MAE de 8,53 anos (r = 0,83) contra a idade real, quase o número do artigo (8,38; r = 0,84). **Muito provavelmente** é a saída do modelo de Lima et al. (não documentado).
 - **Idade e sexo:** 17 a 100 anos (média 53), 40% homens. Bloqueios de ramo, bloqueio AV e FA crescem muito com a idade (FA: ~0,1% antes dos 30, ~7% aos 80+); SB e ST quase não mudam.
-- **Download:** o Zenodo limita ~0,3 MB/s por conexão. Com 16 conexões em paralelo (função `baixar` no notebook), ~2 MB/s, ~20 min por parte no computador da Renata. **Atenção:** uma versão antiga do downloader gerou um arquivo truncado silenciosamente; a versão atual confere o tamanho de cada pedaço e o total.
+- **Download:** o Zenodo limita ~0,3 MB/s por conexão. Com 16 conexões em paralelo (função `baixar` no notebook), ~2 MB/s, ~20 min por parte no computador da Renata e ~6-7 min no do Tom (partes 0 a 3, 07/11). **Atenção:** uma versão antiga do downloader gerou um arquivo truncado silenciosamente; a versão atual confere o tamanho de cada pedaço e o total.
 
 ### PTB-XL (teste externo, Alemanha)
-- PhysioNet `ptb-xl/1.0.3`. 21.799 ECGs, 18.869 pacientes, 10 folds (`strat_fold`), 500 Hz (pasta `records500`) ou 100 Hz, **10 s**, **mesmas 12 derivações na mesma ordem** (I, II, III, AVR, AVL, AVF, V1-V6), em mV.
+- PhysioNet `ptb-xl/1.0.3`. 21.799 ECGs, 18.869 pacientes, 10 folds (`strat_fold`), 500 Hz (pasta `records500`) ou 100 Hz, **10 s**, **mesmas 12 derivações na mesma ordem** (I, II, III, AVR, AVL, AVF, V1-V6, ordem registrada em 05/11), em mV. **Conflito (07/11):** a página do PhysioNet descreve as derivações como "I, II, III, AVL, AVR, AVF, V1, ..., V6". A ordem real nos arquivos é **não verificada**: conferir `sig_name` e as fórmulas de Einthoven ao carregar.
 - Metadados: `ptbxl_database.csv` (coluna `scp_codes`, um dicionário em texto; usar `ast.literal_eval`) e `scp_statements.csv`.
 - Leitura testada: `wfdb.rdrecord('00001_hr', pn_dir='ptb-xl/1.0.3/records500/00000')` → (5000, 12). **O `pn_dir` precisa incluir a subpasta**; passar o caminho inteiro no nome do registro dá erro 404.
 - **Equivalência de rótulos** (códigos SCP): 1dAVb ↔ `1AVB` (793), RBBB ↔ `CRBBB` (541), LBBB ↔ `CLBBB` (536), SB ↔ `SBRAD` (637), ST ↔ `STACH` (826), AF ↔ `AFIB` (1.514); NORM 9.514. **A decidir:** se `AFLT` (flutter) e `IRBBB`/`ILBBB` (bloqueios incompletos) contam como positivos, negativos ou ficam fora; e se usamos a confiança (`likelihood`) dos códigos.
-- **Para usar no modelo:** reamostrar de 500 para 400 Hz (ex.: `scipy.signal.resample_poly(x, 4, 5)` → 4.000 amostras) e **centralizar com zeros** até 4.096 (48 de cada lado), igual à CODE. Escala: as duas bases parecem estar em mV, mas **conferir as amplitudes** antes de testar.
-- Tamanho total do `records500`: **não verificado**. Licença: **não verificada** (conferir na página do PhysioNet).
+- **Para usar no modelo:** reamostrar de 500 para 400 Hz (ex.: `scipy.signal.resample_poly(x, 4, 5)` → 4.000 amostras) e **centralizar com zeros** até 4.096 (48 de cada lado), igual à CODE. Escala: as duas bases parecem estar em mV, mas **conferir as amplitudes** antes de testar. A documentação do PTB-XL diz 1 µV por LSB. Medido em 07/11: o desvio padrão por derivação é de 1,06 a 1,78 na CODE-15% (3.000 exames da parte 0) e de 0,71 a 1,24 no CODE-TEST; se isso é diferença de escala ou de população: **não verificado** (T8). O PTB-XL ainda não foi baixado, então a escala dele não foi medida.
+- **Licença e tamanho (página do PhysioNet, 07/11):** Creative Commons Attribution 4.0 (CC BY 4.0). 3,0 GB descompactado (zip de 1,7 GB), somando `records100` e `records500`. Tamanho só do `records500`: **não verificado**.
+- **Outros pontos da documentação (07/11):** `patient_id` existe e a coluna `strat_fold` já respeita pacientes (todos os registros de um paciente caem no mesmo fold); os autores sugerem folds 1-8 treino, 9 validação e 10 teste, e os folds 9 e 10 passaram por avaliação humana (rótulos de melhor qualidade). Idades acima de 89 aparecem como ~300 (HIPAA). As versões 1.0.2 e 1.0.3 removeram registros duplicados.
 
 ### CODE-TEST (gabarito)
 - Zenodo **10.5281/zenodo.3765780**, **CC BY 4.0**, aberto, 218 MB (`data.zip`). 827 ECGs de pacientes diferentes, anotados por vários cardiologistas, residentes e estudantes, nas mesmas 6 classes. Companion code: github.com/antonior92/automatic-ecg-diagnosis.
-- **Conteúdo do zip ainda não aberto** (formato, ordem das derivações e frequência a conferir).
-- **Risco não verificado:** os pacientes do CODE-TEST podem estar também na CODE-15%. Se estiverem no nosso treino, o teste fica "contaminado". Verificar se dá para cruzar ids; se não der, citar como limitação.
+- **Papel (decisão de 07/11): teste SECUNDÁRIO** (o principal é o PTB-XL).
+- **Conteúdo do zip (aberto em 07/11 no Computador do Tom; tamanho de 218.189.452 bytes e md5 conferidos com o Zenodo):** `data/ecg_tracings.hdf5` (dataset `tracings`, 827 × 4.096 × 12, **float64**, 400 Hz); `data/attributes.csv` (só `age` e `sex`); `data/annotations/` com 7 CSVs de 6 colunas de rótulo `1dAVb, RBBB, LBBB, SB, AF, ST` (`gold_standard`, `cardiologist1`, `cardiologist2`, `cardiology_residents`, `emergency_residents`, `medical_students` e `dnn`, a previsão da rede de Ribeiro et al.); e o `README.md`. A linha *i* de cada CSV corresponde ao sinal *i*.
+- **Ordem das derivações do CODE-TEST (medida): DI, DII, DIII, AVL, AVF, AVR, V1-V6**, como diz o README (correlação de 0,99 das colunas 3, 4 e 5 com aVL, aVF e aVR por Einthoven). É **diferente** da CODE-15% (AVR, AVL, AVF). Antes de testar, reordenar as colunas com o índice `[0,1,2,5,3,4,6,7,8,9,10,11]`.
+- **Gabarito (`gold_standard`), exames positivos:** 1dAVb 28, RBBB 34, LBBB 30, SB 16, AF 13, ST 37; 681 exames sem nenhuma alteração e 12 com mais de uma. **AF tem só 13 positivos**, então as métricas de AF serão muito incertas. Idade de 17 a 97 (média 54,9); 321 homens e 506 mulheres.
+- **Sinais:** 538 exames com 2.934 amostras com sinal (7,3 s), 253 com 4.096, 35 com 4.000 e 1 com 3.134, com zeros dos dois lados (o README fala em 2.800 amostras, mas o dado mede 2.934). 14 exames têm alguma derivação zerada. Sem NaN/inf e sem sinais duplicados. O README diz "escala 1e-4 V"; a escala real contra a CODE-15% é **não verificada** (T8).
+- **Risco não verificado (mantido):** os pacientes do CODE-TEST podem estar também na CODE-15%. Se estiverem no nosso treino, o teste fica "contaminado". Em 07/11 se viu que o CODE-TEST **não tem identificador nenhum** (nem `patient_id` nem `exam_id`), então não dá para cruzar por id: **limitação declarada**. Comparar os sinais (hash ou correlação) só acharia o mesmo *exame*, não o mesmo *paciente*, e exigiria baixar as 18 partes (~46 GB); **não executado**.
 
 ---
 
@@ -171,7 +185,7 @@ Usar ECGs de 12 derivações de **233.770 pacientes brasileiros** (CODE-15%, Red
 - **A1:** CNN 1D base, a mesma do teste de viabilidade: entrada 4.096 × 12 → 4 × [Conv1D (32, 64, 128, 128 filtros; kernel 15; `padding="same"`; ReLU) + MaxPool 4 nas três primeiras] → GlobalAveragePooling → Dense 6 sigmoid. ~406 mil parâmetros. Adam, batch 64. Usar early stopping na perda de validação (como na fase 1).
 - **A2+:** uma mudança por vez (ex.: peso por classe, mais partes, normalização, arquitetura maior), sempre na tabela de experimentos.
 - **Limiar:** a sigmoid dá uma nota de 0 a 1. Para virar "sim/não", escolher um limiar **por rótulo na validação** (proposta: o que maximiza o F1).
-- **Testes externos:** o modelo escolhido na validação é aplicado, **sem retreinar e com os mesmos limiares**, no teste interno, no PTB-XL e no CODE-TEST.
+- **Testes externos:** o modelo escolhido na validação é aplicado, **sem retreinar e com os mesmos limiares**, no teste interno, no PTB-XL e no CODE-TEST. **PTB-XL é o teste externo principal e o CODE-TEST o secundário** (decisão de 07/11, com a limitação descrita na seção 4).
 
 ### 5.4 Parte B: óbito em até X anos (binário)
 - Só o primeiro exame de cada paciente (o que tem `death`/`timey`), aplicando a regra do horizonte (seção 3.6). Horizonte X a decidir (1, 2 ou 3 anos).
@@ -189,7 +203,7 @@ Usar ECGs de 12 derivações de **233.770 pacientes brasileiros** (CODE-15%, Red
 ### 5.6 Decisões em aberto (T1: decidir com a dupla e registrar na seção 10)
 | Decisão | Proposta do Claude da Renata | Por quê |
 |---|---|---|
-| Quantas partes usar | Desenvolver com a parte 0; resultados com 3-4 partes (~60-80 mil exames) | Cabe na RAM (16 GB) e em ~4 min por época |
+| Quantas partes usar | Desenvolver com a parte 0; resultados com 3-4 partes (~60-80 mil exames) | Cabe na RAM (16 GB) e em ~4 min por época. (Tom, 07/11: **como array inteiro em float32 não cabe** no Computador do Tom: 4 partes ≈ 15,7 GB, e em float16 ≈ 7,9 GB; ver T9) |
 | Proporção do split | 70/10/20 | Teste grande o bastante para alterações raras |
 | Normalização do sinal | Nenhuma no A1 (os valores já estão em mV, numa faixa razoável); testar depois como A2 | Uma coisa por vez |
 | Exames com alguma derivação zerada (61 na parte 0) | Descartar | Poucos, e podem confundir o modelo |
@@ -197,16 +211,18 @@ Usar ECGs de 12 derivações de **233.770 pacientes brasileiros** (CODE-15%, Red
 | Horizonte da Parte B | 2 anos (4.716 óbitos, 2,5%) | Equilíbrio entre número de óbitos e pacientes elegíveis |
 | `AFLT`, `IRBBB`, `ILBBB` no PTB-XL | Ficam fora da avaliação (nem positivo nem negativo) | Não existem como classe na CODE |
 | Extensões (fora das aulas) | Saliency/Grad-CAM, peso por classe/focal loss, ResNet 1D maior (GPU), análise de sobrevivência (Cox) | Depois do núcleo |
+| Escala dos sinais entre CODE-15%, CODE-TEST e PTB-XL (T8) | Proposta do Claude do Tom: medir as amplitudes antes de qualquer teste externo | Desvio padrão por derivação difere (1,06-1,78 na CODE-15% vs 0,71-1,24 no CODE-TEST); causa **não verificada** |
+| Como alimentar a CNN sem carregar tudo na RAM (T9) | Proposta do Claude do Tom: gerador lendo o HDF5 em lotes, a decidir com a dupla | 4 partes em float32 ≈ 15,7 GB; em float16 ≈ 7,9 GB (cálculo) |
 
 ---
 
 ## 6. Ambiente e como rodar
 
 ### Montar o ambiente (quem acabou de clonar)
-1. Python 3.12. Criar o ambiente virtual **na raiz do repositório**: `python -m venv .venv`.
+1. Python 3.12 (o 3.11 falha; ver seção 0). Criar o ambiente virtual **na raiz do repositório**: `python -m venv .venv`. Clonar o repositório em um caminho curto, fora de pastas sincronizadas.
 2. Instalar: `.venv\Scripts\python -m pip install -r requirements.txt` (Windows) ou `.venv/bin/python -m pip install -r requirements.txt` (Mac/Linux).
 3. No VS Code, abrir `projeto_ecg.ipynb` e escolher o kernel `.venv`.
-4. Rodar tudo. A seção 2 baixa sozinha o `exams.csv` e as partes listadas em `PARTES` para a pasta `code15/` (~20 min por parte; precisa de ~7 GB livres por parte durante o download, porque o zip só é apagado depois de extraído).
+4. Rodar tudo. A seção 2 baixa sozinha o `exams.csv` e as partes listadas em `PARTES` para a pasta `code15/` (~20 min por parte no computador da Renata, ~6 min no do Tom; precisa de ~7 GB livres por parte durante o download, porque o zip só é apagado depois de extraído).
 
 ### Rodar o notebook pela linha de comando (como o Claude da Renata faz)
 `.venv/Scripts/python.exe -m jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=1800 projeto_ecg.ipynb` (com a parte 0 já baixada, leva poucos minutos). As saídas ficam salvas no notebook e vão para o git, para a outra pessoa ver os resultados sem rodar.
@@ -214,7 +230,7 @@ Usar ECGs de 12 derivações de **233.770 pacientes brasileiros** (CODE-15%, Red
 ### Recursos
 - **Computador da Renata:** Windows, i5-1235U, 16 GB de RAM, sem GPU utilizável (a Intel Iris Xe integrada não serve para o TensorFlow, e o TensorFlow ≥ 2.11 nem usa GPU no Windows nativo). Uma CNN de ~406 mil parâmetros leva ~0,2 s por batch de 64 (~1 min por época com 16 mil exames). Cada parte ocupa ~2 GB de RAM em float16.
 - **Colab/Kaggle (GPU):** opção para modelos maiores. `teste_viabilidade_code15_colab.ipynb` (descartável) mede download e treino com GPU; **ainda não rodado no Colab**. No Colab, os dados somem quando a sessão fecha (precisa baixar de novo ou usar o Google Drive).
-- **Computador do Tom:** desconhecido. Se for Mac com chip Apple ou tiver GPU NVIDIA com Linux/WSL, pode ser mais rápido; registrar aqui.
+- **Computador do Tom** (medido em 07/11): Windows 11 Home, Intel Core i7-12700H (14 núcleos, 20 threads), **15,7 GB de RAM** (3,8 GB livres na hora da medida), placas de vídeo Intel UHD Graphics e **NVIDIA GeForce RTX 3060 Laptop**, disco C: de 953 GB com ~253 GB livres antes dos downloads. Python 3.12.10 (instalado com o winget). Pela limitação já registrada acima (TensorFlow ≥ 2.11 não usa GPU no Windows nativo), a RTX 3060 não deve ser usada; **não testado aqui**, e usar a GPU via WSL2 é **não verificado**. Tempo de treino neste computador: **não medido**. A RAM é o limite principal: ver T9.
 
 ---
 
@@ -268,15 +284,20 @@ Usar ECGs de 12 derivações de **233.770 pacientes brasileiros** (CODE-15%, Red
 | CODE-15%: contagens, colunas, licença, 18 partes | **Conferido** (Zenodo + `exams.csv`, 05/11) |
 | CODE-15%: formato do HDF5, durações, zeros centralizados, exames zerados | **Conferido** na parte 0 (05-06/11) |
 | Óbito só no primeiro exame de cada paciente | **Conferido** (06/11) |
+| CODE-15%: ordem das derivações (DI, DII, DIII, AVR, AVL, AVF) | **Medido** em 07/11 (Einthoven, 2.997 exames da parte 0) |
 | `nn_predicted_age` = modelo de Lima et al. | **Provável** (MAE e r batem com o artigo); não documentado |
 | Origem dos rótulos da CODE-15% (laudo médico, sistema automático?) | **Não verificado** |
 | PTB-XL: tamanho, derivações, códigos das 6 classes, leitura com `wfdb` | **Conferido** (05/11) |
-| PTB-XL: licença, tamanho do download, escala das amplitudes vs CODE | **Não verificado** |
-| CODE-TEST: existe, aberto, CC BY 4.0, 827 ECGs, 6 classes | **Conferido** pela ficha do Zenodo; zip **não aberto** |
-| CODE-TEST × CODE-15%: pacientes em comum? | **Não verificado** |
+| PTB-XL: licença e tamanho do download | **Conferido** na página do PhysioNet (07/11): CC BY 4.0; 3,0 GB descompactado (zip de 1,7 GB) com `records100` + `records500`; `records500` sozinho: **não verificado** |
+| PTB-XL: ordem real das 12 derivações e escala das amplitudes vs CODE | **Não verificado** (a página diz I, II, III, AVL, AVR, AVF; o registro de 05/11 dizia AVR, AVL, AVF) |
+| CODE-TEST: existe, aberto, CC BY 4.0, 827 ECGs, 6 classes | **Conferido** pela ficha do Zenodo e, em 07/11, abrindo o zip (tamanho e md5 conferidos) |
+| CODE-TEST: ordem das derivações (DI, DII, DIII, AVL, AVF, AVR) | **Medido** em 07/11 (Einthoven) e igual ao README |
+| CODE-TEST vs CODE-15%: escala das amplitudes | **Não verificado** (desvio padrão por derivação difere; T8) |
+| CODE-TEST × CODE-15%: pacientes em comum? | **Não verificado**, e não dá para verificar por identificador: o CODE-TEST não tem `patient_id` nem `exam_id` (07/11). Limitação declarada |
 | Treino local (CPU) | **Medido**: ~1 min por época com 16 mil exames |
 | Treino no Colab (GPU) | **Não testado** |
 | Python da Renata | Anaconda em `C:\Users\rehle\anaconda3` (fora do PATH, **não usar para o projeto**). O projeto usa o `.venv/` (versões no `requirements.txt`) |
+| Python do Tom | 3.12.10 (winget), `.venv` criado com o comando do `requirements.txt` (07/11). O 3.11.9 que veio no Windows **falha** com o `requirements.txt` |
 
 ### Armadilhas já encontradas (não repetir)
 - **`pip install` no Python errado:** quebrou o Anaconda base da Renata. Usar só o `.venv`.
@@ -287,6 +308,9 @@ Usar ECGs de 12 derivações de **233.770 pacientes brasileiros** (CODE-15%, Red
 - **Terminal do Windows mostra acentos embaralhados** na saída de scripts. Os arquivos estão em UTF-8 e estão certos; é só a exibição.
 - **Conclusões "a olho":** conferir todo número com código antes de escrever.
 - **Comparações de risco sem controlar a idade enganam** (paradoxo de Simpson, seção 3.5).
+- **Python 3.11 não instala o `requirements.txt`** (`numpy==2.5.4` exige 3.12 ou mais). Conferir `python --version` antes de criar o `.venv`.
+- **Projeto em pasta sincronizada (OneDrive):** os dados (até 46 GB) e o `.venv` seriam candidatos a subir para a nuvem. Clonar em caminho curto, fora dela.
+- **A ordem das derivações difere entre as bases:** CODE-15% (AVR, AVL, AVF) e CODE-TEST (AVL, AVF, AVR). Conferir com as fórmulas de Einthoven antes de testar. PTB-XL: não verificado.
 
 ---
 
@@ -301,6 +325,14 @@ Usar ECGs de 12 derivações de **233.770 pacientes brasileiros** (CODE-15%, Red
 - 2026-11-06 (Claude da Renata): **split por paciente implementado** (provisório 70/10/20; seção 5.2).
 - 2026-11-06 (Claude da Renata): `CLAUDE.md` reorganizado para a outra dupla conseguir continuar sozinha: seção 0 (comece aqui + tarefas), seção 3 (linhas de raciocínio), seção 6 (ambiente), seção 7 (processo de trabalho e coordenação no git), armadilhas conhecidas, tabela de decisões em aberto com propostas. Conferido que os exames curtos têm zeros dos dois lados (581 + 581). `h5py==3.14.0` adicionado ao `requirements.txt`.
 - 2026-11-06 (Claude da Renata): seção 0 ganhou o checklist "Primeira vez neste computador?" (pull, `.venv`, dados, conferência, registro) e a rotina "Antes de cada sessão", para a IA do Tom montar o ambiente antes de começar.
+- 2026-11-07 (Tom e Renata): **decisão: PTB-XL = teste externo principal; CODE-TEST = teste secundário**, com a limitação de que o CODE-TEST não tem `patient_id` nem `exam_id` e a sobreposição com a CODE-15% é **não verificada**.
+- 2026-11-07 (Claude do Tom): **CODE-TEST baixado e inspecionado** (zip de 218.189.452 bytes, md5 conferido). Conteúdo, ordem das derivações (AVL, AVF, AVR) e números do gabarito na seção 4. O `.gitignore` ganhou `code_test/`.
+- 2026-11-07 (Claude do Tom): **PTB-XL consultado no PhysioNet (só leitura, nada baixado):** CC BY 4.0; 3,0 GB descompactado (zip de 1,7 GB). A página lista as derivações como I, II, III, AVL, AVR, AVF, o que conflita com o registro de 05/11 (AVR, AVL, AVF); ordem real **não verificada**.
+- 2026-11-07 (Claude do Tom): **ambiente montado no computador do Tom.** O Python 3.11.9 falhou no `requirements.txt` (numpy 2.5.4 exige 3.12+); instalado o Python 3.12.10 (winget); projeto clonado em caminho curto fora do OneDrive (a cópia antiga no OneDrive foi mantida); `.venv` criado com o comando do `requirements.txt`. Hardware na seção 6.
+- 2026-11-07 (Claude do Tom): **dados baixados no computador do Tom:** `exams.csv` (35.500.900 bytes, md5 conferido) e partes 0 a 3 (zips com tamanho e md5 iguais aos do Zenodo; `testzip` sem erro; cada HDF5 com 3.932.518.664 bytes, `tracings` 20.001 × 4.096 × 12 float32, 1 linha de preenchimento `exam_id` = 0, todos os outros ids na tabela e apontando para a própria parte). Pela tabela, as partes 0 a 3 somam 80.000 exames de 71.477 pacientes (treino 55.679, validação 8.180, teste 16.141 exames, com o split por paciente de sempre); o notebook ainda descarta exames zerados. Sobraram ~237 GB de disco.
+- 2026-11-07 (Claude do Tom): **ordem das derivações da CODE-15% medida** (Einthoven, 2.997 exames da parte 0): DI, DII, DIII, AVR, AVL, AVF. Confirma o registro anterior. No CODE-TEST a ordem é DI, DII, DIII, AVL, AVF, AVR.
+- 2026-11-07 (Claude do Tom): **pendências novas:** T8 (escala dos sinais entre as bases) e T9 (RAM: 4 partes em float32 ≈ 15,7 GB não cabem como array inteiro no Computador do Tom; alimentar a CNN em lotes lendo do HDF5).
+- 2026-11-07 (Claude do Tom): o Tom pediu, uma única vez, que a IA fizesse o commit e o push do `.gitignore` (commit `fc24f3d`). A regra "a IA nunca faz commit nem push" continua valendo.
 
 ## 11. Divisão de tarefas
 
