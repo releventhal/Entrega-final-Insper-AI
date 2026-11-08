@@ -27,15 +27,16 @@ from a0_baselines import PASTA_RESULTADOS, melhor_limiar_f1, metricas
 from ecg_dados import DADOS, PARTES_DEV, ROTULOS, SEED, GeradorECG, construir_indice
 
 PASTA_MODELOS = DADOS.parent / "modelos"  # fora do git
-ROTULO_EXPERIMENTO = {"A1": "A1 CNN (provisório, parte 0)", "A2": "A2 provisório (normalização por exame e derivação)"}  # nome na tabela de experimentos
+ROTULO_EXPERIMENTO = {"A1": "A1 CNN (provisório, parte 0)", "A2": "A2 provisório (normalização por exame e derivação)",
+                      "A3": "A3 provisório (partes 0 a 3; normalização por exame e derivação)"}  # nome na tabela de experimentos
 
 
-def carregar_indices(n_treino=None):
+def carregar_indices(n_treino=None, partes=PARTES_DEV):
     """[PROV] parte 0. Descarta SÓ os exames todo-zero (12/12 derivações), SÓ de treino e validação.
     Devolve (treino, validação, relatório). O grupo teste é cortado aqui e nunca chega ao resto do código."""
-    info = construir_indice(PARTES_DEV)
+    info = construir_indice(partes)
     z = np.load(DADOS / "exames_zerados_p0-3.npy")  # (exam_id, parte, linha, n_deriv_zeradas); o arquivo NÃO é alterado
-    todo_zero = set(z[(z[:, 3] == 12) & np.isin(z[:, 1], PARTES_DEV), 0])
+    todo_zero = set(z[(z[:, 3] == 12) & np.isin(z[:, 1], partes), 0])
     rel = {}
     saida = {}
     for g in ("treino", "validação"):
@@ -44,9 +45,13 @@ def carregar_indices(n_treino=None):
         rel[g] = dict(antes=len(d), todo_zero_descartados=int(sai.sum()), depois=int((~sai).sum()))
         saida[g] = d[~sai].reset_index(drop=True)
     assert not set(saida["treino"].patient_id) & set(saida["validação"].patient_id), "paciente em treino e validação!"
-    if n_treino and n_treino < len(saida["treino"]):  # subconjunto sorteado (seed 42) do treino; pacientes continuam só no treino
-        saida["treino"] = saida["treino"].sample(n=n_treino, random_state=SEED).reset_index(drop=True)
-        rel["treino"]["subconjunto"] = n_treino
+    if n_treino and n_treino < len(saida["treino"]):  # subconjunto do treino sorteado POR PACIENTE (seed 42): paciente entra com todos os exames
+        t = saida["treino"]
+        sorteados = np.random.default_rng(SEED).permutation(np.sort(t.patient_id.unique()))
+        conta = t.groupby("patient_id").size().reindex(sorteados).cumsum()
+        manter = conta.index[: int((conta < n_treino).sum()) + 1]
+        saida["treino"] = t[t.patient_id.isin(manter)].reset_index(drop=True)
+        rel["treino"]["subconjunto"] = len(saida["treino"])
     return saida["treino"], saida["validação"], rel
 
 
@@ -65,10 +70,10 @@ def construir_modelo():
     return m
 
 
-def bench(n_lotes=15):
+def bench(n_lotes=15, normalizar=False, partes=PARTES_DEV):
     """(b) Tempo por lote de treino (leitura e cálculo separados) e estimativa de uma época completa."""
-    tr, va, rel = carregar_indices()
-    g = GeradorECG(tr, embaralhar=True)
+    tr, va, rel = carregar_indices(partes=partes)
+    g = GeradorECG(tr, embaralhar=True, normalizar=normalizar)
     m = construir_modelo()
     print("parâmetros:", m.count_params(), "| treino:", len(tr), "exames =", len(g), "lotes | validação:", len(va), "exames")
     X, y = g[0]
@@ -77,7 +82,7 @@ def bench(n_lotes=15):
     for i in range(1, n_lotes + 1):
         t = time.perf_counter(); X, y = g[i]; t_ler += time.perf_counter() - t
         t = time.perf_counter(); m.train_on_batch(X, y); t_cal += time.perf_counter() - t
-    gv = GeradorECG(va)
+    gv = GeradorECG(va, normalizar=normalizar)
     t = time.perf_counter()
     for i in range(5):
         Xv, yv = gv[i]; m.predict_on_batch(Xv)
@@ -101,10 +106,10 @@ class LimiteDeTempo(keras.callbacks.Callback):
             self.estourou, self.model.stop_training = True, True
 
 
-def treinar(nome, normalizar=False, n_treino=None, max_min=60, max_epocas=15, paciencia=3):
+def treinar(nome, normalizar=False, n_treino=None, max_min=60, max_epocas=15, paciencia=3, partes=PARTES_DEV):
     PASTA_MODELOS.mkdir(exist_ok=True)
     PASTA_RESULTADOS.mkdir(exist_ok=True)
-    tr, va, rel = carregar_indices(n_treino)
+    tr, va, rel = carregar_indices(n_treino, partes)
     print("descartes (só exames todo-zero, só treino e validação):", rel, flush=True)
     g_tr = GeradorECG(tr, embaralhar=True, normalizar=normalizar)
     g_va = GeradorECG(va, normalizar=normalizar)
@@ -124,27 +129,47 @@ def treinar(nome, normalizar=False, n_treino=None, max_min=60, max_epocas=15, pa
     print(f"\n{nome}: {len(h['loss'])} épocas em {minutos:.1f} min (limite de tempo estourou: {limite.estourou}); "
           f"melhor época = {melhor + 1} (val_loss {h['val_loss'][melhor]:.4f})", flush=True)
 
-    # --- avaliação na VALIDAÇÃO com o melhor modelo (restore_best_weights já devolveu os pesos da melhor época)
+    # --- avaliação na VALIDAÇÃO com o MELHOR modelo salvo (o EarlyStopping só restaura pesos se disparar;
+    # se o treino acabar pelo limite de épocas ou de tempo, o checkpoint é que guarda a melhor época)
+    m = keras.models.load_model(caminho)
     S = m.predict(g_va, verbose=0)
     Y = g_va.Y
     assert S.shape == Y.shape == (len(va), len(ROTULOS))  # previsões alinhadas com g_va.info / g_va.Y
+    exp = ROTULO_EXPERIMENTO.get(nome, nome)
+    df = tabela_metricas(exp, Y, S)
+    df["dados"] = f"partes {partes} (provisório, a confirmar com a Renata)"
+    df["n_treino"], df["epocas"], df["melhor_epoca"], df["minutos_treino"] = len(tr), len(h["loss"]), melhor + 1, round(minutos, 1)
+    partes_df = [df]
+    sub = (g_va.info.parte == 0).to_numpy()
+    if len(partes) > 1 and sub.any():
+        # comparação justa com o A1/A2: os MESMOS exames de validação da parte 0 (2.069), em duas versões do limiar
+        lim_completo = {r: melhor_limiar_f1(Y[:, k].astype(int), S[:, k]) for k, r in enumerate(ROTULOS)}  # limiar da validação completa
+        for sufixo, lims in ((f" | só os {sub.sum()} exames de validação da parte 0 (limiar da validação completa)", lim_completo),
+                             (f" | só os {sub.sum()} exames de validação da parte 0 (limiar reescolhido neles, como no A1/A2)", None)):
+            d = tabela_metricas(exp + sufixo, Y[sub], S[sub], lims)
+            d["dados"] = f"partes {partes} (provisório, a confirmar com a Renata)"
+            d["n_treino"], d["epocas"], d["melhor_epoca"], d["minutos_treino"] = len(tr), len(h["loss"]), melhor + 1, round(minutos, 1)
+            partes_df.append(d)
+    df = pd.concat(partes_df, ignore_index=True)
+    np.save(PASTA_RESULTADOS / f"{nome}_previsoes_validacao.npy", S.astype(np.float32))
+    print(df.round(3).to_string(index=False), flush=True)
+    return pd.concat([df, a0b_mesmo_conjunto(tr, va, nome, partes)], ignore_index=True), S, g_va
+
+
+def tabela_metricas(experimento, Y, S, limiares=None):
+    """Métricas por rótulo + média macro. `limiares` = dict rótulo -> limiar; None = maximiza o F1 nestes mesmos exames."""
     linhas = []
     for k, r in enumerate(ROTULOS):
         y, s = Y[:, k].astype(int), S[:, k]
-        linhas.append(dict(experimento=nome, rotulo=r, n_val=len(y), positivos_val=int(y.sum()), **metricas(y, s, melhor_limiar_f1(y, s))))
+        lim = melhor_limiar_f1(y, s) if limiares is None else limiares[r]
+        linhas.append(dict(experimento=experimento, rotulo=r, n_val=len(y), positivos_val=int(y.sum()), **metricas(y, s, lim)))
     df = pd.DataFrame(linhas)
-    df["experimento"] = ROTULO_EXPERIMENTO.get(nome, nome)
     cols = ["auroc", "auprc", "sensibilidade", "precisao", "f1", "especificidade", "acuracia"]
-    macro = df[cols].mean().to_dict() | dict(experimento=df.experimento[0], rotulo="MACRO", n_val=len(va), positivos_val=np.nan, limiar=np.nan)
-    df = pd.concat([df, pd.DataFrame([macro])], ignore_index=True)
-    df["dados"] = "parte 0 (provisório, a confirmar com a Renata)"
-    df["n_treino"], df["epocas"], df["melhor_epoca"], df["minutos_treino"] = len(tr), len(h["loss"]), melhor + 1, round(minutos, 1)
-    np.save(PASTA_RESULTADOS / f"{nome}_previsoes_validacao.npy", S.astype(np.float32))
-    print(df.round(3).to_string(index=False), flush=True)
-    return pd.concat([df, a0b_mesmo_conjunto(tr, va)], ignore_index=True), S, g_va
+    macro = df[cols].mean().to_dict() | dict(experimento=experimento, rotulo="MACRO", n_val=len(Y), positivos_val=np.nan, limiar=np.nan)
+    return pd.concat([df, pd.DataFrame([macro])], ignore_index=True)
 
 
-def a0b_mesmo_conjunto(tr, va):
+def a0b_mesmo_conjunto(tr, va, nome="A1", partes=PARTES_DEV):
     """A0b (idade + sexo) treinado e avaliado EXATAMENTE nos mesmos exames do A1, para comparação justa
     (o A0b do CSV original usa as partes 0 a 3; este usa o mesmo conjunto do A1)."""
     esc = StandardScaler().fit(tr[["age"]])
@@ -153,13 +178,13 @@ def a0b_mesmo_conjunto(tr, va):
     for r in ROTULOS:
         s = LogisticRegression(max_iter=1000, random_state=SEED).fit(f(tr), tr[r]).predict_proba(f(va))[:, 1]
         y = va[r].to_numpy()
-        linhas.append(dict(experimento="A0b idade+sexo (mesmo conjunto do A1)", rotulo=r, n_val=len(y), positivos_val=int(y.sum()),
+        linhas.append(dict(experimento=f"A0b idade+sexo (mesmo conjunto do {nome})", rotulo=r, n_val=len(y), positivos_val=int(y.sum()),
                            **metricas(y, s, melhor_limiar_f1(y, s))))
     df = pd.DataFrame(linhas)
     cols = ["auroc", "auprc", "sensibilidade", "precisao", "f1", "especificidade", "acuracia"]
     macro = df[cols].mean().to_dict() | dict(experimento=df.experimento[0], rotulo="MACRO", n_val=len(va), positivos_val=np.nan, limiar=np.nan)
     df = pd.concat([df, pd.DataFrame([macro])], ignore_index=True)
-    df["dados"] = "parte 0 (provisório, a confirmar com a Renata)"
+    df["dados"] = f"partes {partes} (provisório, a confirmar com a Renata)"
     df["n_treino"] = len(tr)
     return df
 
@@ -181,9 +206,10 @@ if __name__ == "__main__":
     ap.add_argument("--n-treino", type=int, default=None)
     ap.add_argument("--max-min", type=float, default=60)
     ap.add_argument("--max-epocas", type=int, default=15)
+    ap.add_argument("--partes", default="0")  # ex.: 0,1,2,3
     a = ap.parse_args()
     if a.modo == "bench":
-        bench()
+        bench(normalizar=a.normalizar, partes=[int(x) for x in a.partes.split(",")])
     else:
-        df, _, _ = treinar(a.nome, a.normalizar, a.n_treino, a.max_min, a.max_epocas)
+        df, _, _ = treinar(a.nome, a.normalizar, a.n_treino, a.max_min, a.max_epocas, partes=[int(x) for x in a.partes.split(",")])
         gravar_no_csv(df)
