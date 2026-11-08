@@ -103,3 +103,12 @@ Implementado e conferido em `a1_cnn.py` (`--peso-por-classe`; peso = negativos/p
   - `modelos/A3_melhor.keras`: `bae64fa994934072434853ce6c5f6dfffd485a1f126336be1d6e8d526ca12a89`
   - `congelado_candidato_A3.json`: `1c145b6a553a47b53a6330f4de44608c8e54aa251183627d7607673a97ecf935`
 - Nenhum arquivo apagado; split e lista dos 411 exames zerados intactos (a lista só foi lida).
+
+## Bloco 3, complemento: seed 44 (14:33-14:57)
+- Seed 44: 8 épocas em 24,1 min, **parou pelo early stopping** (melhor época 5, val_loss 0,0289), sem parada do computador. Modelo em `modelos/A3_seed44/`. Validação completa: macro AUROC 0,9899, AUPRC 0,696, F1 0,717.
+- **Com 3 seeds (42, 43, 44), validação completa (média; desvio amostral):** macro AUROC 0,9897 (0,0004), AUPRC 0,6970 (0,0066), F1 0,7130 (0,0042). Por alteração (AUROC / AUPRC / F1, média ± desvio): 1dAVb 0,974 ± 0,001 / 0,442 ± 0,009 / 0,508 ± 0,020; RBBB 0,995 ± 0,000 / 0,853 ± 0,006 / 0,829 ± 0,005; LBBB 0,994 ± 0,000 / 0,845 ± 0,004 / 0,793 ± 0,009; SB 0,993 ± 0,000 / 0,638 ± 0,022 / 0,656 ± 0,015; ST 0,995 ± 0,000 / 0,688 ± 0,007 / 0,772 ± 0,013; AF 0,987 ± 0,001 / 0,716 ± 0,015 / 0,720 ± 0,020. Estes números substituem os de 2 seeds acima. `figuras/h_seeds_A3.png` refeita com as 3.
+- **A2 → A3 contra o desvio entre seeds (mesmos 2.069 exames, limiar da validação completa de cada modelo):** A3 nas 3 seeds: AUROC 0,9898 / 0,9904 / 0,9903; AUPRC 0,721 / 0,726 / 0,730; F1 0,717 / 0,730 / 0,736. A2 (1 seed): 0,985 / 0,682 / 0,717. Em AUROC e AUPRC o A2 fica abaixo das 3 seeds do A3, com distância (0,005 e 0,04) maior que a faixa entre as seeds (0,0006 e 0,009). Em F1 o A2 empata com a pior seed do A3: diferença dentro da variação. **Limite:** o A2 tem 1 seed, então não sabemos quanto ele varia; 3 seeds do A3 dão uma ideia grosseira do desvio, não um teste estatístico.
+- Seed 45 e A4 não foram treinados (orçamento).
+
+## Fim da sessão (14:59)
+SHA256 conferido de novo às 14:58, depois da seed 44: `modelos/A3_melhor.keras` e `congelado_candidato_A3.json` **idênticos aos iniciais**. Nenhum processo de treino ficou rodando.

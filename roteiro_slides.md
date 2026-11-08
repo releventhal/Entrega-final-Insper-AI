@@ -47,7 +47,7 @@ Rascunho do Claude do Tom (08/11), **para o Tom e a Renata revisarem**. Todos os
 ### Slide 9. Como chegamos ao A3 (uma mudança por vez)
 - **Ideia:** A1 (sem normalização) → A2 (normaliza cada exame) → A3 (4 partes em vez de 1), nos mesmos 2.069 exames.
 - **Figura:** `figuras/a_modelos_macro.png`.
-- **Fala:** "AUROC 0,976 → 0,985 → 0,990 e AUPRC 0,656 → 0,682 → 0,721. Mas é uma seed só e os intervalos se sobrepõem: não dá para afirmar que cada passo ajudou." (Se o Bloco 3 rodou: completar com o desvio entre seeds, `figuras/h_seeds_A3.png`.)
+- **Fala:** "AUROC 0,976 → 0,985 → 0,990 e AUPRC 0,656 → 0,682 → 0,721. Mas é uma seed só e os intervalos se sobrepõem: não dá para afirmar que cada passo ajudou." Completar com `figuras/h_seeds_A3.png`: em 3 seeds do A3, macro AUROC 0,9897 ± 0,0004, AUPRC 0,697 ± 0,007, F1 0,713 ± 0,004; nos 2.069 exames, o A2 (1 seed) fica abaixo das 3 seeds em AUROC e AUPRC e empata em F1.
 
 ### Slide 10. Curvas do A3
 - **Ideia:** as 6 alterações têm curva ROC colada no canto; na precisão-recall dá para ver quem é difícil.
@@ -75,7 +75,7 @@ Rascunho do Claude do Tom (08/11), **para o Tom e a Renata revisarem**. Todos os
 - **Fala:** "Na validação (18.711 pacientes, 450 óbitos), B0 0,794 e B1 0,804; a diferença tem intervalo de 0,003 a 0,016. Por faixa de idade, o ganho só aparece com clareza entre 40 e 59 anos. A CNN direto no sinal (B2/B3) é o próximo passo."
 
 ### Slide 15. Limitações honestas
-- **Ideia:** tudo é validação (que também escolheu época e limiar, então é otimista); uma seed por configuração (exceto o A3, se o Bloco 3 rodou); só 4 das 18 partes; a origem dos rótulos da CODE-15% e a unidade de `timey` não estão documentadas; o CODE-TEST pode ter pacientes em comum com a CODE-15% (não dá para verificar); 1dAVb fraco.
+- **Ideia:** tudo é validação (que também escolheu época e limiar, então é otimista); uma seed por configuração (exceto o A3, com 3 seeds); só 4 das 18 partes; a origem dos rótulos da CODE-15% e a unidade de `timey` não estão documentadas; o CODE-TEST pode ter pacientes em comum com a CODE-15% (não dá para verificar); 1dAVb fraco.
 - **Figura:** nenhuma.
 - **Fala:** "Preferimos mostrar o que não sabemos a mostrar um número bonito que não se sustenta."
 
