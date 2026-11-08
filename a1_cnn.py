@@ -28,7 +28,8 @@ from ecg_dados import DADOS, PARTES_DEV, ROTULOS, SEED, GeradorECG, construir_in
 
 PASTA_MODELOS = DADOS.parent / "modelos"  # fora do git
 ROTULO_EXPERIMENTO = {"A1": "A1 CNN (provisório, parte 0)", "A2": "A2 provisório (normalização por exame e derivação)",
-                      "A3": "A3 provisório (partes 0 a 3; normalização por exame e derivação)"}  # nome na tabela de experimentos
+                      "A3": "A3 provisório (partes 0 a 3; normalização por exame e derivação)",
+                      "A4": "A4 candidato (A3 + perda ponderada por alteração; fora das aulas)"}  # nome na tabela de experimentos
 
 
 def carregar_indices(n_treino=None, partes=PARTES_DEV):
@@ -54,7 +55,19 @@ def carregar_indices(n_treino=None, partes=PARTES_DEV):
     return saida["treino"], saida["validação"], rel
 
 
-def construir_modelo(seed=SEED):
+def bce_ponderada(pesos):
+    """FORA DAS AULAS: perda ponderada (A4). Igual à binary_crossentropy, mas o erro num exame POSITIVO da
+    alteração k vale pesos[k] vezes mais. Como as alterações são raras (1-3% dos exames), sem peso o modelo
+    "ganha" a perda dizendo quase sempre "não"; o peso compensa isso. Os negativos continuam com peso 1."""
+    w = keras.ops.convert_to_tensor(np.asarray(pesos, np.float32))
+
+    def perda(y, p):
+        p = keras.ops.clip(p, 1e-7, 1 - 1e-7)
+        return keras.ops.mean(-(w * y * keras.ops.log(p) + (1 - y) * keras.ops.log(1 - p)), axis=-1)
+    return perda
+
+
+def construir_modelo(seed=SEED, pesos=None):
     """Arquitetura A1 da seção 5.3, sem mudanças: 4 x Conv1D(32,64,128,128; kernel 15; same; ReLU),
     MaxPool 4 nas três primeiras, GlobalAveragePooling, Dense 6 sigmoid. ~406 mil parâmetros."""
     keras.utils.set_random_seed(seed)  # seed dos pesos iniciais (Bloco 3: só esta e a do embaralhamento mudam)
@@ -65,7 +78,7 @@ def construir_modelo(seed=SEED):
             m.add(layers.MaxPooling1D(4))
     m.add(layers.GlobalAveragePooling1D())
     m.add(layers.Dense(len(ROTULOS), activation="sigmoid"))
-    m.compile(optimizer="adam", loss="binary_crossentropy")
+    m.compile(optimizer="adam", loss="binary_crossentropy" if pesos is None else bce_ponderada(pesos))
     return m
 
 
@@ -105,14 +118,19 @@ class LimiteDeTempo(keras.callbacks.Callback):
             self.estourou, self.model.stop_training = True, True
 
 
-def treinar(nome, normalizar=False, n_treino=None, max_min=60, max_epocas=15, paciencia=3, partes=PARTES_DEV, seed=SEED):
+def treinar(nome, normalizar=False, n_treino=None, max_min=60, max_epocas=15, paciencia=3, partes=PARTES_DEV, seed=SEED, peso_por_classe=False):
     PASTA_MODELOS.mkdir(exist_ok=True)
     PASTA_RESULTADOS.mkdir(exist_ok=True)
     tr, va, rel = carregar_indices(n_treino, partes)
     print("descartes (só exames todo-zero, só treino e validação):", rel, flush=True)
     g_tr = GeradorECG(tr, embaralhar=True, normalizar=normalizar, seed=seed)  # seed muda a ordem do embaralhamento
     g_va = GeradorECG(va, normalizar=normalizar)
-    m = construir_modelo(seed)
+    pesos = None
+    if peso_por_classe:  # A4: peso = negativos/positivos de cada alteração, SÓ no treino, limitado a 10
+        pos = tr[ROTULOS].sum().to_numpy()
+        pesos = np.minimum((len(tr) - pos) / pos, 10.0)
+        print("pesos por alteração (treino):", dict(zip(ROTULOS, pesos.round(2))), flush=True)
+    m = construir_modelo(seed, pesos)
     # seed 42 = caminho de sempre; outra seed = pasta própria (nunca sobrescreve o modelo da seed 42)
     caminho = PASTA_MODELOS / f"{nome}_melhor.keras" if seed == SEED else PASTA_MODELOS / nome / f"{nome}_melhor.keras"
     caminho.parent.mkdir(exist_ok=True)
@@ -132,7 +150,7 @@ def treinar(nome, normalizar=False, n_treino=None, max_min=60, max_epocas=15, pa
 
     # --- avaliação na VALIDAÇÃO com o MELHOR modelo salvo (o EarlyStopping só restaura pesos se disparar;
     # se o treino acabar pelo limite de épocas ou de tempo, o checkpoint é que guarda a melhor época)
-    m = keras.models.load_model(caminho)
+    m = keras.models.load_model(caminho, compile=False)  # só previsão; compile=False também serve para a perda ponderada do A4
     S = m.predict(g_va, verbose=0)
     Y = g_va.Y
     assert S.shape == Y.shape == (len(va), len(ROTULOS))  # previsões alinhadas com g_va.info / g_va.Y
@@ -154,7 +172,7 @@ def treinar(nome, normalizar=False, n_treino=None, max_min=60, max_epocas=15, pa
     df = pd.concat(partes_df, ignore_index=True)
     np.save(PASTA_RESULTADOS / f"{nome}_previsoes_validacao.npy", S.astype(np.float32))
     print(df.round(3).to_string(index=False), flush=True)
-    if seed != SEED:  # o A0b não depende da seed da CNN: já está no CSV para este conjunto
+    if seed != SEED or nome == "A4":  # o A0b não depende da CNN: já está no CSV para este conjunto (A3)
         return df, S, g_va
     return pd.concat([df, a0b_mesmo_conjunto(tr, va, nome, partes)], ignore_index=True), S, g_va
 
@@ -211,10 +229,11 @@ if __name__ == "__main__":
     ap.add_argument("--max-epocas", type=int, default=15)
     ap.add_argument("--partes", default="0")  # ex.: 0,1,2,3
     ap.add_argument("--seed", type=int, default=SEED)  # Bloco 3 (robustez): só muda a seed
+    ap.add_argument("--peso-por-classe", action="store_true")  # A4 (fora das aulas)
     a = ap.parse_args()
     if a.modo == "bench":
         bench(normalizar=a.normalizar, partes=[int(x) for x in a.partes.split(",")])
     else:
         df, _, _ = treinar(a.nome, a.normalizar, a.n_treino, a.max_min, a.max_epocas,
-                           partes=[int(x) for x in a.partes.split(",")], seed=a.seed)
+                           partes=[int(x) for x in a.partes.split(",")], seed=a.seed, peso_por_classe=a.peso_por_classe)
         gravar_no_csv(df)

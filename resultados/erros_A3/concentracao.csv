@@ -1,0 +1,13 @@
+rotulo,tipo,erros,pacientes_com_erro,max_erros_1_paciente,pacientes_para_metade,se_cada_erro_fosse_1_paciente
+1dAVb,FP,62,57,2,26,31
+1dAVb,FN,76,72,2,34,38
+RBBB,FP,80,77,2,37,40
+RBBB,FN,11,11,1,6,6
+LBBB,FP,34,33,2,16,17
+LBBB,FN,21,21,1,11,11
+SB,FP,45,45,1,23,23
+SB,FN,38,38,1,19,19
+ST,FP,62,62,1,31,31
+ST,FN,21,21,1,11,11
+AF,FP,42,40,2,19,21
+AF,FN,58,52,2,23,29
