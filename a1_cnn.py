@@ -24,7 +24,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
 from a0_baselines import PASTA_RESULTADOS, melhor_limiar_f1, metricas
-from ecg_dados import DADOS, PARTES_DEV, ROTULOS, SEED, GeradorECG, construir_indice
+from ecg_dados import DADOS, PARTES_DEV, ROTULOS, SEED, GeradorECG, construir_indice, exames_todo_zero
 
 PASTA_MODELOS = DADOS.parent / "modelos"  # fora do git
 ROTULO_EXPERIMENTO = {"A1": "A1 CNN (provisório, parte 0)", "A2": "A2 provisório (normalização por exame e derivação)",
@@ -35,8 +35,7 @@ def carregar_indices(n_treino=None, partes=PARTES_DEV):
     """[PROV] parte 0. Descarta SÓ os exames todo-zero (12/12 derivações), SÓ de treino e validação.
     Devolve (treino, validação, relatório). O grupo teste é cortado aqui e nunca chega ao resto do código."""
     info = construir_indice(partes)
-    z = np.load(DADOS / "exames_zerados_p0-3.npy")  # (exam_id, parte, linha, n_deriv_zeradas); o arquivo NÃO é alterado
-    todo_zero = set(z[(z[:, 3] == 12) & np.isin(z[:, 1], partes), 0])
+    todo_zero = exames_todo_zero(partes)  # lista code15/exames_zerados_p0-3.npy; o arquivo NÃO é alterado
     rel = {}
     saida = {}
     for g in ("treino", "validação"):

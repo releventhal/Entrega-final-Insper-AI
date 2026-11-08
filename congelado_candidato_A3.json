@@ -2,7 +2,7 @@
   "status": "candidato",
   "aviso": "NAO congelado. Enquanto o status for 'candidato', avaliar_externo.py recusa rodar em qualquer conjunto de teste. Congelar = decisao da dupla (Tom e Renata): mudar o status para 'congelado' SO depois de decidir os itens 'a decidir'.",
   "provisorio": "todo o conteudo e provisorio, a confirmar com a Renata",
-  "gerado_em": "2026-11-07",
+  "gerado_em": "2026-11-08",
   "modelo": {
     "caminho": "modelos/A3_melhor.keras",
     "sha256": "bae64fa994934072434853ce6c5f6dfffd485a1f126336be1d6e8d526ca12a89",
@@ -22,8 +22,9 @@
   "preprocessamento": {
     "nome": "A2: normalizacao por exame e por derivacao (ecg_dados.normalizar_exame)",
     "descricao": "Para cada exame (4096 x 12): a regiao ativa e o conjunto de amostras em que ALGUMA derivacao e diferente de zero (isto exclui o preenchimento de zeros das pontas). Em cada derivacao, media e desvio padrao populacional (np.std, ddof=0) sao calculados SO na regiao ativa, usando apenas o proprio exame. Na regiao ativa: x = (x - media) / desvio. O preenchimento continua zero. Derivacao com desvio <= 1e-6 (zerada ou constante) fica zero. Exame sem nenhuma amostra ativa e devolvido sem mudanca. Nenhuma estatistica e calculada em treino, validacao ou teste inteiros; nenhum rotulo e usado.",
-    "para_ptbxl": "ecg_dados.preprocessar_ptbxl (resample_poly up=4 down=5 de 500 para 400 Hz; 48 zeros de cada lado; ordem das colunas ja igual a da CODE-15%), DEPOIS normalizar_exame. Normalizacao ainda nao integrada ao GeradorPTBXL.",
-    "para_code_test": "reordenar colunas [0,1,2,5,3,4,6..11] (AVL, AVF, AVR -> AVR, AVL, AVF), depois normalizar_exame. Nao implementado."
+    "para_ptbxl": "ecg_dados.preprocessar_ptbxl (resample_poly up=4 down=5 de 500 para 400 Hz = 4000 amostras uteis; 48 zeros de cada lado ate 4096; ordem das colunas ja igual a da CODE-15%), DEPOIS normalizar_exame (GeradorPTBXL(normalizar=True)); a regiao ativa exclui os 48 zeros de cada lado.",
+    "para_code_test": "ecg_dados.GeradorCodeTest: reordenar colunas [0,1,2,5,3,4,6..11] (AVL, AVF, AVR -> AVR, AVL, AVF), float64 -> float32, depois normalizar_exame.",
+    "para_teste_interno": "GeradorECG(normalizar=True) em ordem fixa sobre o grupo teste das partes 0 a 3, sem os exames com as 12 derivacoes zeradas."
   },
   "dados_de_treino": {
     "partes": [
@@ -33,7 +34,7 @@
       3
     ],
     "split": "por patient_id, np.random.default_rng(42).random sobre np.sort(pacientes unicos da tabela inteira): <0,7 treino, <0,8 validacao, resto teste",
-    "regra_de_exclusao": "descartar so os exames com as 12 derivacoes zeradas (lista code15/exames_zerados_p0-3.npy, n_deriv_zeradas == 12), so do treino e da validacao; os parciais (1 a 11 derivacoes zeradas) ficam; o teste nao e filtrado; regra so pelo sinal, nunca pelos rotulos",
+    "regra_de_exclusao": "descartar so os exames com as 12 derivacoes zeradas (lista code15/exames_zerados_p0-3.npy, n_deriv_zeradas == 12): no treino e na validacao (como no A3) e, na avaliacao, tambem no teste interno (mesma regra, provisoria); os parciais (1 a 11 derivacoes zeradas) ficam; regra so pelo sinal, nunca pelos rotulos",
     "descartados": {
       "treino": {
         "antes": 55679,
@@ -76,7 +77,7 @@
     "scipy": "1.18.1"
   },
   "git": {
-    "commit_base": "98fbc7d1d45dfed52f0daf4d3c96e194d0ef0b75",
+    "commit_base": "021c23fd3f6875e8bb00f375f6b6b816d68265a4",
     "arvore_com_alteracoes_nao_commitadas": true,
     "nota": "commit antes de criar este arquivo; o proprio JSON entra no commit seguinte"
   },
@@ -89,8 +90,20 @@
       "ST": "STACH",
       "AF": "AFIB"
     },
-    "limite_de_likelihood": "a decidir",
-    "AFLT_IRBBB_ILBBB": "a decidir (proposta: fora da avaliacao)",
-    "folds": "a decidir"
+    "limite_de_likelihood": "presente",
+    "limite_de_likelihood_estado": "provisorio, a confirmar com a Renata (criterio proposto so pela documentacao: codigo presente com qualquer valor; opcoes: presente, >0, >=50, =100)",
+    "exclusao_por_rotulo": {
+      "AFLT": "AF",
+      "IRBBB": "RBBB",
+      "ILBBB": "LBBB"
+    },
+    "exclusao_por_rotulo_estado": "provisorio, a confirmar com a Renata (padrao ligado: o registro com o codigo sai so da avaliacao do rotulo ao lado; false desliga)",
+    "folds": "todos os 21.799 registros (provisorio, a confirmar com a Renata)"
+  },
+  "code_test": {
+    "arquivo": "code_test/extraido/data/ecg_tracings.hdf5 (827 x 4096 x 12, float64, 400 Hz)",
+    "rotulos": "annotations/gold_standard.csv, so como rotulo",
+    "bootstrap": "por exame (sem patient_id)",
+    "limitacoes": "AF tem so 13 positivos; sobreposicao de pacientes com a CODE-15% NAO VERIFICADA (o CODE-TEST nao tem identificador)"
   }
 }

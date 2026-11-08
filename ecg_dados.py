@@ -13,6 +13,7 @@ from scipy.signal import resample_poly
 
 DADOS = Path(__file__).parent / "code15"
 PTBXL = Path(__file__).parent / "ptbxl"  # PTB-XL 1.0.3 (PhysioNet), fora do git
+CODE_TEST = Path(__file__).parent / "code_test" / "extraido" / "data"  # CODE-TEST (Zenodo), fora do git
 ROTULOS = ["1dAVb", "RBBB", "LBBB", "SB", "ST", "AF"]
 SEED = 42
 PARTES = [0, 1, 2, 3]
@@ -28,6 +29,13 @@ def tabela_com_grupo():
     grupo = pd.Series(np.select([sorteio < 0.7, sorteio < 0.8], ["treino", "validação"], "teste"), index=pacientes)
     tabela["grupo"] = tabela["patient_id"].map(grupo).values
     return tabela
+
+
+def exames_todo_zero(partes):
+    """exam_id dos exames com as 12 derivações zeradas, a partir da lista code15/exames_zerados_p0-3.npy (gerada só pelo sinal).
+    Regra de exclusão provisória (a confirmar com a Renata): só estes saem; os parciais ficam. A lista NÃO é alterada."""
+    z = np.load(DADOS / "exames_zerados_p0-3.npy")  # (exam_id, parte, linha, n_derivações_zeradas)
+    return set(z[(z[:, 3] == 12) & np.isin(z[:, 1], partes), 0])
 
 
 def construir_indice(partes=PARTES, tabela=None):
@@ -150,14 +158,51 @@ class GeradorPTBXL(Sequence):
     """Lotes de `lote` registros do PTB-XL já no formato da CODE-15% (lote, 4096, 12) float32, lidos do disco.
     Ordem fixa = ordem de `self.info` (a de `ptbxl_indice()` ou do subconjunto passado). Devolve só X (sem rótulos)."""
 
-    def __init__(self, info=None, lote=64, **kw):
+    def __init__(self, info=None, lote=64, normalizar=False, **kw):
         super().__init__(**kw)
         self.info = ptbxl_indice() if info is None else info
         self.lote = lote
+        self.normalizar = normalizar  # True = normalizar_exame (A2) depois do pré-processamento; a região ativa exclui os 48 zeros de cada lado
 
     def __len__(self):
         return int(np.ceil(len(self.info) / self.lote))
 
     def __getitem__(self, i):
         caminhos = self.info["filename_hr"].iloc[i * self.lote:(i + 1) * self.lote]
-        return np.stack([preprocessar_ptbxl(wfdb.rdrecord(str(PTBXL / c)).p_signal) for c in caminhos])
+        X = np.stack([preprocessar_ptbxl(wfdb.rdrecord(str(PTBXL / c)).p_signal) for c in caminhos])
+        return np.stack([normalizar_exame(x) for x in X]) if self.normalizar else X
+
+
+# ---------------------------------------------------------------------------------------------
+# CODE-TEST (teste externo secundário, 827 exames, SEM patient_id). gold_standard.csv só como rótulo.
+# ---------------------------------------------------------------------------------------------
+# No CODE-TEST a ordem das colunas é DI, DII, DIII, AVL, AVF, AVR; [0,1,2,5,3,4,...] leva a DI, DII, DIII, AVR, AVL, AVF (medido em 07/11).
+ORDEM_CODETEST = [0, 1, 2, 5, 3, 4, 6, 7, 8, 9, 10, 11]
+
+
+def codetest_rotulos():
+    """(827, 6) float32 na ordem de ROTULOS, lido de annotations/gold_standard.csv (colunas 1dAVb, RBBB, LBBB, SB, AF, ST)."""
+    return pd.read_csv(CODE_TEST / "annotations" / "gold_standard.csv")[ROTULOS].to_numpy(np.float32)
+
+
+class GeradorCodeTest(Sequence):
+    """Lotes do CODE-TEST: (lote, 4096, 12) float32 (o arquivo é float64), derivações reordenadas, ordem fixa do arquivo.
+    Devolve só X. Rótulos em `self.Y` (gold_standard). Sem patient_id: `self.info` só tem o número da linha."""
+
+    def __init__(self, lote=64, normalizar=True, **kw):
+        super().__init__(**kw)
+        self.lote, self.normalizar = lote, normalizar
+        with h5py.File(CODE_TEST / "ecg_tracings.hdf5", "r") as f:
+            self.n = f["tracings"].shape[0]
+        self.Y = codetest_rotulos()
+        assert len(self.Y) == self.n, (len(self.Y), self.n)  # rótulos alinhados linha a linha com os sinais
+        self.info = pd.DataFrame({"linha": np.arange(self.n)})
+
+    def __len__(self):
+        return int(np.ceil(self.n / self.lote))
+
+    def __getitem__(self, i):
+        with h5py.File(CODE_TEST / "ecg_tracings.hdf5", "r") as f:
+            x = f["tracings"][i * self.lote:(i + 1) * self.lote]
+        x = x[:, :, ORDEM_CODETEST].astype(np.float32)
+        return np.stack([normalizar_exame(e) for e in x]) if self.normalizar else x
