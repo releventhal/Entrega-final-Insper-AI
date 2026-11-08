@@ -56,12 +56,14 @@ def b_por_alteracao(exp):
     fig, axs = plt.subplots(1, 2, figsize=(14, 5.5))
     for ax, met, nome in zip(axs, ["auroc", "auprc"], ["AUROC", "AUPRC"]):
         x = np.arange(6)
-        rotular_barras(ax, ax.bar(x - 0.2, a0.loc[ROTULOS, met], 0.4, color=MODELOS["A0b"], label="A0b idade+sexo"), "{:.2f}")
-        rotular_barras(ax, ax.bar(x + 0.2, a3.loc[ROTULOS, met], 0.4, color=MODELOS["A3"], label="A3 CNN"), "{:.2f}")
+        for dx, d, m, rot in ((-0.2, a0, "A0b", "A0b idade+sexo"), (0.2, a3, "A3", "A3 CNN")):
+            for b in ax.bar(x + dx, d.loc[ROTULOS, met], 0.4, color=MODELOS[m], label=rot):  # 3 casas: 0,995 não vira "1,00"
+                ax.annotate(f"{b.get_height():.3f}", (b.get_x() + b.get_width() / 2, b.get_height()), ha="center", va="bottom",
+                            fontsize=9.5, rotation=90 if met == "auroc" else 0)
         ax.set_xticks(x, ROTULOS)
-        ax.set_ylim(0, 1.12)
+        ax.set_ylim(0, 1.22)
         ax.set_title(nome)
-    axs[0].legend(frameon=False, loc="lower left")
+    axs[1].legend(frameon=False, loc="upper right")
     fig.suptitle("Por alteração, validação completa (8.158 exames)", fontsize=16)
     salvar(fig, "b_por_alteracao_A0b_A3.png")
 
