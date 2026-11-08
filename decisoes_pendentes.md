@@ -4,13 +4,13 @@ Organizado pelo Claude do Tom em 08/11/2026. **Nada aqui foi decidido.** Cada it
 
 ## 1. Congelar o A3 como modelo final da Parte A?
 - **Proposta:** congelar o A3 (seed 42), como está em `congelado_candidato_A3.json`, e só então abrir o teste interno, o PTB-XL e o CODE-TEST, uma única vez.
-- **Evidência:** validação de 8.158 exames: macro AUROC 0,989, AUPRC 0,691, F1 0,709 (A0b: 0,705 / 0,046 / 0,095). Variação entre seeds e o candidato A4: ver `RELATORIO_NOITE.md`, Blocos 3 e 4. Sem vazamento achado (seção 9 do `CLAUDE.md`). Teste de estresse de escala e análise de erros: Bloco 2.
+- **Evidência:** validação de 8.158 exames: macro AUROC 0,989, AUPRC 0,691, F1 0,709 (A0b: 0,705 / 0,046 / 0,095). Duas seeds (42 e 43): macro AUROC 0,9892 e 0,9899, AUPRC 0,691 e 0,704, F1 0,709 e 0,713 (a seed 43 parou pelo limite de tempo depois de uma parada do computador; ver `RELATORIO_NOITE.md`, Bloco 3). A4: não treinado. Sem vazamento achado (seção 9 do `CLAUDE.md`). Teste de estresse de escala e análise de erros: Bloco 2.
 - **Risco:** depois de abrir o teste, qualquer troca de modelo deixa o número do teste "usado" (regra 3). Se o A4 (ou outra mudança) for melhor, tem que ser escolhido **antes**, só com a validação.
 - **Se escolher diferente:** congelar o A4 (se houver) exige gerar um JSON novo com o caminho, SHA256 e limiares do A4 (o JSON atual aponta para o A3). Treinar mais (ex.: mais partes) atrasa o teste externo e a intermediária de 11/11.
 
 ## 2. Alternativa A4 (perda ponderada, fora das aulas)
 - **Proposta:** tratar como candidato; decidir entre A3 e A4 só pela validação, olhando também a variação entre seeds do A3.
-- **Evidência:** ver `RELATORIO_NOITE.md`, Bloco 4 (uma seed).
+- **Evidência:** nenhuma ainda: o A4 foi implementado e conferido, mas **não treinado** (o orçamento da sessão de 08/11 acabou). Comando no `RELATORIO_NOITE.md`, Bloco 4.
 - **Risco:** com uma seed, uma diferença menor que o desvio entre seeds do A3 não é diferença demonstrada. A perda ponderada muda a escala das notas (calibração), mas os limiares são reescolhidos na validação.
 - **Se escolher diferente:** ficar com o A3 mantém o modelo mais simples e dentro das aulas.
 
@@ -46,7 +46,7 @@ Organizado pelo Claude do Tom em 08/11/2026. **Nada aqui foi decidido.** Cada it
 
 ## 8. Quantas partes no resultado final
 - **Proposta:** partes 0 a 3 (80.000 exames), como o A3.
-- **Evidência:** A3 (4 partes) vs A2 (1 parte), nos mesmos 2.069 exames: AUROC 0,990 vs 0,985, AUPRC 0,721 vs 0,682, F1 0,717 vs 0,717 (uma seed cada); comparar com o desvio entre seeds do Bloco 3. Tempo: ~37 min por treino de 4 partes neste computador.
+- **Evidência:** A3 (4 partes) vs A2 (1 parte), nos mesmos 2.069 exames: AUROC 0,990 vs 0,985, AUPRC 0,721 vs 0,682, F1 0,717 vs 0,717 (uma seed cada); entre as seeds 42 e 43 do A3, nos mesmos 2.069 exames, a diferença foi 0,0006 em AUROC e 0,005 em AUPRC (só 2 seeds; o A2 não tem várias seeds). Tempo: ~37 min por treino de 4 partes neste computador.
 - **Risco:** mais partes = mais disco (3,9 GB cada), mais tempo, e a Renata precisaria das mesmas partes para reproduzir.
 - **Se escolher diferente:** mais partes exigem retreinar e reescolher limiares antes de congelar.
 
