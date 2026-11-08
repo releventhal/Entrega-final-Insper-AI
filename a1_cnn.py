@@ -54,10 +54,10 @@ def carregar_indices(n_treino=None, partes=PARTES_DEV):
     return saida["treino"], saida["validação"], rel
 
 
-def construir_modelo():
+def construir_modelo(seed=SEED):
     """Arquitetura A1 da seção 5.3, sem mudanças: 4 x Conv1D(32,64,128,128; kernel 15; same; ReLU),
     MaxPool 4 nas três primeiras, GlobalAveragePooling, Dense 6 sigmoid. ~406 mil parâmetros."""
-    keras.utils.set_random_seed(SEED)
+    keras.utils.set_random_seed(seed)  # seed dos pesos iniciais (Bloco 3: só esta e a do embaralhamento mudam)
     m = keras.Sequential([layers.Input((4096, 12))])
     for i, f in enumerate([32, 64, 128, 128]):
         m.add(layers.Conv1D(f, 15, padding="same", activation="relu"))
@@ -105,15 +105,17 @@ class LimiteDeTempo(keras.callbacks.Callback):
             self.estourou, self.model.stop_training = True, True
 
 
-def treinar(nome, normalizar=False, n_treino=None, max_min=60, max_epocas=15, paciencia=3, partes=PARTES_DEV):
+def treinar(nome, normalizar=False, n_treino=None, max_min=60, max_epocas=15, paciencia=3, partes=PARTES_DEV, seed=SEED):
     PASTA_MODELOS.mkdir(exist_ok=True)
     PASTA_RESULTADOS.mkdir(exist_ok=True)
     tr, va, rel = carregar_indices(n_treino, partes)
     print("descartes (só exames todo-zero, só treino e validação):", rel, flush=True)
-    g_tr = GeradorECG(tr, embaralhar=True, normalizar=normalizar)
+    g_tr = GeradorECG(tr, embaralhar=True, normalizar=normalizar, seed=seed)  # seed muda a ordem do embaralhamento
     g_va = GeradorECG(va, normalizar=normalizar)
-    m = construir_modelo()
-    caminho = PASTA_MODELOS / f"{nome}_melhor.keras"
+    m = construir_modelo(seed)
+    # seed 42 = caminho de sempre; outra seed = pasta própria (nunca sobrescreve o modelo da seed 42)
+    caminho = PASTA_MODELOS / f"{nome}_melhor.keras" if seed == SEED else PASTA_MODELOS / nome / f"{nome}_melhor.keras"
+    caminho.parent.mkdir(exist_ok=True)
     limite = LimiteDeTempo(max_min)
     t0 = time.perf_counter()
     hist = m.fit(g_tr, validation_data=g_va, epochs=max_epocas, verbose=2, callbacks=[
@@ -134,7 +136,7 @@ def treinar(nome, normalizar=False, n_treino=None, max_min=60, max_epocas=15, pa
     S = m.predict(g_va, verbose=0)
     Y = g_va.Y
     assert S.shape == Y.shape == (len(va), len(ROTULOS))  # previsões alinhadas com g_va.info / g_va.Y
-    exp = ROTULO_EXPERIMENTO.get(nome, nome)
+    exp = ROTULO_EXPERIMENTO.get(nome, nome) if seed == SEED else f"{ROTULO_EXPERIMENTO.get(nome.split('_seed')[0], nome)} | seed {seed}"
     df = tabela_metricas(exp, Y, S)
     df["dados"] = f"partes {partes} (provisório, a confirmar com a Renata)"
     df["n_treino"], df["epocas"], df["melhor_epoca"], df["minutos_treino"] = len(tr), len(h["loss"]), melhor + 1, round(minutos, 1)
@@ -152,6 +154,8 @@ def treinar(nome, normalizar=False, n_treino=None, max_min=60, max_epocas=15, pa
     df = pd.concat(partes_df, ignore_index=True)
     np.save(PASTA_RESULTADOS / f"{nome}_previsoes_validacao.npy", S.astype(np.float32))
     print(df.round(3).to_string(index=False), flush=True)
+    if seed != SEED:  # o A0b não depende da seed da CNN: já está no CSV para este conjunto
+        return df, S, g_va
     return pd.concat([df, a0b_mesmo_conjunto(tr, va, nome, partes)], ignore_index=True), S, g_va
 
 
@@ -206,9 +210,11 @@ if __name__ == "__main__":
     ap.add_argument("--max-min", type=float, default=60)
     ap.add_argument("--max-epocas", type=int, default=15)
     ap.add_argument("--partes", default="0")  # ex.: 0,1,2,3
+    ap.add_argument("--seed", type=int, default=SEED)  # Bloco 3 (robustez): só muda a seed
     a = ap.parse_args()
     if a.modo == "bench":
         bench(normalizar=a.normalizar, partes=[int(x) for x in a.partes.split(",")])
     else:
-        df, _, _ = treinar(a.nome, a.normalizar, a.n_treino, a.max_min, a.max_epocas, partes=[int(x) for x in a.partes.split(",")])
+        df, _, _ = treinar(a.nome, a.normalizar, a.n_treino, a.max_min, a.max_epocas,
+                           partes=[int(x) for x in a.partes.split(",")], seed=a.seed)
         gravar_no_csv(df)

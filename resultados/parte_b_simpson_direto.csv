@@ -1,0 +1,4 @@
+delta,pacientes,obitos,taxa,idade_media
+ECG 8+ mais jovem,34555,1617,0.0468,62.8999
+semelhante (±8),107336,3736,0.0348,50.3943
+ECG 8+ mais velho,45084,1351,0.0300,42.1688

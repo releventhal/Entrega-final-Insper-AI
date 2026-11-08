@@ -1,0 +1,7 @@
+horizonte,grupo,pacientes_com_death,elegiveis,obitos,censurados_sairam
+2,treino,163406,129439,3368,33967
+2,validação,23569,18711,450,4858
+1,treino,163406,157208,2021,6198
+1,validação,23569,22753,251,816
+3,treino,163406,100538,4382,62868
+3,validação,23569,14481,585,9088
