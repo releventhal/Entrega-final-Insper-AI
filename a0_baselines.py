@@ -61,7 +61,10 @@ def main():
     macro = macro.reset_index().assign(rotulo="MACRO", n_val=len(va), positivos_val=np.nan, limiar=np.nan)
     df = pd.concat([df, macro], ignore_index=True)
     PASTA_RESULTADOS.mkdir(exist_ok=True)
-    df.to_csv(PASTA_RESULTADOS / "experimentos.csv", index=False, float_format="%.4f")
+    arq = PASTA_RESULTADOS / "experimentos.csv"  # troca só as linhas do A0 e mantém as de outros experimentos (A1, A2...)
+    if arq.exists():
+        df = pd.concat([pd.read_csv(arq).query("~experimento.isin(@df.experimento.unique())"), df], ignore_index=True)
+    df.to_csv(arq, index=False, float_format="%.4f")
     print(df.round(3).to_string(index=False))  # sem to_markdown: exigiria o pacote tabulate (fora do requirements.txt)
 
 

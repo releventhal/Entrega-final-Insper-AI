@@ -16,6 +16,7 @@ PTBXL = Path(__file__).parent / "ptbxl"  # PTB-XL 1.0.3 (PhysioNet), fora do git
 ROTULOS = ["1dAVb", "RBBB", "LBBB", "SB", "ST", "AF"]
 SEED = 42
 PARTES = [0, 1, 2, 3]
+PARTES_DEV = [0]  # [PROV] dados de desenvolvimento do A1: só a parte 0 (a confirmar com a Renata)
 
 
 def tabela_com_grupo():
@@ -59,6 +60,19 @@ def listar_zerados(partes=PARTES, passo=500):
     return np.array(achados, dtype=np.int32).reshape(-1, 4)
 
 
+def normalizar_exame(x):
+    """A2 (provisório, a confirmar com a Renata): normalização POR EXAME e POR DERIVAÇÃO.
+    Média e desvio são calculados só na região com sinal (fora do preenchimento de zeros das pontas), sem usar rótulos.
+    O preenchimento continua zero. Derivação totalmente zerada (ou constante) fica zero."""
+    ativo = np.abs(x).max(axis=1) > 0
+    if not ativo.any():
+        return x
+    media, desvio = x[ativo].mean(axis=0), x[ativo].std(axis=0)
+    y = np.zeros_like(x)
+    y[ativo] = (x[ativo] - media) / np.where(desvio > 1e-6, desvio, np.inf)
+    return y
+
+
 class GeradorECG(Sequence):
     """Lotes de `lote` exames lidos direto do HDF5 (float32), sem carregar parte nenhuma inteira.
 
@@ -68,8 +82,9 @@ class GeradorECG(Sequence):
     - Dentro de cada lote os exames são lidos ordenados por (parte, linha); X e y saem nessa mesma ordem.
     """
 
-    def __init__(self, info, lote=64, embaralhar=False, seed=SEED, **kw):
+    def __init__(self, info, lote=64, embaralhar=False, seed=SEED, normalizar=False, **kw):
         super().__init__(**kw)
+        self.normalizar = normalizar  # False = nenhuma normalização (A1); True = por exame e derivação (A2 provisório)
         self.info = info.sort_values(["parte", "linha"], ignore_index=True)
         self.lote, self.embaralhar, self.seed, self.epoca = lote, embaralhar, seed, 0
         self.Y = self.info[ROTULOS].to_numpy(np.float32)
@@ -94,6 +109,8 @@ class GeradorECG(Sequence):
         X = np.empty((len(pos), 4096, 12), np.float32)
         for k, (p, linha) in enumerate(self.info.loc[pos, ["parte", "linha"]].to_numpy()):
             X[k] = self._abrir(p)["tracings"][linha]
+            if self.normalizar:
+                X[k] = normalizar_exame(X[k])
         return X, self.Y[pos]
 
     def _abrir(self, p):

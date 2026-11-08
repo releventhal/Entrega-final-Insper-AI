@@ -15,3 +15,6 @@ code_test/
 
 # PTB-XL (teste externo, baixado do PhysioNet)
 ptbxl/
+
+# Modelos treinados (locais)
+modelos/
