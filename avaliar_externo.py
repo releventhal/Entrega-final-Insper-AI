@@ -10,9 +10,9 @@ Uso:
 
 Conjuntos (PROVISÓRIO, a confirmar com a Renata, salvo onde dito):
   interno   : grupo teste das partes 0 a 3, ordem fixa, mesma regra de exclusão do A3 (só exames com as 12 derivações zeradas, pelo sinal).
-  ptbxl     : 21.799 registros; positivo = código SCP presente (limite de likelihood é parâmetro do JSON); registros com AFLT, IRBBB ou ILBBB
+  ptbxl     : 21.799 registros menos os com as 12 derivações zeradas (mesma regra, lida do sinal cru; 0 na medição anterior); positivo = código SCP presente (limite de likelihood é parâmetro do JSON); registros com AFLT, IRBBB ou ILBBB
               saem só da avaliação do rótulo correspondente (AFLT->AF, IRBBB->RBBB, ILBBB->LBBB), também parâmetro; bootstrap por patient_id.
-  code_test : 827 exames, SEM patient_id (bootstrap por exame), rótulo = gold_standard.csv. LIMITAÇÕES: AF tem só 13 positivos (IC largo);
+  code_test : 827 exames menos os com as 12 derivações zeradas (mesma regra, lida do sinal cru), SEM patient_id (bootstrap por exame), rótulo = gold_standard.csv. LIMITAÇÕES: AF tem só 13 positivos (IC largo);
               a sobreposição de pacientes com a CODE-15% é NÃO VERIFICADA (o CODE-TEST não tem identificador).
 Nenhuma estatística é calculada no conjunto avaliado: normalização é por exame (só o próprio exame) e os limiares vêm do JSON.
 IC de 95% por bootstrap (1.000 reamostras, seed 42).
@@ -57,6 +57,14 @@ def sha256(caminho):
         for b in iter(lambda: f.read(1 << 20), b""):
             h.update(b)
     return h.hexdigest()
+
+
+# ------------------------------------------------------------------------------------------------ exclusão de exames zerados
+def mascara_todo_zero(gerador_cru):
+    """True nos exames com as 12 derivações zeradas, lidos do SINAL CRU (gerador com normalizar=False; a normalização zera derivações
+    constantes e mudaria a regra). Mesma definição do caminho `interno` (ecg_dados.todo_zero = n_deriv_zeradas == 12). Nunca usa rótulos."""
+    from ecg_dados import todo_zero
+    return np.concatenate([todo_zero(gerador_cru[i]) for i in range(len(gerador_cru))]) if len(gerador_cru) else np.zeros(0, bool)
 
 
 # ------------------------------------------------------------------------------------------------ rótulos do PTB-XL
@@ -109,6 +117,7 @@ def carregar_conjunto(conjunto, cfg):
         sai = teste.exam_id.isin(E.exames_todo_zero(partes))
         teste = teste[~sai].reset_index(drop=True)
         g = E.GeradorECG(teste, normalizar=True)  # ordem fixa (parte, linha)
+        print(f"interno: excluídos por terem as 12 derivações zeradas: {int(sai.sum())} de {len(sai)}")
         resumo = {"exames_antes": int(len(sai)), "exames_excluidos_todo_zero": int(sai.sum()), "exames": len(teste),
                   "positivos": {r: int(teste[r].sum()) for r in E.ROTULOS}, "pacientes": int(teste.patient_id.nunique())}
         return dict(gerador=g, Y=g.Y, mask=np.ones(g.Y.shape, bool), pacientes=g.info["patient_id"].to_numpy(), resumo=resumo)
@@ -116,13 +125,19 @@ def carregar_conjunto(conjunto, cfg):
         info = E.ptbxl_indice()  # 21.799 registros, ordem de ecg_id
         limite, excl = parametros_ptbxl(cfg)
         mapa = cfg["ptbxl"]["mapeamento_de_rotulos"]
+        sai = mascara_todo_zero(E.GeradorPTBXL(info, normalizar=False))  # passada extra de leitura (~12 min), só pelo sinal
+        print(f"ptbxl: excluídos por terem as 12 derivações zeradas: {int(sai.sum())} de {len(info)}")
+        info = info[~sai]
         Y, mask, resumo = rotulos_ptbxl(info, mapa, limite, excl)
-        resumo.update(limite_de_likelihood=limite, exclusao=excl, registros=len(info), pacientes=int(info.patient_id.nunique()))
+        resumo.update(limite_de_likelihood=limite, exclusao=excl, registros=len(info), registros_excluidos_todo_zero=int(sai.sum()),
+                      pacientes=int(info.patient_id.nunique()))
         g = E.GeradorPTBXL(info, normalizar=True)  # 500 -> 400 Hz, 48 zeros de cada lado, depois normalizar_exame (A2)
         return dict(gerador=g, Y=Y, mask=mask, pacientes=info["patient_id"].to_numpy(), resumo=resumo)
     if conjunto == "code_test":
-        g = E.GeradorCodeTest(normalizar=True)  # reordena [0,1,2,5,3,4,...], float64 -> float32
-        resumo = {"exames": g.n, "positivos": {r: int(g.Y[:, k].sum()) for k, r in enumerate(E.ROTULOS)},
+        sai = mascara_todo_zero(E.GeradorCodeTest(normalizar=False))  # só pelo sinal
+        print(f"code_test: excluídos por terem as 12 derivações zeradas: {int(sai.sum())} de {len(sai)}")
+        g = E.GeradorCodeTest(normalizar=True, linhas=np.where(~sai)[0])  # reordena [0,1,2,5,3,4,...], float64 -> float32
+        resumo = {"exames_antes": len(sai), "exames_excluidos_todo_zero": int(sai.sum()), "exames": g.n, "positivos": {r: int(g.Y[:, k].sum()) for k, r in enumerate(E.ROTULOS)},
                   "aviso": "AF tem so 13 positivos; sobreposicao de pacientes com a CODE-15% e NAO VERIFICADA (sem identificador)"}
         return dict(gerador=g, Y=g.Y, mask=np.ones(g.Y.shape, bool), pacientes=None, resumo=resumo)  # sem patient_id -> bootstrap por exame
     sys.exit(f"conjunto desconhecido: {conjunto}")

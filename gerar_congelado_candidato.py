@@ -6,6 +6,7 @@ Uso (raiz do repositório, Python do .venv): python gerar_congelado_candidato.py
 import hashlib
 import json
 import subprocess
+import sys
 from datetime import date
 from importlib.metadata import version
 from pathlib import Path
@@ -30,6 +31,10 @@ def sha256(caminho):
 
 
 def main():
+    atual = RAIZ / "congelado_candidato_A3.json"
+    if atual.exists() and "decisoes" in json.loads(atual.read_text(encoding="utf-8")):
+        sys.exit("RECUSADO: congelado_candidato_A3.json já tem decisões da dupla (chave 'decisoes'); gerar de novo as apagaria. "
+                 "Para refazer de propósito, apague essa chave à mão e registre a razão no CLAUDE.md.")
     tr, va, rel = carregar_indices(partes=PARTES)
     va = va.sort_values(["parte", "linha"], ignore_index=True)  # mesma ordem do GeradorECG (previsões salvas)
     S = np.load(RAIZ / "resultados" / "A3_previsoes_validacao.npy")

@@ -53,6 +53,17 @@ def construir_indice(partes=PARTES, tabela=None):
     return idx.sort_values(["parte", "linha"], ignore_index=True)
 
 
+def n_deriv_zeradas(x):
+    """Nº de derivações com o sinal todo zero. x: (T, 12) ou (n, T, 12) -> escalar ou (n,). Só usa o sinal, nunca rótulos.
+    Usa .max (não soma): a soma em float16 estoura (seção 9)."""
+    return (np.abs(x).max(axis=-2) == 0).sum(axis=-1)
+
+
+def todo_zero(x):
+    """True nos exames com as 12 derivações zeradas (única regra de exclusão decidida em 08/11; os parciais ficam). Mesma definição de `listar_zerados`."""
+    return n_deriv_zeradas(x) == 12
+
+
 def listar_zerados(partes=PARTES, passo=500):
     """Passada única pelos sinais. Devolve array int32 (exam_id, parte, linha, n_derivações_zeradas),
     só dos exames com pelo menos 1 derivação zerada. NÃO descarta nada."""
@@ -62,7 +73,7 @@ def listar_zerados(partes=PARTES, passo=500):
             ds, ids = f["tracings"], f["exam_id"][:]
             for ini in range(0, len(ids), passo):
                 x = ds[ini:ini + passo]                                  # float32: o max evita o estouro da soma em float16
-                n_zer = (np.abs(x).max(axis=1) == 0).sum(axis=1)         # (exames,) derivações com o sinal todo zero
+                n_zer = n_deriv_zeradas(x)                               # (exames,) derivações com o sinal todo zero
                 for k in np.where((n_zer > 0) & (ids[ini:ini + passo] != 0))[0]:
                     achados.append((ids[ini + k], p, ini + k, n_zer[k]))
     return np.array(achados, dtype=np.int32).reshape(-1, 4)
@@ -189,20 +200,22 @@ class GeradorCodeTest(Sequence):
     """Lotes do CODE-TEST: (lote, 4096, 12) float32 (o arquivo é float64), derivações reordenadas, ordem fixa do arquivo.
     Devolve só X. Rótulos em `self.Y` (gold_standard). Sem patient_id: `self.info` só tem o número da linha."""
 
-    def __init__(self, lote=64, normalizar=True, **kw):
+    def __init__(self, lote=64, normalizar=True, linhas=None, **kw):
         super().__init__(**kw)
         self.lote, self.normalizar = lote, normalizar
         with h5py.File(CODE_TEST / "ecg_tracings.hdf5", "r") as f:
-            self.n = f["tracings"].shape[0]
-        self.Y = codetest_rotulos()
-        assert len(self.Y) == self.n, (len(self.Y), self.n)  # rótulos alinhados linha a linha com os sinais
-        self.info = pd.DataFrame({"linha": np.arange(self.n)})
+            n_arquivo = f["tracings"].shape[0]
+        Y = codetest_rotulos()
+        assert len(Y) == n_arquivo, (len(Y), n_arquivo)  # rótulos alinhados linha a linha com os sinais
+        self.linhas = np.arange(n_arquivo) if linhas is None else np.sort(np.asarray(linhas))  # `linhas`: subconjunto (ex.: sem exames todo-zero)
+        self.n, self.Y = len(self.linhas), Y[self.linhas]
+        self.info = pd.DataFrame({"linha": self.linhas})
 
     def __len__(self):
         return int(np.ceil(self.n / self.lote))
 
     def __getitem__(self, i):
         with h5py.File(CODE_TEST / "ecg_tracings.hdf5", "r") as f:
-            x = f["tracings"][i * self.lote:(i + 1) * self.lote]
+            x = f["tracings"][self.linhas[i * self.lote:(i + 1) * self.lote]]  # índices crescentes (h5py)
         x = x[:, :, ORDEM_CODETEST].astype(np.float32)
         return np.stack([normalizar_exame(e) for e in x]) if self.normalizar else x
