@@ -20,8 +20,11 @@ Os caminhos interno, ptbxl e code_test NÃO FORAM EXECUTADOS COM O MODELO (códi
 """
 import argparse
 import ast
+import datetime
 import hashlib
 import json
+import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -197,10 +200,29 @@ def main():
     modelo = keras.models.load_model(caminho)
     rotulos, limiares = cfg["rotulos"], cfg["limiares"]["valores"]
 
-    d = carregar_conjunto(a.conjunto, cfg)
-    print("resumo do conjunto:", d["resumo"])
-    Y, mask, pacientes = d["Y"], d["mask"], d["pacientes"]
-    S = modelo.predict(d["gerador"], verbose=0)  # sem retreinar; a normalização do JSON já está no gerador
+    # Saída bruta (notas do modelo) gravada logo depois do predict, antes do bootstrap. Se já existir e abrir íntegra, o predict NÃO é refeito.
+    brutos = sorted((RAIZ / "resultados").glob(f"bruto_{a.conjunto}_*.npz")) if a.conjunto not in LIVRES else []
+    if brutos:
+        b = np.load(brutos[-1], allow_pickle=False)
+        S, Y, mask, pacientes = b["S"], b["Y"], b["mask"], (b["pacientes"] if b["pacientes"].size else None)
+        print(f"saída bruta já existe ({brutos[-1].name}): predict NÃO refeito; só as métricas são recalculadas. resumo: {b['resumo']}")
+    else:
+        d = carregar_conjunto(a.conjunto, cfg)
+        print("resumo do conjunto:", d["resumo"])
+        Y, mask, pacientes = d["Y"], d["mask"], d["pacientes"]
+        S = modelo.predict(d["gerador"], verbose=0)  # sem retreinar; a normalização do JSON já está no gerador
+        if a.conjunto not in LIVRES:
+            gi = d["gerador"].info
+            ids = gi["exam_id"] if "exam_id" in gi else (gi["linha"] if "linha" in gi else gi.index)  # interno: exam_id; ptbxl: ecg_id; code_test: linha
+            commit = subprocess.run(["git", "-C", str(RAIZ), "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
+            sujo = subprocess.run(["git", "-C", str(RAIZ), "status", "--porcelain", "--untracked-files=no"], capture_output=True, text=True).stdout.strip()
+            nome = RAIZ / "resultados" / f"bruto_{a.conjunto}_{datetime.date.today():%Y%m%d}_{commit}{'-sujo' if sujo else ''}.npz"
+            tmp = nome.with_suffix(".tmp")
+            with open(tmp, "wb") as f:  # escreve em arquivo temporário e renomeia: uma queda no meio não deixa um .npz pela metade
+                np.savez(f, S=S, Y=Y, mask=mask, ids=np.asarray(ids), pacientes=np.array([]) if pacientes is None else pacientes,
+                         resumo=json.dumps(d["resumo"], default=str), json_sha256=sha256(RAIZ / a.json), modelo_sha256=cfg["modelo"]["sha256"])
+            os.replace(tmp, nome)
+            print(f"saída bruta salva: {nome.name}")
     assert S.shape == Y.shape and list(limiares) == rotulos
     m = com_macro(metricas_exame(Y, S, limiares, mask))
     ic, n_validas = bootstrap(Y, S, limiares, mask, pacientes, a.boot)
