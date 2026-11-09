@@ -1,0 +1,58 @@
+
+(a) positivos previstos com o limiar congelado vs positivos reais
+
+| Conjunto | Alteração | Avaliados | Positivos reais (prevalência) | Previstos | Previstos / reais |
+|---|---|---|---|---|---|
+| Teste interno | 1dAVb | 16109 | 281 (1,7%) | 256 | 0,91 |
+| Teste interno | RBBB | 16109 | 442 (2,7%) | 549 | 1,24 |
+| Teste interno | LBBB | 16109 | 290 (1,8%) | 335 | 1,16 |
+| Teste interno | SB | 16109 | 308 (1,9%) | 320 | 1,04 |
+| Teste interno | ST | 16109 | 353 (2,2%) | 452 | 1,28 |
+| Teste interno | AF | 16109 | 310 (1,9%) | 288 | 0,93 |
+| PTB-XL | 1dAVb | 21799 | 793 (3,6%) | 969 | 1,22 |
+| PTB-XL | RBBB | 20681 | 540 (2,6%) | 581 | 1,08 |
+| PTB-XL | LBBB | 21722 | 536 (2,5%) | 768 | 1,43 |
+| PTB-XL | SB | 21799 | 637 (2,9%) | 426 | 0,67 |
+| PTB-XL | ST | 21799 | 826 (3,8%) | 962 | 1,16 |
+| PTB-XL | AF | 21726 | 1497 (6,9%) | 1445 | 0,97 |
+| CODE-TEST | 1dAVb | 827 | 28 (3,4%) | 15 | 0,54 |
+| CODE-TEST | RBBB | 827 | 34 (4,1%) | 36 | 1,06 |
+| CODE-TEST | LBBB | 827 | 30 (3,6%) | 29 | 0,97 |
+| CODE-TEST | SB | 827 | 16 (1,9%) | 13 | 0,81 |
+| CODE-TEST | ST | 827 | 37 (4,5%) | 33 | 0,89 |
+| CODE-TEST | AF | 827 | 13 (1,6%) | 11 | 0,85 |
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794189429.567923    5920 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794189431.752408    5920 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+
+(d) CODE-TEST, F1 contra o gold_standard (sem IC; 13 a 37 positivos por alteração)
+
+| Quem | 1dAVb | RBBB | LBBB | SB | ST | AF | Média macro |
+|---|---|---|---|---|---|---|---|
+| A3 (este projeto) | 0,651 | 0,914 | 0,983 | 0,690 | 0,886 | 0,750 | 0,812 |
+| dnn | 0,897 | 0,944 | 1,000 | 0,882 | 0,960 | 0,870 | 0,925 |
+| cardiologist1 | 0,828 | 0,957 | 0,966 | 0,897 | 0,896 | 0,870 | 0,902 |
+| cardiologist2 | 0,926 | 0,971 | 1,000 | 0,897 | 0,930 | 0,889 | 0,935 |
+| cardiology_residents | 0,776 | 0,917 | 0,947 | 0,882 | 0,882 | 0,769 | 0,862 |
+| emergency_residents | 0,719 | 0,852 | 0,912 | 0,848 | 0,946 | 0,696 | 0,829 |
+| medical_students | 0,732 | 0,928 | 0,915 | 0,750 | 0,873 | 0,706 | 0,817 |
+md5: parte 0 pronta
+md5: parte 1 pronta
+md5: parte 2 pronta
+md5: parte 3 pronta
+
+(b) teste interno: 16109 exames; 139 com sinal idêntico a outro exame das partes 0 a 3 (28 idênticos a algum exame de treino/validação; 28 cujo sinal também aparece em outro paciente); com alguma das 6 alterações: 5
+
+| Alteração | AUROC com / sem | AUPRC com / sem | F1 com / sem |
+|---|---|---|---|
+| 1dAVb | 0,978 / 0,978 | 0,477 / 0,479 | 0,525 / 0,526 |
+| RBBB | 0,992 / 0,992 | 0,826 / 0,826 | 0,819 / 0,823 |
+| LBBB | 0,993 / 0,993 | 0,784 / 0,782 | 0,781 / 0,779 |
+| SB | 0,992 / 0,992 | 0,693 / 0,695 | 0,678 / 0,679 |
+| ST | 0,993 / 0,993 | 0,717 / 0,718 | 0,740 / 0,741 |
+| AF | 0,984 / 0,985 | 0,761 / 0,764 | 0,686 / 0,689 |
+| Média macro | 0,989 / 0,989 | 0,710 / 0,711 | 0,705 / 0,706 |
+
+maior diferença absoluta (com - sem) em qualquer métrica e alteração: 0.0054; sem os idênticos a treino/validação: 0.0023
+EXIT=0

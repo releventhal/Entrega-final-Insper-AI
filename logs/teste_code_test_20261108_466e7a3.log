@@ -1,0 +1,19 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794189353.811719   29244 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794189359.317110   29244 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+I0000 00:00:1794189364.785564   29244 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+code_test: excluídos por terem as 12 derivações zeradas: 0 de 827
+resumo do conjunto: {'exames_antes': 827, 'exames_excluidos_todo_zero': 0, 'exames': 827, 'positivos': {'1dAVb': 28, 'RBBB': 34, 'LBBB': 30, 'SB': 16, 'ST': 37, 'AF': 13}, 'aviso': 'AF tem so 13 positivos; sobreposicao de pacientes com a CODE-15% e NAO VERIFICADA (sem identificador)'}
+saída bruta salva: bruto_code_test_20261108_466e7a3.npz
+conjunto: code_test | exames: 827 | pacientes: n/d (bootstrap por exame) | JSON status: congelado | reamostras válidas: 1000
+1dAVb (positivos 28 de 827): auroc 0.997 [0.993-0.999], auprc 0.920 [0.829-0.981], sensibilidade 0.500 [0.318-0.708], precisao 0.933 [0.778-1.000], f1 0.651 [0.465-0.818], especificidade 0.999 [0.996-1.000]
+RBBB (positivos 34 de 827): auroc 0.995 [0.987-1.000], auprc 0.952 [0.887-0.995], sensibilidade 0.941 [0.844-1.000], precisao 0.889 [0.786-0.975], f1 0.914 [0.841-0.973], especificidade 0.995 [0.990-0.999]
+LBBB (positivos 30 de 827): auroc 1.000 [0.999-1.000], auprc 0.996 [0.982-1.000], sensibilidade 0.967 [0.885-1.000], precisao 1.000 [1.000-1.000], f1 0.983 [0.939-1.000], especificidade 1.000 [1.000-1.000]
+SB (positivos 16 de 827): auroc 0.997 [0.994-0.999], auprc 0.864 [0.693-0.973], sensibilidade 0.625 [0.375-0.867], precisao 0.769 [0.500-1.000], f1 0.690 [0.444-0.857], especificidade 0.996 [0.991-1.000]
+ST (positivos 37 de 827): auroc 0.999 [0.997-1.000], auprc 0.977 [0.939-0.999], sensibilidade 0.838 [0.706-0.945], precisao 0.939 [0.840-1.000], f1 0.886 [0.800-0.957], especificidade 0.997 [0.994-1.000]
+AF (positivos 13 de 827): auroc 0.997 [0.993-1.000], auprc 0.789 [0.558-0.981], sensibilidade 0.692 [0.429-0.923], precisao 0.818 [0.556-1.000], f1 0.750 [0.522-0.919], especificidade 0.998 [0.994-1.000]
+MACRO: auroc 0.997 [0.996-0.999], auprc 0.916 [0.870-0.960], sensibilidade 0.760 [0.686-0.830], precisao 0.892 [0.821-0.954], f1 0.812 [0.747-0.865], especificidade 0.998 [0.996-0.999]
+EXIT=0

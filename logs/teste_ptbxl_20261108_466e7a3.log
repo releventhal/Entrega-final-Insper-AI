@@ -1,0 +1,19 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794187798.975086   15136 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794187802.480366   15136 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+I0000 00:00:1794187807.084069   15136 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+ptbxl: excluídos por terem as 12 derivações zeradas: 0 de 21799
+resumo do conjunto: {'1dAVb': {'positivos_sem_exclusao': 793, 'positivos': 793, 'avaliados': 21799, 'excluidos': 0}, 'RBBB': {'positivos_sem_exclusao': 541, 'positivos': 540, 'avaliados': 20681, 'excluidos': 1118}, 'LBBB': {'positivos_sem_exclusao': 536, 'positivos': 536, 'avaliados': 21722, 'excluidos': 77}, 'SB': {'positivos_sem_exclusao': 637, 'positivos': 637, 'avaliados': 21799, 'excluidos': 0}, 'ST': {'positivos_sem_exclusao': 826, 'positivos': 826, 'avaliados': 21799, 'excluidos': 0}, 'AF': {'positivos_sem_exclusao': 1514, 'positivos': 1497, 'avaliados': 21726, 'excluidos': 73}, 'registros_com_AFLT_IRBBB_ILBBB': 1264, 'limite_de_likelihood': 'presente', 'exclusao': {'AFLT': 'AF', 'IRBBB': 'RBBB', 'ILBBB': 'LBBB'}, 'registros': 21799, 'registros_excluidos_todo_zero': 0, 'pacientes': 18869}
+saída bruta salva: bruto_ptbxl_20261108_466e7a3.npz
+conjunto: ptbxl | exames: 21799 | pacientes: 18869 | JSON status: congelado | reamostras válidas: 1000
+1dAVb (positivos 793 de 21799): auroc 0.924 [0.916-0.933], auprc 0.400 [0.363-0.439], sensibilidade 0.503 [0.466-0.541], precisao 0.412 [0.381-0.445], f1 0.453 [0.424-0.483], especificidade 0.973 [0.970-0.975]
+RBBB (positivos 540 de 20681): auroc 0.997 [0.993-0.999], auprc 0.951 [0.928-0.970], sensibilidade 0.959 [0.941-0.977], precisao 0.892 [0.864-0.916], f1 0.924 [0.907-0.940], especificidade 0.997 [0.996-0.998]
+LBBB (positivos 536 de 21722): auroc 0.998 [0.996-0.999], auprc 0.942 [0.926-0.958], sensibilidade 0.965 [0.947-0.980], precisao 0.673 [0.636-0.709], f1 0.793 [0.763-0.819], especificidade 0.988 [0.986-0.990]
+SB (positivos 637 de 21799): auroc 0.920 [0.907-0.933], auprc 0.671 [0.630-0.708], sensibilidade 0.557 [0.517-0.596], precisao 0.833 [0.794-0.867], f1 0.668 [0.631-0.699], especificidade 0.997 [0.996-0.997]
+ST (positivos 826 de 21799): auroc 0.993 [0.991-0.995], auprc 0.878 [0.853-0.900], sensibilidade 0.881 [0.859-0.903], precisao 0.757 [0.727-0.785], f1 0.814 [0.793-0.833], especificidade 0.989 [0.987-0.990]
+AF (positivos 1497 de 21726): auroc 0.989 [0.987-0.992], auprc 0.886 [0.866-0.905], sensibilidade 0.810 [0.787-0.832], precisao 0.839 [0.816-0.861], f1 0.824 [0.807-0.842], especificidade 0.988 [0.987-0.990]
+MACRO: auroc 0.970 [0.968-0.973], auprc 0.788 [0.776-0.799], sensibilidade 0.779 [0.767-0.790], precisao 0.734 [0.721-0.747], f1 0.746 [0.735-0.756], especificidade 0.989 [0.988-0.989]
+EXIT=0
