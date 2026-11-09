@@ -17,4 +17,5 @@ code_test/
 ptbxl/
 
 # Modelos treinados (locais)
-modelos/
+modelos/*
+!modelos/A3_melhor.keras
