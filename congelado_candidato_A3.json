@@ -1,5 +1,5 @@
 {
-  "status": "candidato",
+  "status": "congelado",
   "aviso": "NAO congelado. Enquanto o status for 'candidato', avaliar_externo.py recusa rodar em qualquer conjunto de teste. Congelar = decisao da dupla (Tom e Renata): mudar o status para 'congelado' so com congelar.py, rodado a mao.",
   "provisorio": "itens decididos por Tom e Renata em 2026-11-08 (ver 'decisoes'); o resto segue como gerado, ainda candidato",
   "gerado_em": "2026-11-08",
@@ -123,5 +123,7 @@
     "exclusao_aflt_irbbb_ilbbb": "decidido: ligada, so da avaliacao do rotulo correspondente (AFLT->AF, IRBBB->RBBB, ILBBB->LBBB)",
     "registros_ptbxl": "decidido: todos os 21.799; bootstrap por patient_id",
     "exames_zerados": "decidido: excluir so exames com as 12 derivacoes zeradas, nos tres testes (interno, PTB-XL, CODE-TEST), decidido pelo sinal, nunca pelos rotulos"
-  }
+  },
+  "congelado_em": "2026-11-08T22:23:17-03:00",
+  "congelado_commit": "b80883a8bf1fa725dae6e86c9585047a2b4102a7"
 }
