@@ -1,0 +1,25 @@
+conjunto,subgrupo,positivos,falsos_negativos,sensibilidade,negativos,falsos_positivos,taxa_falso_positivo
+Validação,idade <40,13,9,0.3077,2325,6,0.0026
+Validação,idade 40-59,17,7,0.5882,2338,9,0.0038
+Validação,idade 60-69,29,15,0.4828,1274,15,0.0118
+Validação,idade 70+,82,45,0.4512,2080,32,0.0154
+Validação,homens,69,43,0.3768,3201,34,0.0106
+Validação,mulheres,72,33,0.5417,4816,28,0.0058
+Teste interno,idade <40,29,16,0.4483,4701,10,0.0021
+Teste interno,idade 40-59,39,20,0.4872,4587,20,0.0044
+Teste interno,idade 60-69,32,14,0.5625,2575,24,0.0093
+Teste interno,idade 70+,181,90,0.5028,3965,61,0.0154
+Teste interno,homens,163,77,0.5276,6422,61,0.0095
+Teste interno,mulheres,118,63,0.4661,9406,54,0.0057
+PTB-XL,idade <40,29,14,0.5172,2818,26,0.0092
+PTB-XL,idade 40-59,100,40,0.6000,6803,124,0.0182
+PTB-XL,idade 60-69,195,96,0.5077,5053,163,0.0323
+PTB-XL,idade 70+,469,244,0.4797,6332,257,0.0406
+PTB-XL,homens,481,225,0.5322,10873,388,0.0357
+PTB-XL,mulheres,312,169,0.4583,10133,182,0.0180
+CODE-TEST,idade <40,2,1,0.5000,149,0,0.0000
+CODE-TEST,idade 40-59,7,3,0.5714,333,1,0.0030
+CODE-TEST,idade 60-69,8,4,0.5000,157,0,0.0000
+CODE-TEST,idade 70+,11,6,0.4545,160,0,0.0000
+CODE-TEST,homens,17,10,0.4118,304,1,0.0033
+CODE-TEST,mulheres,11,4,0.6364,495,0,0.0000

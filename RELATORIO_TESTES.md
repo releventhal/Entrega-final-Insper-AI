@@ -175,7 +175,9 @@ F1 com o limiar congelado:
 | emergency_residents | 0,719 | 0,852 | 0,912 | 0,848 | 0,946 | 0,696 | 0,829 |
 | medical_students | 0,732 | 0,928 | 0,915 | 0,750 | 0,873 | 0,706 | 0,817 |
 
-O A3 (CNN pequena, ~406 mil parâmetros, 55 mil exames, CPU) fica abaixo da rede de Ribeiro et al. e dos cardiologistas, e perto dos estudantes de medicina e dos residentes de emergência em F1 macro. A maior distância está em 1dAVb e SB. Quantos exames a rede deles usou no treino e se ela viu pacientes do CODE-TEST: ver o artigo; **não verificado aqui**.
+**Correção (seção 7, D):** `cardiologist1` (F1 0,902) e `cardiologist2` (0,935) são os dois cardiologistas cuja concordância **é** o gold standard (nas divergências, um terceiro especialista que via as duas anotações decidiu; README do zip). Comparar os dois com o gold standard é **circular** e não deve ser usado. A comparação justa é com residentes e estudantes (seção 7, D).
+
+O A3 (CNN pequena, ~406 mil parâmetros, 55 mil exames, CPU) fica abaixo da rede de Ribeiro et al. e perto dos estudantes de medicina e dos residentes de emergência em F1 macro. A maior distância está em 1dAVb e SB. Quantos exames a rede deles usou no treino e se ela viu pacientes do CODE-TEST: ver o artigo; **não verificado aqui**.
 
 ## 5. Figuras (geradas depois de salvar as saídas brutas)
 
@@ -188,4 +190,68 @@ O A3 (CNN pequena, ~406 mil parâmetros, 55 mil exames, CPU) fica abaixo da rede
 - Causa das quedas de SB e 1dAVb no PTB-XL (definição do rótulo, população, forma do sinal): **não verificado**.
 - Sobreposição de pacientes entre CODE-TEST e CODE-15%: **não verificado**.
 - Tudo foi rodado com uma seed (42); a variação entre seeds no teste não foi medida (por decisão, só o A3 seed 42 foi testado).
+
+## 7. Análise exploratória posterior ao teste (madrugada de 08/11; posterior, descritiva, exploratória, não muda nada)
+
+Feita com `analise_posterior_testes.py` (log em `logs/analise_posterior_testes_20261108.log`; CSVs em `resultados/posterior_testes/`). **Nenhum predict:** as notas vêm das saídas brutas já salvas (`resultados/bruto_*.npz`) e, para a validação, de `resultados/erros_A3/previsoes_e_rotulos.npy`. Sinal do PTB-XL e da validação só foi lido para estimar a frequência cardíaca. Modelo, limiares, normalização, exclusões, limite de `likelihood` e JSON não mudaram. **Nenhum número desta seção é resultado principal.**
+
+### A) SB no PTB-XL: o rótulo quer dizer a mesma coisa nas duas bases? (hipótese)
+
+**(i) Notas do modelo (limiar congelado 0,370).** PTB-XL, 637 positivos SB: mediana 0,456; **179 (28,1%) com nota < 0,05**; 355 (55,7%) acima do limiar. Negativos (21.162): mediana 0,000; 71 (0,3%) acima do limiar. Validação da CODE-15%, 118 positivos: mediana 0,526; **5 (4,2%) com nota < 0,05**; 80 (67,8%) acima do limiar. Figura `l_sb_notas_ptbxl_validacao.png`.
+
+**(ii)/(iii) Frequência cardíaca (FC) estimada pelo sinal.**
+- **Método:** derivação II do sinal bruto (PTB-XL a 500 Hz; CODE-15% a 400 Hz, só a parte com sinal, sem os zeros das pontas). Filtro passa-banda de 5 a 15 Hz (realça o QRS e atenua onda T e linha de base), derivada ao quadrado, média móvel de 150 ms, picos com no mínimo 0,25 s entre si e altura de pelo menos 30% do percentil 99. FC = 60 / mediana dos intervalos entre picos. Com menos de 3 picos, sem estimativa.
+- **Amostras (seed 42):** PTB-XL: **todos os 637 SB positivos** (não há 1.000), 1.000 negativos sorteados e 200 positivos de taquicardia (ST) como controle. Validação: todos os 118 SB positivos, 1.000 negativos sorteados e os 171 ST positivos como controle.
+- **Incerteza:** (1) em sinais sintéticos de FC conhecida (40 a 150 bpm, 400 e 500 Hz), erro < 1,5 bpm (`python analise_posterior_testes.py checar`); (2) a FC da derivação II e a da V5 (calculadas separadamente) ficam a até 5 bpm uma da outra em 96,9% a 98,9% dos exames, conforme o grupo; (3) controle de taquicardia: FC > 100 em 187 de 195 estimados no PTB-XL (95,9%) e 161 de 165 na validação (97,6%); (4) sem estimativa em 2 de 637 SB positivos do PTB-XL e 2 de 118 na validação. **É uma estimativa, não a FC do laudo**; perto do corte de 50 bpm, um erro de 1 a 2 bpm muda a faixa de um exame. Exames da CODE-15% de 7,3 s têm poucos batimentos (cerca de 6 a 50 bpm).
+- **Resultados (derivação II):**
+  - **PTB-XL, SB positivos (635 com estimativa):** mediana 48,6 bpm (p10 43,2; p90 57,3). < 50 bpm: 429 (67,6%); **50 a 59,9: 190 (29,9%)**; < 60: 619 (97,5%).
+  - **Validação CODE-15%, SB positivos (116):** mediana 47,3 bpm (p10 42,1; **p90 50,1**). < 50 bpm: 103 (88,8%); 50 a 59,9: 13 (11,2%); < 60: 116 (100%).
+  - **Validação CODE-15%, SB negativos (976 com estimativa):** **159 (16,3%) com FC estimada entre 50 e 59,9** e mesmo assim sem o rótulo SB; < 50: 10 (1,0%). PTB-XL, negativos: 50 a 59,9 em 143 de 987 (14,5%); < 50: 11 (1,1%).
+  - **Nota do modelo por faixa de FC, SB positivos do PTB-XL:** FC < 50: 429, nota < 0,05 em 11 (2,6%), acima do limiar 347 (80,9%). FC 50 a 54,9: 90, nota < 0,05 em 54 (60,0%), acima do limiar 5 (5,6%). **FC 55 a 59,9: 100, nota < 0,05 em 100 (100%)**, acima do limiar 0. FC ≥ 60: 16, nota < 0,05 em 14. **Dos 179 SB do PTB-XL com nota < 0,05, 168 têm FC estimada ≥ 50.**
+  - **Exploratório:** AUROC de SB no PTB-XL usando só os positivos com FC estimada < 50 (429) contra todos os negativos: **0,997**; só os positivos com FC ≥ 50 (206): 0,761. (Para comparar: 0,920 com todos, 0,993 na validação.) Figura `m_fc_sb_ptbxl_validacao.png`.
+- **Leitura (hipótese, agora com evidência descritiva):** na CODE-15%, o rótulo SB se comporta como **"FC abaixo de ~50 bpm"** (90% dos positivos abaixo de 50,1 bpm, e 16% dos negativos entre 50 e 60 sem o rótulo). No PTB-XL, `SBRAD` inclui 50 a 60 bpm (30% dos positivos). O modelo aprendeu o corte da CODE-15% e dá nota quase zero aos SB do PTB-XL entre 55 e 60 bpm. **A queda de SB no PTB-XL parece ser uma diferença de definição do rótulo, não uma falha do modelo em ler o sinal de outra base.** O critério oficial de SB da CODE-15% (laudo da Telessaúde-MG) é **não verificado** (a documentação não diz); a conclusão depende de uma FC estimada.
+
+### B) 1dAVb: notas e erros por idade e sexo
+
+Notas nos positivos (mediana; quantis 5% e 95%): validação 0,431 (0,028 a 0,899); interno 0,489 (0,032 a 0,880); PTB-XL 0,498 (0,001 a 0,958); CODE-TEST 0,532 (0,175 a 0,852). Nos negativos, a mediana é 0,000 nos quatro, mas o quantil 95% vai a 0,243 no PTB-XL (0,076 a 0,082 na CODE-15%, 0,043 no CODE-TEST). Em todos os conjuntos, **a mediana dos positivos fica perto do limiar (0,489)**, então cerca de metade dos 1dAVb fica abaixo dele: o problema é o mesmo nas quatro bases. No PTB-XL há também mais negativos com nota intermediária (mais falsos positivos).
+
+Erros por subgrupo (sensibilidade, com o número de positivos; taxa de falso positivo):
+- **Validação:** < 40 anos 0,31 (13 positivos); 40-59 0,59 (17); 60-69 0,48 (29); 70+ 0,45 (82). Homens 0,38 (69), mulheres 0,54 (72). Falso positivo: de 0,26% (< 40) a 1,54% (70+).
+- **Teste interno:** < 40 0,45 (29); 40-59 0,49 (39); 60-69 0,56 (32); 70+ 0,50 (181). Homens 0,53 (163), mulheres 0,47 (118). Falso positivo: de 0,21% (< 40) a 1,54% (70+).
+- **PTB-XL:** < 40 0,52 (29); 40-59 0,60 (100); 60-69 0,51 (195); 70+ 0,48 (469). Homens 0,53 (481), mulheres 0,46 (312). **Falso positivo de 0,92% (< 40) a 4,06% (70+)**; homens 3,57%, mulheres 1,80%.
+- **CODE-TEST:** 2 a 17 positivos por subgrupo (instável): homens 0,41 (17), mulheres 0,64 (11); 1 falso positivo em 799 negativos.
+- **Leitura:** a sensibilidade fica perto de 0,5 em quase todas as faixas e nos dois sexos. A diferença entre homens e mulheres **muda de lado** entre a validação (mulheres melhor) e o teste interno/PTB-XL (homens melhor), então não há padrão estável. O que aumenta com a idade, de forma consistente, é a **taxa de falso positivo**; no PTB-XL ela é 2,6 a 4,4 vezes a do teste interno na mesma faixa de idade. Causa: **não verificada** (sem medida do intervalo PR, as hipóteses de definição, população e forma do sinal não foram testadas).
+
+### C) LBBB no PTB-XL: quem são os falsos positivos
+
+- **251 falsos positivos** em 21.186 negativos avaliados (os 77 registros com ILBBB já estavam fora da avaliação de LBBB; o modelo marcou 33 deles como LBBB).
+- **203 dos 251 (80,9%) têm algum código de distúrbio de condução** (classe "CD" do `scp_statements.csv`), contra **19,5%** entre os verdadeiros negativos. Por código (um registro pode ter vários): **LAFB 141**, **IVCD 71** (distúrbio de condução intraventricular inespecífico), 1AVB 28, WPW 5, IRBBB 1, ILBBB 0 (excluídos), CRBBB 0, LPFB 0.
+- Os 48 sem código CD: **marca-passo (PACE) 28**, hipertrofia ventricular esquerda (LVH) 12, isquemia (ISC_) 11, entre outros.
+- **Leitura:** os falsos positivos de LBBB são, na maioria, **outros distúrbios de condução** (LAFB, IVCD) e **ritmos de marca-passo**, que no ECG podem se parecer com LBBB. Se esses achados existem na CODE-15% e como foram rotulados lá: **não verificado**.
+
+### D) CODE-TEST: comparação só com os grupos justos
+
+- **Quem é quem (README do zip):** `cardiologist1` e `cardiologist2` são dois cardiologistas; o **gold standard é a concordância deles**, e nas divergências um terceiro especialista, que via as duas anotações, decidiu. `cardiology_residents` = dois residentes de cardiologia do 4º ano (cada um anotou metade); `emergency_residents` = dois residentes de emergência do 3º ano (metade cada); `medical_students` = dois estudantes do 5º ano de medicina (metade cada); `dnn` = rede de Ribeiro et al., com limiar escolhido para maximizar o F1 (em que conjunto: **não verificado** pelo README).
+- **Os F1 reportados antes: 0,902 = cardiologist1; 0,935 = cardiologist2. Os dois são circulares** (são a origem do gold standard) e saem da comparação.
+- **F1 com IC 95% (bootstrap por exame, 1.000 reamostras, seed 42, as mesmas para todos) e diferença A3 − grupo:**
+  - **1dAVb (n=28; A3 AUROC 0,997 [0,993-0,999]):** A3 0,651 [0,465-0,818]; res. cardiologia 0,776 [0,622-0,893] (dif. −0,124 [−0,302 a 0,055]); res. emergência 0,719 [0,580-0,833] (−0,068 [−0,274 a 0,140]); estudantes 0,732 [0,600-0,839] (−0,081 [−0,284 a 0,133]).
+  - **RBBB (n=34; AUROC 0,995 [0,987-1,000]):** A3 0,914 [0,841-0,973]; res. cardiologia 0,917 [0,846-0,973] (−0,002 [−0,072 a 0,073]); res. emergência 0,852 [0,750-0,938] (+0,062 [−0,051 a 0,176]); estudantes 0,928 [0,857-0,986] (−0,013 [−0,077 a 0,056]).
+  - **LBBB (n=30; AUROC 1,000 [0,999-1,000]):** A3 0,983 [0,939-1,000]; res. cardiologia 0,947 [0,868-1,000] (+0,036 [0,000 a 0,101]); res. emergência 0,912 [0,824-0,982] (+0,071 [−0,003 a 0,166]); estudantes 0,915 [0,828-0,980] (+0,068 [−0,001 a 0,162]).
+  - **SB (n=16; AUROC 0,997 [0,994-1,000]):** A3 0,690 [0,444-0,857]; **res. cardiologia 0,882 [0,727-0,977] (−0,193 [−0,412 a −0,019])**; res. emergência 0,848 [0,692-0,968] (−0,159 [−0,380 a 0,022]); estudantes 0,750 [0,533-0,900] (−0,060 [−0,225 a 0,078]).
+  - **ST (n=37; AUROC 0,999 [0,997-1,000]):** A3 0,886 [0,800-0,957]; res. cardiologia 0,882 [0,788-0,952] (+0,003 [−0,110 a 0,115]); res. emergência 0,946 [0,882-0,988] (−0,060 [−0,158 a 0,026]); estudantes 0,873 [0,775-0,947] (+0,012 [−0,104 a 0,136]).
+  - **AF (n=13; AUROC 0,997 [0,993-1,000]):** A3 0,750 [0,522-0,919]; res. cardiologia 0,769 [0,545-0,929] (−0,019 [−0,274 a 0,233]); res. emergência 0,696 [0,429-0,875] (+0,054 [−0,292 a 0,373]); estudantes 0,706 [0,476-0,851] (+0,044 [−0,215 a 0,307]).
+  - **Média macro:** A3 0,812 [0,747-0,865]; res. cardiologia 0,862 [0,805-0,906] (−0,050 [−0,122 a 0,012]); res. emergência 0,829 [0,766-0,882] (−0,017 [−0,099 a 0,058]); estudantes 0,817 [0,754-0,864] (−0,005 [−0,072 a 0,059]).
+- **Leitura:** com 827 exames e 13 a 37 positivos por alteração, **não dá para separar o A3 dos residentes e dos estudantes** em F1 macro (todas as diferenças têm IC que inclui zero). A única diferença com IC fora de zero é **SB contra os residentes de cardiologia (A3 pior)**; em LBBB o A3 fica no limite de ser melhor que os três grupos (limite inferior do IC entre −0,003 e 0,000). Sobreposição de pacientes com a CODE-15%: continua **não verificada**.
+
+### E) Figuras (todas marcadas "posterior ao teste")
+
+- `figuras/i_testes_auroc.png` e `figuras/j_testes_auprc.png` (validação × interno × PTB-XL × CODE-TEST, com IC) e `figuras/k_roc_pr_ptbxl.png`: regeneradas com a marca "posterior ao teste: modelo congelado, sem ajuste depois do teste" (os números não mudaram).
+- `figuras/l_sb_notas_ptbxl_validacao.png`: distribuição acumulada das notas de SB, positivos e negativos, PTB-XL × validação.
+- `figuras/m_fc_sb_ptbxl_validacao.png`: FC estimada nos SB positivos das duas bases e, no PTB-XL, nota do modelo × FC.
+
+### O que se confirmou, o que não e o que continua não verificado
+
+- **Confirmado (descritivo):** a queda de SB no PTB-XL se concentra nos positivos com FC estimada entre 50 e 60 bpm, faixa que a CODE-15% praticamente não rotula como SB. Os falsos positivos de LBBB no PTB-XL são, na maioria, outros distúrbios de condução e marca-passo. 1dAVb perde cerca de metade dos positivos em todas as bases, e o PTB-XL tem mais falsos positivos de 1dAVb, crescendo com a idade. No CODE-TEST, o A3 fica no nível dos residentes e estudantes em F1 macro.
+- **Não confirmado:** padrão estável de erro de 1dAVb por sexo; A3 "melhor" que residentes ou estudantes.
+- **Continua não verificado:** critério oficial de SB e de 1dAVb da CODE-15%; FC e intervalo PR "verdadeiros" (só estimativa de FC, nenhuma medida de PR); sobreposição de pacientes CODE-TEST × CODE-15%; em que conjunto foi escolhido o limiar da `dnn`.
 

@@ -181,7 +181,8 @@ def figuras():
         if met == "auroc":
             ax.set_ylim(0.5, 1.02)
         ax.set_ylabel(nome + (" (eixo começa em 0,5)" if met == "auroc" else ""))
-        ax.set_title(f"{nome} por alteração: validação do A3 contra cada teste (barras = IC 95%)")
+        ax.set_title(f"{nome} por alteração: validação do A3 contra cada teste (barras = IC 95%)\n"
+                     "posterior ao teste: modelo congelado, sem ajuste depois do teste", fontsize=15)
         ax.legend(ncol=len(disp), loc="upper center", bbox_to_anchor=(0.5, -0.08), frameon=False)
         salvar(fig, arq)
     if "ptbxl" not in disp:
@@ -204,7 +205,7 @@ def figuras():
     axs[1].set(xlabel="sensibilidade (recall)", ylabel="precisão", title="PTB-XL: curvas Precisão-Recall", ylim=(0, 1.02))
     for ax in axs:
         ax.legend(loc="lower right" if ax is axs[0] else "lower left", fontsize=11)
-    fig.suptitle("Ponto = limiar congelado (escolhido na validação)", fontsize=13, y=0.0)
+    fig.suptitle("Ponto = limiar congelado (escolhido na validação) | posterior ao teste: modelo congelado, sem ajuste depois do teste", fontsize=13, y=0.0)
     salvar(fig, "k_roc_pr_ptbxl.png")
 
 
