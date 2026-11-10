@@ -11,7 +11,8 @@ Modelos, todos avaliados nos MESMOS pacientes de validação:
       só a camada final (1 sigmoid) é treinada sobre elas. Uma camada sigmoid sobre características fixas
       é exatamente uma regressão logística, então ela é ajustada com o scikit-learn.
   B3  B2t + idade + sexo (as 128 características do ECG mais idade e sexo na mesma camada final)
-Uma mudança por vez: B2z -> B2t (de onde a rede começa) e B2t -> B3 (entra idade e sexo).
+  B3z B2z + idade + sexo: a CNN do zero com idade e sexo juntados depois do GlobalAveragePooling, treinada de ponta a ponta
+Uma mudança por vez: B2z -> B2t (de onde a rede começa), B2t -> B3 e B2z -> B3z (entra idade e sexo).
 
 Regras (CLAUDE.md): split por paciente de sempre; o grupo teste é cortado logo na carga e NUNCA é lido;
 exames com as 12 derivações zeradas saem (pelo sinal, nunca pelos rótulos); normalização por exame do A2 (a mesma do A3).
@@ -22,7 +23,8 @@ Uso (raiz do repositório, Python do .venv; as etapas gravam em resultados/ e mo
   python parte_b_cnn.py caracteristicas     # passa os exames pelo A3 congelado e guarda as 128 características
   python parte_b_cnn.py bench               # tempo por lote da CNN do zero
   python parte_b_cnn.py treinar_zero        # B2z (o mais demorado)
-  python parte_b_cnn.py avaliar             # B0, B1, B2t, B3 e (se existir) B2z; IC por bootstrap
+  python parte_b_cnn.py treinar_zero_idade  # B3z
+  python parte_b_cnn.py avaliar             # B0, B1, B2t, B3 e (se existirem) B2z e B3z; IC por bootstrap
   Para um teste rápido do encanamento: --partes 0 --saida <pasta temporária> --max-epocas 1
 """
 import argparse
@@ -95,9 +97,18 @@ def carregar(partes, saida):
 class GeradorObito(E.GeradorECG):
     """GeradorECG com o rótulo de óbito (y) no lugar das 6 alterações. Mesma leitura e mesma normalização do A3."""
 
-    def __init__(self, info, **kw):
+    def __init__(self, info, idade=None, **kw):
         super().__init__(info, normalizar=True, **kw)
         self.Y = self.info["y"].to_numpy(np.float32)[:, None]      # self.info já está na ordem (parte, linha)
+        # B3z: idade (padronizada com a média e o desvio do TREINO) e sexo entram como segunda entrada
+        self.T = None if idade is None else np.column_stack(
+            [(self.info["age"] - idade[0]) / idade[1], self.info["is_male"].astype(float)]).astype(np.float32)
+
+    def __getitem__(self, i):
+        X, y = super().__getitem__(i)
+        if self.T is None:
+            return X, y
+        return {"ecg": X, "idade_sexo": self.T[self.posicoes(i)]}, y
 
 
 # ------------------------------------------------------------------------------------------------ modelos
@@ -122,6 +133,23 @@ def cnn_do_zero(seed=E.SEED):
             m.add(layers.MaxPooling1D(4))
     m.add(layers.GlobalAveragePooling1D())
     m.add(layers.Dense(1, activation="sigmoid"))
+    m.compile(optimizer="adam", loss="binary_crossentropy", metrics=[keras.metrics.AUC(name="auroc")])
+    return m
+
+
+def cnn_do_zero_com_idade(seed=E.SEED):
+    """B3z: a mesma CNN do B2z (do zero) e UMA mudança: idade e sexo são juntados às 128 características do ECG
+    depois do GlobalAveragePooling, antes da saída sigmoid (o B3 planejado na seção 5.4, treinado de ponta a ponta)."""
+    keras.utils.set_random_seed(seed)
+    ecg = keras.Input((4096, 12), name="ecg")
+    tab = keras.Input((2,), name="idade_sexo")
+    x = ecg
+    for i, f in enumerate([32, 64, 128, 128]):
+        x = layers.Conv1D(f, 15, padding="same", activation="relu")(x)
+        if i < 3:
+            x = layers.MaxPooling1D(4)(x)
+    x = layers.Concatenate()([layers.GlobalAveragePooling1D()(x), tab])
+    m = keras.Model([ecg, tab], layers.Dense(1, activation="sigmoid")(x))
     m.compile(optimizer="adam", loss="binary_crossentropy", metrics=[keras.metrics.AUC(name="auroc")])
     return m
 
@@ -156,28 +184,30 @@ def bench(a, n=10):
           f"-> ~{len(g) * lote / 60:.0f} min por época só de treino (estimativa)")
 
 
-def treinar_zero(a):
+def treinar_zero(a, nome="B2z"):
     el, rel = carregar(a.partes, a.saida)
     print("dados:", rel, flush=True)
-    g_tr = GeradorObito(el[el.grupo == "treino"], embaralhar=True)
-    g_va = GeradorObito(el[el.grupo == "validação"])
-    m = cnn_do_zero()
-    caminho = a.modelos / f"B2z_{nome_partes(a.partes)}_melhor.keras"
+    tr = el[el.grupo == "treino"]
+    idade = (tr["age"].mean(), tr["age"].std()) if nome == "B3z" else None     # média e desvio só do treino
+    g_tr = GeradorObito(tr, idade=idade, embaralhar=True)
+    g_va = GeradorObito(el[el.grupo == "validação"], idade=idade)
+    m = cnn_do_zero_com_idade() if nome == "B3z" else cnn_do_zero()
+    caminho = a.modelos / f"{nome}_{nome_partes(a.partes)}_melhor.keras"
     limite = LimiteDeTempo(a.max_min)
     t0 = time.time()
     hist = m.fit(g_tr, validation_data=g_va, epochs=a.max_epocas, verbose=2, callbacks=[
         # para pelo AUROC de validação (a perda quase não muda com 2,6% de óbitos); paciência 3, como no A3
         keras.callbacks.EarlyStopping("val_auroc", mode="max", patience=3, restore_best_weights=True),
         keras.callbacks.ModelCheckpoint(caminho, monitor="val_auroc", mode="max", save_best_only=True),
-        keras.callbacks.CSVLogger(a.saida / f"parte_b_B2z_{nome_partes(a.partes)}_log_por_epoca.csv"),
+        keras.callbacks.CSVLogger(a.saida / f"parte_b_{nome}_{nome_partes(a.partes)}_log_por_epoca.csv"),
         limite])
     h = hist.history
     melhor = int(np.argmax(h["val_auroc"]))
-    print(f"B2z: {len(h['loss'])} épocas em {(time.time() - t0) / 60:.1f} min (limite de tempo: {limite.estourou}); "
+    print(f"{nome}: {len(h['loss'])} épocas em {(time.time() - t0) / 60:.1f} min (limite de tempo: {limite.estourou}); "
           f"melhor época {melhor + 1} (val_auroc {h['val_auroc'][melhor]:.4f})", flush=True)
     m = keras.models.load_model(caminho, compile=False)              # o melhor salvo, mesmo se parar pelo tempo
     S = m.predict(g_va, verbose=0)[:, 0]
-    np.savez(a.saida / f"parte_b_B2z_{nome_partes(a.partes)}_previsoes_validacao.npz", S=S, exam_id=g_va.info["exam_id"].to_numpy(),
+    np.savez(a.saida / f"parte_b_{nome}_{nome_partes(a.partes)}_previsoes_validacao.npz", S=S, exam_id=g_va.info["exam_id"].to_numpy(),
              epocas=len(h["loss"]), melhor_epoca=melhor + 1, minutos=(time.time() - t0) / 60)
 
 
@@ -221,15 +251,16 @@ def avaliar(a):
         lr = LogisticRegression(max_iter=2000, random_state=E.SEED).fit(e.transform(Xtr), tr["y"])
         notas[nome] = lr.predict_proba(e.transform(Xva))[:, 1]
 
-    # B2z (CNN do zero), se já foi treinada
-    arq = a.saida / f"parte_b_B2z_{tag}_previsoes_validacao.npz"
-    if arq.exists():
-        z = np.load(arq)
-        notas["B2z"] = pd.Series(z["S"], index=z["exam_id"]).loc[va["exam_id"]].to_numpy()
+    # B2z e B3z (CNNs do zero), se já foram treinadas
+    for nome in ("B2z", "B3z"):
+        arq = a.saida / f"parte_b_{nome}_{tag}_previsoes_validacao.npz"
+        if arq.exists():
+            z = np.load(arq)
+            notas[nome] = pd.Series(z["S"], index=z["exam_id"]).loc[va["exam_id"]].to_numpy()
 
-    ordem = [m for m in ("B0", "B1", "B2z", "B2t", "B3") if m in notas]
-    pares = [(m, "B0") for m in ordem if m != "B0"] + [("B3", "B1"), ("B2t", "B2z")] * ("B2z" in notas)
-    pares = list(dict.fromkeys(pares + [("B3", "B1")]))
+    ordem = [m for m in ("B0", "B1", "B2z", "B2t", "B3", "B3z") if m in notas]
+    pares = [(m, "B0") for m in ordem if m != "B0"] + [("B3", "B1"), ("B2t", "B2z"), ("B3z", "B1"), ("B3z", "B2z"), ("B3z", "B3")]
+    pares = [(m1, m0) for m1, m0 in pares if m1 in notas and m0 in notas]
     ic = bootstrap(y, notas, pares)
     linhas = []
     for m in ordem + [f"{m1} - {m0}" for m1, m0 in pares]:
@@ -255,7 +286,7 @@ def avaliar(a):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("etapa", choices=["preparar", "caracteristicas", "bench", "treinar_zero", "avaliar"])
+    ap.add_argument("etapa", choices=["preparar", "caracteristicas", "bench", "treinar_zero", "treinar_zero_idade", "avaliar"])
     ap.add_argument("--partes", default=",".join(map(str, PARTES_B)))
     ap.add_argument("--saida", default=str(RAIZ / "resultados"))
     ap.add_argument("--modelos", default=str(RAIZ / "modelos"))
@@ -266,4 +297,5 @@ if __name__ == "__main__":
     a.saida, a.modelos = Path(a.saida), Path(a.modelos)
     a.saida.mkdir(exist_ok=True)
     a.modelos.mkdir(exist_ok=True)
-    {"preparar": preparar, "caracteristicas": caracteristicas, "bench": bench, "treinar_zero": treinar_zero, "avaliar": avaliar}[a.etapa](a)
+    {"preparar": preparar, "caracteristicas": caracteristicas, "bench": bench, "treinar_zero": treinar_zero,
+     "treinar_zero_idade": lambda a: treinar_zero(a, "B3z"), "avaliar": avaliar}[a.etapa](a)
