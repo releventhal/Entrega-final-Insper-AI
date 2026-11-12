@@ -1,0 +1,10 @@
+comparacao,metrica_macro,diferenca,ic_inf,ic_sup
+"ensemble - A3 oficial (seed 42, limiares do JSON)",auroc,0.0011725,0.000731097,0.00164254
+"ensemble - A3 oficial (seed 42, limiares do JSON)",auprc,0.0200235,0.0105523,0.0297949
+"ensemble - A3 oficial (seed 42, limiares do JSON)",f1,0.0118381,-0.000422881,0.0241908
+ensemble - seed 43,auroc,0.000511381,-0.000325634,0.001265
+ensemble - seed 43,auprc,0.00686983,-0.00411388,0.0195801
+ensemble - seed 43,f1,0.00724652,-0.00507688,0.0193857
+ensemble - seed 44,auroc,0.000528025,8.90223e-06,0.00110397
+ensemble - seed 44,auprc,0.0147225,0.00536233,0.0247471
+ensemble - seed 44,f1,0.00338697,-0.00894636,0.0167473

@@ -64,6 +64,7 @@ Rascunho do Claude do Tom (08/11), **para o Tom e a Renata revisarem**. Todos os
 - **Ideia:** sem vazamento achado; multiplicar o sinal por 0,45 ou 2 não muda as previsões (diferença máxima 3e-5), por causa da normalização por exame; tirar exames com derivação zerada ou duplicados não muda o resultado (≤ 0,002).
 - **Figura:** nenhuma.
 - **Fala:** "O PTB-XL alemão tem amplitudes cerca de metade das nossas; a normalização por exame torna o modelo indiferente a esse fator de escala. Outras diferenças entre aparelhos não estão cobertas."
+- **Acréscimo de 12/11 (Fase 2 de robustez; só validação, provisório; registrado a partir dos CSVs):** teste de estresse em 8.158 exames (`figuras/robustez_02_estresse.png`): amplitude ×0,5 e ×2 não muda nada; ruído de 1,0 do desvio tira 0,0070 de AUROC macro; deriva de linha de base e derivação zerada tiram ≤ 0,0018. Ponto de atenção: recortando o sinal em 25%, o AUROC cai só 0,0055, mas o F1 com os limiares fixos vai a 0,0043 (hipótese, não verificada: pooling diluído pelos zeros). IC do estresse com 200 reamostras. Ensemble das 3 seeds: AUROC 0,9904, AUPRC 0,7108 (A3 seed 42: 0,9892 / 0,6908). Calibração (`figuras/robustez_03_calibracao.png`) e Grad-CAM (`figuras/robustez_gradcam_logit_*.png`, 3 exemplos por alteração, sem teste de sanidade) só como diagnóstico.
 
 ### Slide 13. Parte B: o paradoxo de Simpson
 - **Ideia:** sem controlar a idade, quem tem o "ECG mais velho" morre menos; dentro de cada faixa de idade, morre mais.
