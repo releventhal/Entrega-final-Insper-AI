@@ -43,6 +43,7 @@ Rascunho do Claude do Tom (08/11), **para o Tom e a Renata revisarem**. Todos os
 - **Ideia:** a CNN ganha com folga do modelo que só sabe idade e sexo.
 - **Figura:** `figuras/b_por_alteracao_A0b_A3.png`.
 - **Fala:** "Na validação de 8.158 exames, o AUROC médio foi 0,989 contra 0,705 da idade + sexo; a AUPRC, 0,691 contra 0,046. O 1dAVb é o mais difícil: AUPRC 0,44."
+- **Acréscimo de 12/11 (Claude do Tom; degraus intermediários, fora das aulas; só validação, provisório):** entre A0b e a CNN entram a árvore de decisão (A0c) e a random forest (A0d) sobre 22 atributos calculados do sinal (FC, variabilidade do RR, amplitude, largura do QRS aproximada; **sem o PR**). Macro AUROC / AUPRC: A0b 0,705 / 0,046; A0c 0,911 / 0,402; A0d 0,943 / 0,531; A3 0,989 / 0,691 (`resultados/experimentos.csv`). Fala sugerida: "Atributos simples já levam o AUROC a 0,94; a CNN ainda fica bem acima em AUPRC. A floresta se aproxima da CNN em bradicardia e taquicardia, e falha no 1dAVb (AUROC 0,75 vs 0,97), justamente o que depende do PR, que não calculamos." Árvore de SB: raiz em FC ≈ 50 bpm (`figuras/arvore_SB_ecg.png`).
 
 ### Slide 9. Como chegamos ao A3 (uma mudança por vez)
 - **Ideia:** A1 (sem normalização) → A2 (normaliza cada exame) → A3 (4 partes em vez de 1), nos mesmos 2.069 exames.
@@ -63,6 +64,7 @@ Rascunho do Claude do Tom (08/11), **para o Tom e a Renata revisarem**. Todos os
 - **Ideia:** sem vazamento achado; multiplicar o sinal por 0,45 ou 2 não muda as previsões (diferença máxima 3e-5), por causa da normalização por exame; tirar exames com derivação zerada ou duplicados não muda o resultado (≤ 0,002).
 - **Figura:** nenhuma.
 - **Fala:** "O PTB-XL alemão tem amplitudes cerca de metade das nossas; a normalização por exame torna o modelo indiferente a esse fator de escala. Outras diferenças entre aparelhos não estão cobertas."
+- **Acréscimo de 12/11 (Fase 2 de robustez; só validação, provisório; registrado a partir dos CSVs):** teste de estresse em 8.158 exames (`figuras/robustez_02_estresse.png`): amplitude ×0,5 e ×2 não muda nada; ruído de 1,0 do desvio tira 0,0070 de AUROC macro; deriva de linha de base e derivação zerada tiram ≤ 0,0018. Ponto de atenção: mantendo só 25% do sinal (o resto vira zero), o AUROC cai só 0,0055, mas o F1 com os limiares fixos vai a 0,0043 (hipótese, não verificada: pooling diluído pelos zeros). IC do estresse com 200 reamostras. Ensemble das 3 seeds: AUROC 0,9904, AUPRC 0,7108 (A3 seed 42: 0,9892 / 0,6908). Calibração (`figuras/robustez_03_calibracao.png`) e Grad-CAM (`figuras/robustez_gradcam_logit_*.png`, 3 exemplos por alteração, sem teste de sanidade) só como diagnóstico.
 
 ### Slide 13. Parte B: o paradoxo de Simpson
 - **Ideia:** sem controlar a idade, quem tem o "ECG mais velho" morre menos; dentro de cada faixa de idade, morre mais.
@@ -78,6 +80,9 @@ Rascunho do Claude do Tom (08/11), **para o Tom e a Renata revisarem**. Todos os
 - **Ideia:** tudo é validação (que também escolheu época e limiar, então é otimista); uma seed por configuração (exceto o A3, com 3 seeds); só 4 das 18 partes; a origem dos rótulos da CODE-15% e a unidade de `timey` não estão documentadas; o CODE-TEST pode ter pacientes em comum com a CODE-15% (não dá para verificar); 1dAVb fraco.
 - **Figura:** nenhuma.
 - **Fala:** "Preferimos mostrar o que não sabemos a mostrar um número bonito que não se sustenta."
+
+### Nota de 12/11 (Claude do Tom): este roteiro está anterior à intermediária
+Os slides 5, 14 e 16 não mencionam a Parte B com CNN (B2z/B3/B3z, 9/11) nem B4/B4p (12/11), feitos pela Renata e registrados no `CLAUDE.md`; o texto acima ficou como estava. A versão de 14 slides da Renata (artifact) é a que vale para a apresentação.
 
 ### Slide 16. O que falta até 17/11
 - **Ideia:** congelar o modelo; abrir uma vez o teste interno, o PTB-XL (principal) e o CODE-TEST (secundário); B2/B3 da Parte B; decisões em `decisoes_pendentes.md`.
