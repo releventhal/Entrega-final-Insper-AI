@@ -11,3 +11,4 @@ wfdb==4.3.1
 ipykernel
 nbconvert
 nbformat
+neurokit2==0.3.0
