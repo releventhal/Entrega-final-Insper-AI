@@ -1,0 +1,23 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794528876.558296    6860 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794528879.787162    6860 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+descartes (só exames todo-zero, só treino e validação): {'treino': {'antes': 55679, 'todo_zero_descartados': 118, 'depois': 55561}, 'validação': {'antes': 8180, 'todo_zero_descartados': 22, 'depois': 8158}}
+I0000 00:00:1794528883.472849    6860 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+Epoch 1/20
+869/869 - 241s - 277ms/step - loss: 0.0986 - val_loss: 0.0941
+Epoch 2/20
+869/869 - 277s - 318ms/step - loss: 0.0887 - val_loss: 0.0738
+Epoch 3/20
+869/869 - 281s - 323ms/step - loss: 0.0707 - val_loss: 0.0633
+Epoch 4/20
+869/869 - 285s - 328ms/step - loss: 0.0594 - val_loss: 0.0568
+Epoch 5/20
+869/869 - 284s - 327ms/step - loss: 0.0562 - val_loss: 0.0568
+Epoch 6/20
+869/869 - 285s - 328ms/step - loss: 0.0543 - val_loss: 0.0569
+Epoch 7/20
+869/869 - 252s - 290ms/step - loss: 0.0551 - val_loss: 0.0537
+Epoch 8/20
