@@ -20,7 +20,8 @@ from parte_b_cnn import bootstrap
 
 SAIDA = Path(__file__).parent / "resultados"
 CANDIDATOS = {"B3z_p0-7": ("parte_b_cnn_p0-7_previsoes_validacao.csv", "B3z"),
-              "B3z_p0-17": ("parte_b_cnn_p0-17_previsoes_validacao.csv", "B3z")}
+              "B3z_p0-17": ("parte_b_cnn_p0-17_previsoes_validacao.csv", "B3z"),
+              "B5_p0-17": ("parte_b_B5_p0-17_previsoes_validacao.npz", "S")}      # B3z com pré-treino de idade
 REFERENCIAS = {"B0_p0-17": ("parte_b_cnn_p0-17_previsoes_validacao.csv", "B0")}
 
 
@@ -30,12 +31,16 @@ def main():
         if not (SAIDA / arq).exists():
             print(f"{nome}: {arq} não existe, fica de fora")
             continue
+        if arq.endswith(".npz"):                                      # só notas; o rótulo vem dos CSVs
+            z = np.load(SAIDA / arq)
+            notas[nome] = pd.Series(z[col], index=z["exam_id"])
+            continue
         d = pd.read_csv(SAIDA / arq).set_index("exam_id")
         notas[nome] = d[col]
         y = d["y"] if y is None else y.combine_first(d["y"])
     comum = sorted(set.intersection(*(set(s.index) for s in notas.values())))
     yc = y.loc[comum].to_numpy().astype(int)
-    for k in notas:                                        # o rótulo tem de ser o mesmo nos dois arquivos
+    for k in [k for k in notas if not {**CANDIDATOS, **REFERENCIAS}[k][0].endswith(".npz")]:   # rótulo igual nos CSVs
         d = pd.read_csv(SAIDA / {**CANDIDATOS, **REFERENCIAS}[k][0]).set_index("exam_id")
         assert (d.loc[comum, "y"].to_numpy() == yc).all(), f"rótulos diferentes em {k}"
     nc = {k: s.loc[comum].to_numpy() for k, s in notas.items()}
@@ -43,6 +48,8 @@ def main():
     pares = [(k, "B0_p0-17") for k in cand if "B0_p0-17" in nc]
     if {"B3z_p0-17", "B3z_p0-7"} <= set(cand):
         pares.append(("B3z_p0-17", "B3z_p0-7"))
+    if {"B5_p0-17", "B3z_p0-17"} <= set(cand):
+        pares.append(("B5_p0-17", "B3z_p0-17"))
     ic = bootstrap(yc, nc, pares)
     from sklearn.metrics import average_precision_score as ap, roc_auc_score as auc
     linhas = []
