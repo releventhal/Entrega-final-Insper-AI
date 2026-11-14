@@ -97,7 +97,7 @@ def main(partes=PARTES_B):
         el[f"logit_{r}"] = np.log(p / (1 - p))
     dif = conferir_notas_a3(el, P)
     print(f"conferência das notas do A3 (características salvas vs A3 inteiro no sinal, 64 exames): dif. máx {dif:.2e}")
-    assert dif < 1e-4
+    assert dif < 1e-3   # na CPU dá ~1e-7; na GPU L4 (Colab) deu 2,6e-4 em 14/11 (TF32 nas convoluções), por isso 1e-3
 
     tr = el[el.grupo == "treino"]
     va = el[el.grupo == "validação"].sort_values(["parte", "linha"], ignore_index=True)
