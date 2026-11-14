@@ -1,0 +1,168 @@
+onde,item,valor_citado,valor_arquivo,arquivo_origem,status
+"roteiro_slides.md, slide 7",A0a n_val,8.180,8180,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 7",A0a acurácia macro,"0,980",0.9804,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 7",A0a sensibilidade macro,0,0,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 7",A0a AUROC macro,"0,500",0.5,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 8",A3 n_val,8.158,8158,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 8",A3 AUROC macro,"0,989",0.9892,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 8",A0b AUROC macro (8.158),"0,705",0.7053,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 8",A3 AUPRC macro,"0,691",0.6908,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 8",A0b AUPRC macro (8.158),"0,046",0.0459,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 8",A3 AUPRC 1dAVb,"0,44",0.4362,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 8",A0c AUROC macro,"0,911",0.911,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 8",A0c AUPRC macro,"0,402",0.402,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 8",A0d AUROC macro,"0,943",0.9431,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 8",A0d AUPRC macro,"0,531",0.5308,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 8",A0e1 AUROC macro,"0,976",0.9761,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 8",A0e1 AUPRC macro,"0,567",0.5672,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 8",A0d AUROC 1dAVb,"0,749",0.7489,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 8",A0e-1 floresta AUROC 1dAVb,"0,942",0.941507,resultados/arvore_rf_pr_ic.csv,ok
+"roteiro_slides.md, slide 8",A0e-1 floresta AUROC 1dAVb IC inf,"0,922",0.922352,resultados/arvore_rf_pr_ic.csv,ok
+"roteiro_slides.md, slide 8",A0e-1 floresta AUROC 1dAVb IC sup,"0,957",0.956566,resultados/arvore_rf_pr_ic.csv,ok
+"roteiro_slides.md, slide 8",A0d AUPRC 1dAVb,"0,053",0.0529,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 8",A0e-1 floresta AUPRC 1dAVb,"0,262",0.261879,resultados/arvore_rf_pr_ic.csv,ok
+"roteiro_slides.md, slide 8",A0e-1 floresta AUPRC 1dAVb IC inf,"0,204",0.204024,resultados/arvore_rf_pr_ic.csv,ok
+"roteiro_slides.md, slide 8",A0e-1 floresta AUPRC 1dAVb IC sup,"0,337",0.336679,resultados/arvore_rf_pr_ic.csv,ok
+"roteiro_slides.md, slide 8",A3 AUROC 1dAVb,"0,972",0.9723,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 8",A3 AUPRC 1dAVb,"0,436",0.4362,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 9",A1 AUROC macro (2.069),"0,976",0.9762,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 9",A1 AUPRC macro (2.069),"0,656",0.6556,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 9",A2 AUROC macro (2.069),"0,985",0.9853,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 9",A2 AUPRC macro (2.069),"0,682",0.6823,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 9",A3_2069 AUROC macro (2.069),"0,990",0.9898,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 9",A3_2069 AUPRC macro (2.069),"0,721",0.7207,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 9",3 seeds do A3: média auroc,"0,9897",0.989667,"resultados/experimentos.csv (seeds 42, 43, 44; desvio ddof=1)",ok
+"roteiro_slides.md, slide 9",3 seeds do A3: desvio auroc,"0,0004",0.000404,"resultados/experimentos.csv (seeds 42, 43, 44; desvio ddof=1)",ok
+"roteiro_slides.md, slide 9",3 seeds do A3: média auprc,"0,697",0.696967,"resultados/experimentos.csv (seeds 42, 43, 44; desvio ddof=1)",ok
+"roteiro_slides.md, slide 9",3 seeds do A3: desvio auprc,"0,007",0.006643,"resultados/experimentos.csv (seeds 42, 43, 44; desvio ddof=1)",ok
+"roteiro_slides.md, slide 9",3 seeds do A3: média f1,"0,713",0.713,"resultados/experimentos.csv (seeds 42, 43, 44; desvio ddof=1)",ok
+"roteiro_slides.md, slide 9",3 seeds do A3: desvio f1,"0,004",0.004204,"resultados/experimentos.csv (seeds 42, 43, 44; desvio ddof=1)",ok
+"roteiro_slides.md, slide 10","1dAVb: precisão máxima com sensibilidade >= 0,5","0,45",0.449367,"resultados/erros_A3/previsoes_e_rotulos.npy (recalculado: precisão máxima com sensibilidade >= 0,5)",ok
+"roteiro_slides.md, slide 12 (acréscimo de 14/11)",A6_completo AUPRC macro,"0,445",0.4454,resultados/experimentos.csv,ok
+"roteiro_slides.md, slide 12 (acréscimo de 14/11)",A5 parcial (14/11) AUPRC macro,"0,705",0.7045,resultados/noite_A5_completo_parcial14_avaliacao.csv,ok
+"roteiro_slides.md, slide 12 (acréscimo de 14/11)","A3 sens. com esp. 99%, 1dAVb","0,48",0.48227,resultados/sgpu_pontos_operacao.csv,ok
+"roteiro_slides.md, slide 12 (acréscimo de 14/11)","A3 sens. com esp. 99%, AF","0,75",0.748571,resultados/sgpu_pontos_operacao.csv,ok
+"roteiro_slides.md, slide 12 (acréscimo de 14/11)","A3 sens. com esp. 95%, 1dAVb","0,88",0.879433,resultados/sgpu_pontos_operacao.csv,ok
+"roteiro_slides.md, slide 12 (acréscimo de 14/11)","A3 sens. com esp. 95%, ST","1,00",1,resultados/sgpu_pontos_operacao.csv,ok
+"roteiro_slides.md, slide 12 (acréscimo de 14/11)",floresta A0e-1 5 folds AUPRC média,"0,558",0.557483,resultados/sgpu_rf_A0e1_groupkfold_resumo.csv,divergente
+"roteiro_slides.md, slide 12 (acréscimo de 14/11)",floresta A0e-1 5 folds AUPRC dp,"0,020",0.019914,resultados/sgpu_rf_A0e1_groupkfold_resumo.csv,ok
+"roteiro_slides.md, slide 12 (acréscimo de 14/11)",ensemble A3+A6 AUPRC macro,"0,676",0.6762,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A0b auroc macro,"0,705",0.7052,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A0b auprc macro,"0,046",0.0458,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A0b f1 macro,"0,095",0.0952,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A0b_A1 auroc macro,"0,697",0.6972,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A0b_A1 auprc macro,"0,046",0.0458,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A0b_A1 f1 macro,"0,103",0.1027,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A1 auroc macro,"0,976",0.9762,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A1 auprc macro,"0,656",0.6556,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A1 f1 macro,"0,696",0.6956,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A2 auroc macro,"0,985",0.9853,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A2 auprc macro,"0,682",0.6823,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A2 f1 macro,"0,717",0.717,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 auroc macro,"0,989",0.9892,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 auprc macro,"0,691",0.6908,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 f1 macro,"0,709",0.7087,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A0b_A3 auroc macro,"0,705",0.7053,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A0b_A3 auprc macro,"0,046",0.0459,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A0b_A3 f1 macro,"0,095",0.0954,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3_2069 auroc macro,"0,990",0.9898,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3_2069 auprc macro,"0,721",0.7207,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3_2069 f1 macro,"0,717",0.717,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3_2069r f1 macro,"0,739",0.7386,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A1 sensibilidade macro,"0,749",0.7486,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A1 precisao macro,"0,658",0.6578,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A1 especificidade macro,"0,993",0.9925,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 sensibilidade macro,"0,746",0.7458,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 precisao macro,"0,681",0.6812,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 especificidade macro,"0,993",0.9932,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3_2069r sensibilidade macro,"0,817",0.8165,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3_2069r precisao macro,"0,680",0.6796,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A1 AUROC 1dAVb,"0,919",0.9194,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A1 AUROC RBBB,"0,997",0.9965,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A1 AUROC LBBB,"0,994",0.9941,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A1 AUROC SB,"0,992",0.9924,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A1 AUROC ST,"0,996",0.996,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A1 AUROC AF,"0,959",0.9586,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A2 AUROC 1dAVb,"0,952",0.9516,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A2 AUROC RBBB,"0,993",0.9934,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A2 AUROC LBBB,"0,994",0.9935,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A2 AUROC SB,"0,994",0.9944,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A2 AUROC ST,"0,996",0.9958,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A2 AUROC AF,"0,983",0.9831,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3_2069 AUROC 1dAVb,"0,969",0.9688,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3_2069 AUROC RBBB,"0,995",0.9952,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3_2069 AUROC LBBB,"0,996",0.9958,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3_2069 AUROC SB,"0,996",0.9956,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3_2069 AUROC ST,"0,996",0.9957,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3_2069 AUROC AF,"0,988",0.988,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 auroc 1dAVb,"0,972",0.9723,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 auprc 1dAVb,"0,436",0.4362,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 f1 1dAVb,"0,485",0.4851,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 auroc RBBB,"0,995",0.9952,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 auprc RBBB,"0,851",0.8514,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 f1 RBBB,"0,826",0.826,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 auroc LBBB,"0,994",0.9941,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 auprc LBBB,"0,844",0.8441,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 f1 LBBB,"0,798",0.7985,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 auroc SB,"0,993",0.9926,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 auprc SB,"0,618",0.6177,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 f1 SB,"0,658",0.6584,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 auroc ST,"0,995",0.995,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 auprc ST,"0,695",0.6954,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 f1 ST,"0,783",0.7833,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 auroc AF,"0,986",0.9862,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 auprc AF,"0,700",0.7001,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 f1 AF,"0,701",0.7006,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A3 n_treino,55.561,55561,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A1 n_treino (parte 0),13.866,13866,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 5.3 / 0 / 9",A1 n_val (parte 0),2.069,2069,resultados/experimentos.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",interno auroc macro,"0,989",0.9888,resultados/avaliacao_interno_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",interno auroc macro IC inf,"0,987",0.9866,resultados/avaliacao_interno_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",interno auroc macro IC sup,"0,991",0.9906,resultados/avaliacao_interno_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",interno auprc macro,"0,710",0.7096,resultados/avaliacao_interno_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",interno auprc macro IC inf,"0,686",0.6864,resultados/avaliacao_interno_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",interno auprc macro IC sup,"0,733",0.733,resultados/avaliacao_interno_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",interno f1 macro,"0,705",0.7049,resultados/avaliacao_interno_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",interno f1 macro IC inf,"0,687",0.687,resultados/avaliacao_interno_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",interno f1 macro IC sup,"0,722",0.7215,resultados/avaliacao_interno_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",ptbxl auroc macro,"0,970",0.9702,resultados/avaliacao_ptbxl_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",ptbxl auroc macro IC inf,"0,968",0.9675,resultados/avaliacao_ptbxl_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",ptbxl auroc macro IC sup,"0,973",0.9729,resultados/avaliacao_ptbxl_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",ptbxl auprc macro,"0,788",0.7879,resultados/avaliacao_ptbxl_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",ptbxl auprc macro IC inf,"0,776",0.7763,resultados/avaliacao_ptbxl_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",ptbxl auprc macro IC sup,"0,799",0.7994,resultados/avaliacao_ptbxl_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",ptbxl f1 macro,"0,746",0.746,resultados/avaliacao_ptbxl_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",ptbxl f1 macro IC inf,"0,735",0.7346,resultados/avaliacao_ptbxl_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",ptbxl f1 macro IC sup,"0,756",0.7557,resultados/avaliacao_ptbxl_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",code_test auroc macro,"0,998",0.9975,resultados/avaliacao_code_test_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",code_test auroc macro IC inf,"0,996",0.9958,resultados/avaliacao_code_test_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",code_test auroc macro IC sup,"0,999",0.9988,resultados/avaliacao_code_test_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",code_test auprc macro,"0,916",0.9164,resultados/avaliacao_code_test_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",code_test auprc macro IC inf,"0,870",0.8702,resultados/avaliacao_code_test_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",code_test auprc macro IC sup,"0,960",0.9597,resultados/avaliacao_code_test_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",code_test f1 macro,"0,812",0.8123,resultados/avaliacao_code_test_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",code_test f1 macro IC inf,"0,747",0.7467,resultados/avaliacao_code_test_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",code_test f1 macro IC sup,"0,865",0.8652,resultados/avaliacao_code_test_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",PTB-XL AUROC SB,"0,920",0.9205,resultados/avaliacao_ptbxl_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",PTB-XL AUROC 1dAVb,"0,924",0.9243,resultados/avaliacao_ptbxl_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)","PTB-XL AUROC RBBB (citado: >= 0,990)",">=0,990",0.9965,resultados/avaliacao_ptbxl_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)","PTB-XL AUROC LBBB (citado: >= 0,990)",">=0,990",0.9975,resultados/avaliacao_ptbxl_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)","PTB-XL AUROC ST (citado: >= 0,990)",">=0,990",0.993,resultados/avaliacao_ptbxl_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)","PTB-XL AUROC AF (citado: >= 0,990)",">=0,990",0.9895,resultados/avaliacao_ptbxl_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)","interno sensibilidade 1dAVb (citado: ~0,50)","~0,50",0.5018,resultados/avaliacao_interno_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)","ptbxl sensibilidade 1dAVb (citado: ~0,50)","~0,50",0.5032,resultados/avaliacao_ptbxl_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)","code_test sensibilidade 1dAVb (citado: ~0,50)","~0,50",0.5,resultados/avaliacao_code_test_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 9 (teste interno)",positivos 1dAVb teste interno,281,281,resultados/avaliacao_interno_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 9 (teste interno)",positivos RBBB teste interno,442,442,resultados/avaliacao_interno_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 9 (teste interno)",positivos LBBB teste interno,290,290,resultados/avaliacao_interno_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 9 (teste interno)",positivos SB teste interno,308,308,resultados/avaliacao_interno_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 9 (teste interno)",positivos ST teste interno,353,353,resultados/avaliacao_interno_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 9 (teste interno)",positivos AF teste interno,310,310,resultados/avaliacao_interno_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 4 (CODE-TEST)",positivos 1dAVb CODE-TEST,28,28,resultados/avaliacao_code_test_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 4 (CODE-TEST)",positivos RBBB CODE-TEST,34,34,resultados/avaliacao_code_test_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 4 (CODE-TEST)",positivos LBBB CODE-TEST,30,30,resultados/avaliacao_code_test_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 4 (CODE-TEST)",positivos SB CODE-TEST,16,16,resultados/avaliacao_code_test_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 4 (CODE-TEST)",positivos ST CODE-TEST,37,37,resultados/avaliacao_code_test_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 4 (CODE-TEST)",positivos AF CODE-TEST,13,13,resultados/avaliacao_code_test_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",PTB-XL positivos RBBB (com exclusão IRBBB),540,540,resultados/avaliacao_ptbxl_20261108_466e7a3.csv,ok
+"CLAUDE.md, seção 0 (Testes do A3 congelado)",PTB-XL positivos AF (com exclusão AFLT),1.497,1497,resultados/avaliacao_ptbxl_20261108_466e7a3.csv,ok

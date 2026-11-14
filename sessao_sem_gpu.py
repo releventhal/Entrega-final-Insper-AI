@@ -22,11 +22,11 @@ N_BOOT = 1000
 ESPS, SENS = (0.90, 0.95, 0.99), (0.90, 0.95)
 
 
-def modelos_val():
+def modelos_val(a5=("A5_completo", "A5_completo_parcial")):
     """Previsões de validação alinhadas com carregar_val (mesma ordem; conferido pela forma e pelo AUROC macro impresso)."""
     S3, Y, _, _, pid = carregar_val()
     M = {"A3": S3, "A6_completo": np.load(RES / "A6_completo_previsoes_validacao.npy").astype(np.float64)}
-    for nome in ("A5_completo", "A5_completo_parcial"):  # o final, se existir; senão o parcial (rotulado como tal)
+    for nome in a5:  # o final, se existir; senão o parcial (rotulado como tal)
         arq = RES / f"{nome}_previsoes_validacao.npy"
         if arq.exists():
             M[nome] = np.load(arq).astype(np.float64)
@@ -64,8 +64,9 @@ def checar():
     print("checar: ok", r)
 
 
-def operacao():
-    M, Y, pid = modelos_val()
+def operacao(prefixo="sgpu", a5=("A5_completo", "A5_completo_parcial"), aviso_a5=None):
+    """prefixo/a5: sessão 2 (14/11 à tarde) usa prefixo "sessao2" e o A5 mais recente (final, senão o parcial de 14/11, época 9)."""
+    M, Y, pid = modelos_val(a5)
     idxs = reamostras(pid, N_BOOT, SEED)
     linhas = []
     for n, S in M.items():
@@ -78,7 +79,7 @@ def operacao():
                 linhas.append(dict(modelo=n, rotulo=rot, metrica=m, valor=v, ic_inf=lo, ic_sup=hi, n_boot=len(bs), positivos=int(Y[:, k].sum()), negativos=int((Y[:, k] == 0).sum())))
         print(f"{n}: bootstrap {time.perf_counter() - t0:.0f} s", flush=True)
     tab = pd.DataFrame(linhas)
-    salvar_novo(tab, RES / "sgpu_pontos_operacao.csv")
+    salvar_novo(tab, RES / f"{prefixo}_pontos_operacao.csv")
 
     # figura: sensibilidade com especificidade 95% e 99%, por alteração e modelo, com IC
     import matplotlib
@@ -96,9 +97,10 @@ def operacao():
         ax.set_ylim(0, 1.05)
         ax.grid(axis="y", alpha=0.3)
     axs[0].set_ylabel("sensibilidade (IC 95%, bootstrap por paciente)")
-    axs[0].legend(fontsize=8, loc="lower left")
+    # legenda fora dos eixos (na versão sgpu de 14/11 de manhã ela cobria a barra do A6 em 1dAVb)
+    fig.legend(*axs[0].get_legend_handles_labels(), fontsize=8, loc="lower center", ncol=len(M), bbox_to_anchor=(0.5, -0.06))
     fig.suptitle("Pontos de operação na VALIDAÇÃO (limiar escolhido na própria validação: ilustrativo, não é número de teste)", fontsize=10)
-    salvar_novo(fig, FIG / "sgpu_pontos_operacao.png")
+    salvar_novo(fig, FIG / f"{prefixo}_pontos_operacao.png")
 
     # resumo .md
     def f(n, r, m):
@@ -107,10 +109,12 @@ def operacao():
     md = ["# Pontos de operação na validação (sessão sem GPU, 14/11)", "",
           "> **Aviso:** números de **validação** (8.158 exames), com o limiar de cada ponto escolhido **na própria validação**. São **ilustrativos** "
           "(otimistas), **não** são números finais de teste. O teste interno, o PTB-XL e o CODE-TEST não foram abertos.", "",
-          "- Gerado por `sessao_sem_gpu.py operacao`; tabela completa em `resultados/sgpu_pontos_operacao.csv`; figura `figuras/sgpu_pontos_operacao.png`.",
+          f"- Gerado por `sessao_sem_gpu.py {'operacao' if prefixo == 'sgpu' else 'operacao2'}`; tabela completa em `resultados/{prefixo}_pontos_operacao.csv`; figura `figuras/{prefixo}_pontos_operacao.png`.",
           f"- IC 95%: bootstrap por paciente ({N_BOOT} reamostras, seed {SEED}), com o limiar **reescolhido** em cada reamostra.",
           "- `FA/1000` = falsos alarmes por 1.000 exames **negativos para aquela alteração** = 1000 × (1 − especificidade).",
           "- Modelos: " + ", ".join(f"`{n}`" for n in M) + (". **`A5_completo_parcial` = 3 épocas, sem early stopping: PARCIAL, NÃO CONCLUSIVO.**" if "A5_completo_parcial" in M else "."), ""]
+    if aviso_a5:
+        md.insert(-1, aviso_a5)
     for n in M:
         md += [f"## {n}", "", "| Alteração | positivos | Sens. c/ esp. 90% | Sens. c/ esp. 95% | Sens. c/ esp. 99% | Prec. c/ esp. 99% | Esp. c/ sens. 90% | Esp. c/ sens. 95% | FA/1000 c/ sens. 90% | Prec. c/ sens. 90% |",
                "|---|---|---|---|---|---|---|---|---|---|"]
@@ -118,7 +122,7 @@ def operacao():
             p = tab[(tab.modelo == n) & (tab.rotulo == r)].positivos.iloc[0]
             md.append(f"| {r} | {p} | " + " | ".join(f(n, r, m) for m in ("sens_esp90", "sens_esp95", "sens_esp99", "prec_esp99", "esp_sens90", "esp_sens95", "fa1000_sens90", "prec_sens90")) + " |")
         md.append("")
-    arq = RES / "sgpu_pontos_operacao.md"
+    arq = RES / f"{prefixo}_pontos_operacao.md"
     assert not arq.exists()
     arq.write_text("\n".join(md), encoding="utf-8")
     print("\n".join(md))
@@ -236,4 +240,7 @@ def experimentos():
 
 
 if __name__ == "__main__":
-    {"operacao": operacao, "ensemble": ensemble, "rf": rf, "checar": checar, "experimentos": experimentos}[sys.argv[1]]()
+    operacao2 = lambda: operacao("sessao2", ("A5_completo", "A5_completo_parcial14"),
+                                 "- **`A5_completo_parcial14` = melhor checkpoint (época 9 de 10 fechadas) da retomada de 14/11 de manhã, cortada à mão: "
+                                 "early stopping NÃO concluído, PARCIAL, NÃO CONCLUSIVO.** (Se existir `A5_completo`, é o A5 com early stopping completo e ele é usado no lugar.)")
+    {"operacao": operacao, "operacao2": operacao2, "ensemble": ensemble, "rf": rf, "checar": checar, "experimentos": experimentos}[sys.argv[1]]()
