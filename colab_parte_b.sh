@@ -15,6 +15,7 @@ python -u parte_b_cnn.py caracteristicas --partes $P                 # 128 carac
 python -u parte_b_cnn.py avaliar --partes $P                         # B0, B1, B2t, B3, B3z + IC
 python -u parte_b_alteracoes.py --partes $P                          # B4, B4n, B4p
 python -u parte_b_analises.py --partes $P                            # risco escondido e triagem
+python -u parte_b_km.py --partes $P                                  # Kaplan-Meier por quartil (inclui censurados)
 date
-cd /content && zip -j parte_b_$T.zip repo/resultados/parte_b_*${T}* repo/modelos/B3z_${T}_melhor.keras parte_b.log
+cd /content && zip -j parte_b_$T.zip repo/resultados/parte_b_*${T}* repo/modelos/B3z_${T}_melhor.keras repo/figuras/parte_b_km_${T}.png parte_b.log
 echo FIM
