@@ -18,8 +18,9 @@ no treino, com IC 95% por bootstrap de pacientes do treino. Idade em décadas.
 
 Mesmos dados do parte_b_cnn.py (partes 0 a 7, primeiro exame de cada paciente, regra do horizonte de 2 anos,
 exames todo-zero fora pelo sinal, grupo teste cortado na carga e nunca lido).
-Uso: .venv\\Scripts\\python parte_b_alteracoes.py
+Uso: .venv\\Scripts\\python parte_b_alteracoes.py [--partes 0,1,...,17]   (padrão: partes 0 a 7)
 """
+import argparse
 import json
 from pathlib import Path
 
@@ -84,9 +85,9 @@ def razoes_de_chance(tr, seed=E.SEED):
                          "n_treino_com": pos, "obitos_treino_com": ob})
 
 
-def main():
-    tag = nome_partes(PARTES_B)
-    el, rel = carregar(PARTES_B, SAIDA)
+def main(partes=PARTES_B):
+    tag = nome_partes(partes)
+    el, rel = carregar(partes, SAIDA)
     for c in R + ["normal_ecg"]:
         el[c] = el[c].astype(bool)
     P = notas_a3(el, tag)
@@ -96,7 +97,7 @@ def main():
         el[f"logit_{r}"] = np.log(p / (1 - p))
     dif = conferir_notas_a3(el, P)
     print(f"conferência das notas do A3 (características salvas vs A3 inteiro no sinal, 64 exames): dif. máx {dif:.2e}")
-    assert dif < 1e-4
+    assert dif < 1e-3   # na CPU dá ~1e-7; na GPU L4 (Colab) deu 2,6e-4 em 14/11 (TF32 nas convoluções), por isso 1e-3
 
     tr = el[el.grupo == "treino"]
     va = el[el.grupo == "validação"].sort_values(["parte", "linha"], ignore_index=True)
@@ -146,4 +147,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--partes", default=",".join(map(str, PARTES_B)))
+    main([int(p) for p in ap.parse_args().partes.split(",")])

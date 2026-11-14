@@ -1,0 +1,2 @@
+partes,n_treino,n_val,epocas,melhor_epoca,minutos,mae_nosso,r_nosso,mae_lima,r_lima,dif_mae,dif_ic_inf,dif_ic_sup
+p0-17,163137,23513,9,7,75.4812,8.0752,0.8487,8.4283,0.8389,-0.3531,-0.4285,-0.2733

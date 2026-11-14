@@ -242,11 +242,12 @@ def avaliar(a):
     notas = {m: mods[m].predict_proba(features(va, esc, m))[:, 1] for m in ("B0", "B1")}
 
     # B2t e B3: camada final sobre as características do A3 congelado
-    c = np.load(a.saida / f"parte_b_caracteristicas_A3_{tag}.npz")
-    F = pd.DataFrame(c["F"], index=c["exam_id"])
-    Ftr, Fva = F.loc[tr["exam_id"]].to_numpy(), F.loc[va["exam_id"]].to_numpy()
+    arq_c = a.saida / f"parte_b_caracteristicas_A3_{tag}.npz"
+    c = np.load(arq_c) if arq_c.exists() else None                     # sem a etapa 'caracteristicas', B2t/B3 ficam de fora
+    F = pd.DataFrame(c["F"], index=c["exam_id"]) if c is not None else None
+    Ftr, Fva = (F.loc[tr["exam_id"]].to_numpy(), F.loc[va["exam_id"]].to_numpy()) if c is not None else (None, None)
     tab = lambda d: np.column_stack([d["age"], d["is_male"].astype(float)])
-    for nome, Xtr, Xva in (("B2t", Ftr, Fva), ("B3", np.hstack([Ftr, tab(tr)]), np.hstack([Fva, tab(va)]))):
+    for nome, Xtr, Xva in ((("B2t", Ftr, Fva), ("B3", np.hstack([Ftr, tab(tr)]), np.hstack([Fva, tab(va)]))) if c is not None else ()):
         e = StandardScaler().fit(Xtr)                                  # escala só do treino
         lr = LogisticRegression(max_iter=2000, random_state=E.SEED).fit(e.transform(Xtr), tr["y"])
         notas[nome] = lr.predict_proba(e.transform(Xva))[:, 1]

@@ -19,3 +19,4 @@ ptbxl/
 # Modelos treinados (locais)
 modelos/*
 !modelos/A3_melhor.keras
+!modelos/B3z_p0-17_melhor.keras

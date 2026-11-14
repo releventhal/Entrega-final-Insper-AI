@@ -1,0 +1,69 @@
+nohup: ignoring input
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794679791.608309   48475 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+I0000 00:00:1794679791.680353   48475 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794679794.016699   48475 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+idade: treino 163137 | validação 23513 | média 50.70 desvio 19.80
+W0000 00:00:1794679797.579903   48475 gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was false.
+I0000 00:00:1794679797.581483   48475 gpu_device.cc:2043] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 20833 MB memory:  -> device: 0, name: NVIDIA L4, pci bus id: 0000:00:03.0, compute capability: 8.9
+Epoch 1/10
+I0000 00:00:1794679798.926702   48475 generator_dataset_op.cc:213] Memory patch applied: M_TRIM_THRESHOLD=128 kb was set.
+I0000 00:00:1794679800.356866   48577 service.cc:153] XLA service 0x7f1160007230 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+I0000 00:00:1794679800.356907   48577 service.cc:161]   StreamExecutor [0]: NVIDIA L4, Compute Capability 8.9 (Driver: 13.0.0; Runtime: 12.9.0; Toolkit: 12.5.0; DNN: 9.28.0)
+I0000 00:00:1794679800.397485   48577 dump_mlir_util.cc:269] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.
+I0000 00:00:1794679800.670305   48577 cuda_dnn.cc:461] Loaded cuDNN version 92800
+I0000 00:00:1794679807.256081   48577 device_compiler.h:208] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.
+2550/2550 - 441s - 173ms/step - loss: 0.4336 - mae: 0.5201 - val_loss: 0.3811 - val_mae: 0.4816
+Epoch 2/10
+2550/2550 - 475s - 186ms/step - loss: 0.3435 - mae: 0.4590 - val_loss: 0.3350 - val_mae: 0.4467
+Epoch 3/10
+2550/2550 - 487s - 191ms/step - loss: 0.3194 - mae: 0.4410 - val_loss: 0.3237 - val_mae: 0.4344
+Epoch 4/10
+2550/2550 - 501s - 196ms/step - loss: 0.2999 - mae: 0.4263 - val_loss: 0.3141 - val_mae: 0.4438
+Epoch 5/10
+2550/2550 - 511s - 201ms/step - loss: 0.2873 - mae: 0.4170 - val_loss: 0.2869 - val_mae: 0.4136
+Epoch 6/10
+2550/2550 - 514s - 202ms/step - loss: 0.2786 - mae: 0.4101 - val_loss: 0.2814 - val_mae: 0.4094
+Epoch 7/10
+2550/2550 - 503s - 197ms/step - loss: 0.2693 - mae: 0.4032 - val_loss: 0.2819 - val_mae: 0.4078
+Epoch 8/10
+2550/2550 - 538s - 211ms/step - loss: 0.2627 - mae: 0.3980 - val_loss: 0.2823 - val_mae: 0.4112
+Epoch 9/10
+2550/2550 - 516s - 202ms/step - loss: 0.2560 - mae: 0.3932 - val_loss: 0.2850 - val_mae: 0.4116
+partes  n_treino  n_val  epocas  melhor_epoca  minutos  mae_nosso  r_nosso  mae_lima  r_lima  dif_mae  dif_ic_inf  dif_ic_sup
+ p0-17    163137  23513       9             7   75.481      8.075    0.849     8.428   0.839   -0.353      -0.429      -0.273
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794684333.136616   68266 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+I0000 00:00:1794684333.737573   68266 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794684338.917681   68266 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+dados: {'treino': {'primeiros_exames': 163406, 'todo_zero': 269, 'censurados': 33916, 'elegiveis': 129221, 'obitos': 3356}, 'validação': {'primeiros_exames': 23569, 'todo_zero': 56, 'censurados': 4848, 'elegiveis': 18665, 'obitos': 450}}
+W0000 00:00:1794684345.364168   68266 gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was false.
+I0000 00:00:1794684345.365900   68266 gpu_device.cc:2043] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 20833 MB memory:  -> device: 0, name: NVIDIA L4, pci bus id: 0000:00:03.0, compute capability: 8.9
+Epoch 1/15
+I0000 00:00:1794684346.992231   68266 generator_dataset_op.cc:213] Memory patch applied: M_TRIM_THRESHOLD=128 kb was set.
+I0000 00:00:1794684348.590850   68394 service.cc:153] XLA service 0x7f66d8031fe0 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+I0000 00:00:1794684348.590891   68394 service.cc:161]   StreamExecutor [0]: NVIDIA L4, Compute Capability 8.9 (Driver: 13.0.0; Runtime: 12.9.0; Toolkit: 12.5.0; DNN: 9.28.0)
+I0000 00:00:1794684348.650064   68394 dump_mlir_util.cc:269] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.
+I0000 00:00:1794684349.019063   68394 cuda_dnn.cc:461] Loaded cuDNN version 92800
+I0000 00:00:1794684356.527779   68394 device_compiler.h:208] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.
+2020/2020 - 448s - 222ms/step - auroc: 0.7742 - loss: 0.1092 - val_auroc: 0.8128 - val_loss: 0.1008
+Epoch 2/15
+2020/2020 - 378s - 187ms/step - auroc: 0.8126 - loss: 0.1027 - val_auroc: 0.8165 - val_loss: 0.0985
+Epoch 3/15
+2020/2020 - 335s - 166ms/step - auroc: 0.8263 - loss: 0.1005 - val_auroc: 0.8191 - val_loss: 0.0976
+Epoch 4/15
+2020/2020 - 261s - 129ms/step - auroc: 0.8307 - loss: 0.0997 - val_auroc: 0.8245 - val_loss: 0.0964
+Epoch 5/15
+2020/2020 - 248s - 123ms/step - auroc: 0.8392 - loss: 0.0982 - val_auroc: 0.8288 - val_loss: 0.0980
+Epoch 6/15
+2020/2020 - 246s - 122ms/step - auroc: 0.8431 - loss: 0.0973 - val_auroc: 0.8159 - val_loss: 0.0969
+Epoch 7/15
+2020/2020 - 247s - 122ms/step - auroc: 0.8489 - loss: 0.0960 - val_auroc: 0.8131 - val_loss: 0.0977
+Epoch 8/15
+2020/2020 - 246s - 122ms/step - auroc: 0.8601 - loss: 0.0940 - val_auroc: 0.8112 - val_loss: 0.1005
+B5: 8 épocas em 40.2 min (limite: False); melhor época 5 (val_auroc 0.8288)
+FIM_OK
