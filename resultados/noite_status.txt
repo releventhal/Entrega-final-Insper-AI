@@ -50,3 +50,24 @@ Treino: 3 épocas, melhor época 3, terminou por INTERROMPIDO PELO USUÁRIO na �
   NÃO CONCLUSIVO: o treino terminou por INTERROMPIDO PELO USUÁRIO na época 4 (3 épocas fechadas; melhor checkpoint = época 3): PARCIAL, NÃO CONCLUSIVO, NÃO por early stopping; não declarar o modelo 'pior' nem 'melhor' que o A3 (pode estar subtreinado).
 [13/11 22:08:22] FIM_AVALIACAO A5_completo_parcial: resultados/noite_A5_completo_parcial_avaliacao.csv
 [13/11 22:08:27] AVALIAÇÃO PARCIAL, NÃO CONCLUSIVA do A5 (melhor checkpoint = época 3, 3 épocas fechadas, interrompido pelo usuário): resultados/noite_A5_completo_parcial_avaliacao.csv; previsões em resultados/A5_completo_parcial_previsoes_validacao.npy. Números acima rotulados 'PARCIAL, NÃO CONCLUSIVO'; não usar como resultado final do A5.
+[14/11 09:03:20] INICIO_TREINO A5_completo (A5): partes 0-3, seed 42, lote 64, máximo 20 épocas e 190 min
+[14/11 09:03:21] RETOMADO A5_completo depois da época 3 (estado do early stopping restaurado: melhor val_loss 0.0308, espera 0/3)
+[14/11 09:26:14] A5_completo época 4/20: perda de treino 0.0283 | perda de validação 0.0285 (melhor 0.0285 na época 4; paciência 0/3) | 22.9 min
+[14/11 09:50:21] A5_completo época 5/20: perda de treino 0.0271 | perda de validação 0.0295 (melhor 0.0285 na época 4; paciência 1/3) | 24.1 min
+[14/11 10:14:26] A5_completo época 6/20: perda de treino 0.0263 | perda de validação 0.0282 (melhor 0.0282 na época 6; paciência 0/3) | 24.1 min
+[14/11 10:37:51] A5_completo época 7/20: perda de treino 0.0257 | perda de validação 0.0287 (melhor 0.0282 na época 6; paciência 1/3) | 23.4 min
+[14/11 11:01:15] A5_completo época 8/20: perda de treino 0.0249 | perda de validação 0.0300 (melhor 0.0282 na época 6; paciência 2/3) | 23.4 min
+[14/11 11:24:39] A5_completo época 9/20: perda de treino 0.0239 | perda de validação 0.0282 (melhor 0.0282 na época 9; paciência 0/3) | 23.4 min
+[14/11 11:48:01] A5_completo época 10/20: perda de treino 0.0229 | perda de validação 0.0282 (melhor 0.0282 na época 9; paciência 1/3) | 23.4 min
+[14/11 11:52:40] A5_completo_parcial14: bootstrap por paciente (avaliar_externo.bootstrap, 1.000 reamostras): 1000 válidas (novo), 1000 (A3); 132 s
+[14/11 11:53:54] === AVALIAÇÃO A5_completo_parcial14 na VALIDAÇÃO (8.158 exames; limiar = F1 máximo na validação; A3 com os limiares do JSON; IC 95% por bootstrap de pacientes) ===
+Treino: 10 épocas, melhor época 9, terminou por CORTADO POR TEMPO na sessão de 14/11 (10 épocas fechadas; melhor checkpoint = época 9; espera 1/3): PARCIAL, NÃO CONCLUSIVO.
+  1dAVb  AUROC 0.968 (0.946-0.982) vs A3 0.972 (0.961-0.981) | dif -0.005 (-0.019 a +0.006; IC inclui zero) || AUPRC 0.459 (0.382-0.552) vs A3 0.436 (0.358-0.524) | dif +0.023 (-0.031 a +0.077; IC inclui zero)
+  RBBB   AUROC 0.992 (0.986-0.996) vs A3 0.995 (0.993-0.997) | dif -0.003 (-0.009 a +0.000; IC inclui zero) || AUPRC 0.821 (0.762-0.875) vs A3 0.851 (0.802-0.894) | dif -0.030 (-0.069 a +0.009; IC inclui zero)
+  LBBB   AUROC 0.995 (0.991-0.997) vs A3 0.994 (0.990-0.997) | dif +0.001 (-0.003 a +0.005; IC inclui zero) || AUPRC 0.850 (0.794-0.904) vs A3 0.844 (0.783-0.897) | dif +0.006 (-0.026 a +0.043; IC inclui zero)
+  SB     AUROC 0.994 (0.992-0.996) vs A3 0.993 (0.990-0.995) | dif +0.001 (-0.000 a +0.003; IC inclui zero) || AUPRC 0.600 (0.509-0.704) vs A3 0.618 (0.532-0.709) | dif -0.018 (-0.071 a +0.048; IC inclui zero)
+  ST     AUROC 0.995 (0.993-0.996) vs A3 0.995 (0.994-0.996) | dif -0.000 (-0.002 a +0.000; IC inclui zero) || AUPRC 0.700 (0.622-0.780) vs A3 0.695 (0.620-0.777) | dif +0.005 (-0.048 a +0.060; IC inclui zero)
+  AF     AUROC 0.992 (0.986-0.996) vs A3 0.986 (0.978-0.992) | dif +0.005 (+0.003 a +0.009; IC acima de zero) || AUPRC 0.797 (0.733-0.859) vs A3 0.700 (0.624-0.776) | dif +0.097 (+0.045 a +0.155; IC acima de zero)
+  MACRO  AUROC 0.989 (0.985-0.992) vs A3 0.989 (0.987-0.991) | dif -0.000 (-0.003 a +0.002; IC inclui zero) || AUPRC 0.705 (0.679-0.741) vs A3 0.691 (0.664-0.724) | dif +0.014 (-0.006 a +0.035; IC inclui zero)
+  NÃO CONCLUSIVO: o treino terminou por CORTADO POR TEMPO na sessão de 14/11 (10 épocas fechadas; melhor checkpoint = época 9; espera 1/3): PARCIAL, NÃO CONCLUSIVO, NÃO por early stopping; não declarar o modelo 'pior' nem 'melhor' que o A3 (pode estar subtreinado).
+[14/11 11:53:54] FIM_AVALIACAO A5_completo_parcial14: resultados/noite_A5_completo_parcial14_avaliacao.csv

@@ -1,0 +1,64 @@
+modelo,rotulo,metrica,valor,ic_inf,ic_sup,dif_vs_A3,dif_ic_inf,dif_ic_sup
+A3 (limiares do JSON),1dAVb,auroc,0.972302,0.960819,0.980996,,,
+A3 (limiares do JSON),RBBB,auroc,0.995195,0.993398,0.996752,,,
+A3 (limiares do JSON),LBBB,auroc,0.994078,0.989856,0.9973,,,
+A3 (limiares do JSON),SB,auroc,0.992615,0.990207,0.994822,,,
+A3 (limiares do JSON),ST,auroc,0.995031,0.993572,0.996256,,,
+A3 (limiares do JSON),AF,auroc,0.986209,0.977941,0.992169,,,
+A3 (limiares do JSON),MACRO,auroc,0.989238,0.986822,0.991316,,,
+A3 (limiares do JSON),1dAVb,auprc,0.436158,0.358258,0.52406,,,
+A3 (limiares do JSON),RBBB,auprc,0.851368,0.801574,0.893539,,,
+A3 (limiares do JSON),LBBB,auprc,0.844115,0.783413,0.896915,,,
+A3 (limiares do JSON),SB,auprc,0.6177,0.53152,0.709379,,,
+A3 (limiares do JSON),ST,auprc,0.695448,0.620295,0.776804,,,
+A3 (limiares do JSON),AF,auprc,0.700121,0.624399,0.775969,,,
+A3 (limiares do JSON),MACRO,auprc,0.690819,0.663646,0.723761,,,
+A3 (limiares do JSON),1dAVb,f1,0.485075,0.409081,0.55754,,,
+A3 (limiares do JSON),RBBB,f1,0.826004,0.788606,0.860717,,,
+A3 (limiares do JSON),LBBB,f1,0.798535,0.742253,0.850582,,,
+A3 (limiares do JSON),SB,f1,0.658436,0.589856,0.724641,,,
+A3 (limiares do JSON),ST,f1,0.78329,0.736803,0.825006,,,
+A3 (limiares do JSON),AF,f1,0.700599,0.634608,0.755214,,,
+A3 (limiares do JSON),MACRO,f1,0.708656,0.684955,0.732821,,,
+A6_completo (limiar F1-máx val.),1dAVb,auroc,0.70983,0.666321,0.746176,-0.262472,-0.305174,-0.225719
+A6_completo (limiar F1-máx val.),RBBB,auroc,0.972505,0.958961,0.984878,-0.0226891,-0.0352637,-0.0112082
+A6_completo (limiar F1-máx val.),LBBB,auroc,0.988898,0.982435,0.993933,-0.00518091,-0.0100808,-0.00167322
+A6_completo (limiar F1-máx val.),SB,auroc,0.981596,0.974379,0.987907,-0.0110191,-0.018378,-0.00481521
+A6_completo (limiar F1-máx val.),ST,auroc,0.987538,0.984476,0.990247,-0.00749244,-0.0104233,-0.00498595
+A6_completo (limiar F1-máx val.),AF,auroc,0.833425,0.801559,0.863959,-0.152783,-0.18366,-0.123916
+A6_completo (limiar F1-máx val.),MACRO,auroc,0.912299,0.903436,0.920545,-0.0769395,-0.0856288,-0.0689751
+A6_completo (limiar F1-máx val.),1dAVb,auprc,0.0394154,0.0305522,0.0548436,-0.396743,-0.483196,-0.318989
+A6_completo (limiar F1-máx val.),RBBB,auprc,0.722795,0.662182,0.791106,-0.128574,-0.185141,-0.0669549
+A6_completo (limiar F1-máx val.),LBBB,auprc,0.702848,0.619489,0.787706,-0.141267,-0.216759,-0.0736312
+A6_completo (limiar F1-máx val.),SB,auprc,0.513992,0.426443,0.619494,-0.103708,-0.189563,-0.00509247
+A6_completo (limiar F1-máx val.),ST,auprc,0.572715,0.496104,0.652203,-0.122733,-0.199695,-0.0429754
+A6_completo (limiar F1-máx val.),AF,auprc,0.120675,0.092917,0.165488,-0.579446,-0.646934,-0.500156
+A6_completo (limiar F1-máx val.),MACRO,auprc,0.445407,0.422418,0.479108,-0.245412,-0.277585,-0.213221
+A6_completo (limiar F1-máx val.),1dAVb,f1,0.0881801,0.0658206,0.112172,-0.396895,-0.471237,-0.316748
+A6_completo (limiar F1-máx val.),RBBB,f1,0.745826,0.701148,0.787648,-0.0801782,-0.114494,-0.049915
+A6_completo (limiar F1-máx val.),LBBB,f1,0.688172,0.615369,0.75,-0.110363,-0.164006,-0.0590389
+A6_completo (limiar F1-máx val.),SB,f1,0.619718,0.553173,0.682781,-0.0387179,-0.102912,0.028542
+A6_completo (limiar F1-máx val.),ST,f1,0.651376,0.602433,0.700423,-0.131914,-0.175354,-0.088976
+A6_completo (limiar F1-máx val.),AF,f1,0.205263,0.148996,0.261101,-0.495336,-0.562349,-0.424437
+A6_completo (limiar F1-máx val.),MACRO,f1,0.499756,0.479345,0.519759,-0.2089,-0.233588,-0.183325
+ensemble A3+A6 (limiar F1-máx val.),1dAVb,auroc,0.965643,0.945455,0.97882,-0.00665872,-0.0161714,-0.000497991
+ensemble A3+A6 (limiar F1-máx val.),RBBB,auroc,0.993863,0.991205,0.995927,-0.00133197,-0.00230416,-0.000499663
+ensemble A3+A6 (limiar F1-máx val.),LBBB,auroc,0.992186,0.986935,0.996304,-0.00189242,-0.00488905,0.000362885
+ensemble A3+A6 (limiar F1-máx val.),SB,auroc,0.993387,0.991468,0.995153,0.00077262,-0.000207483,0.00191166
+ensemble A3+A6 (limiar F1-máx val.),ST,auroc,0.993736,0.992134,0.995155,-0.0012945,-0.00199578,-0.000613876
+ensemble A3+A6 (limiar F1-máx val.),AF,auroc,0.975561,0.958849,0.988497,-0.0106476,-0.0216872,-0.00272149
+ensemble A3+A6 (limiar F1-máx val.),MACRO,auroc,0.985729,0.981536,0.989102,-0.00350877,-0.00590581,-0.00166069
+ensemble A3+A6 (limiar F1-máx val.),1dAVb,auprc,0.434868,0.355358,0.521291,-0.0012902,-0.012036,0.00774582
+ensemble A3+A6 (limiar F1-máx val.),RBBB,auprc,0.843657,0.796969,0.887646,-0.00771195,-0.0331229,0.0206052
+ensemble A3+A6 (limiar F1-máx val.),LBBB,auprc,0.813963,0.75255,0.874606,-0.0301527,-0.0623365,0.00107711
+ensemble A3+A6 (limiar F1-máx val.),SB,auprc,0.618987,0.535693,0.711444,0.00128728,-0.0370511,0.041273
+ensemble A3+A6 (limiar F1-máx val.),ST,auprc,0.673047,0.59341,0.751068,-0.022401,-0.0664026,0.0155584
+ensemble A3+A6 (limiar F1-máx val.),AF,auprc,0.672408,0.590865,0.747297,-0.0277136,-0.0700763,0.0122098
+ensemble A3+A6 (limiar F1-máx val.),MACRO,auprc,0.676155,0.647806,0.710248,-0.0146637,-0.0292377,-0.00143349
+ensemble A3+A6 (limiar F1-máx val.),1dAVb,f1,0.48415,0.418474,0.550659,-0.000924771,-0.0478315,0.0548235
+ensemble A3+A6 (limiar F1-máx val.),RBBB,f1,0.808943,0.770599,0.844793,-0.0170607,-0.0474752,0.00973612
+ensemble A3+A6 (limiar F1-máx val.),LBBB,f1,0.8,0.743284,0.851487,0.0014652,-0.0166007,0.0193157
+ensemble A3+A6 (limiar F1-máx val.),SB,f1,0.674603,0.607992,0.735046,0.016167,-0.0130066,0.0506043
+ensemble A3+A6 (limiar F1-máx val.),ST,f1,0.725581,0.680231,0.772111,-0.0577084,-0.0914562,-0.0263398
+ensemble A3+A6 (limiar F1-máx val.),AF,f1,0.700535,0.642655,0.752893,-6.4043e-05,-0.032096,0.0331212
+ensemble A3+A6 (limiar F1-máx val.),MACRO,f1,0.698969,0.677007,0.721264,-0.00968763,-0.0228884,0.00402414
