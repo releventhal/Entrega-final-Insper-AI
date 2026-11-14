@@ -1,0 +1,52 @@
+=== PASSO 0 (2026-11-13 18:02) ===
+máquina: 14 núcleos físicos / 20 lógicos; RAM total 15.7 GiB, livre agora 6.7 GiB; bateria: NA BATERIA (95%)
+RESULTADO A3 | parâmetros 406,246 | 15 lotes: leitura 113 ms + treino 140 ms = 253 ms por lote de 64 | validação 183 ms por lote | 869 lotes de treino + 128 de validação => ESTIMATIVA 4.1 min por época | RAM do processo depois do aquecimento 0.57 GiB, pico 0.69 GiB (inclui TensorFlow e o modelo)
+RESULTADO A6 | parâmetros 505,062 | 15 lotes: leitura 68 ms + treino 171 ms = 240 ms por lote de 64 | validação 211 ms por lote | 869 lotes de treino + 128 de validação => ESTIMATIVA 3.9 min por época | RAM do processo depois do aquecimento 0.58 GiB, pico 0.75 GiB (inclui TensorFlow e o modelo)
+RESULTADO A5 | parâmetros 3,443,462 | 4 lotes: leitura 70 ms + treino 1159 ms = 1229 ms por lote de 64 | validação 390 ms por lote | 869 lotes de treino + 128 de validação => ESTIMATIVA 18.6 min por época | RAM do processo depois do aquecimento 1.23 GiB, pico 1.75 GiB (inclui TensorFlow e o modelo)
+DECISÃO (13/11 18:15): fila A6_completo (a1_cnn.treinar, seed 42, lote 64, paciência 3, até 30 épocas e 300 min) e depois A5_completo SÓ SE restarem mais de 206 min (10 épocas x 18,6 min + 20 de margem). Orçamento total 8 h de relógio. Nomes novos (A6_completo/A5_completo): nenhum arquivo A6_* da Renata é tocado. Avaliação ao fim de cada modelo: avaliar_externo.bootstrap (o mesmo do A3), 1.000 reamostras por paciente. Teste de fumaça da retomada e da avaliação feito com A6_fumaca (2.000 exames; arquivos removidos depois).
+[13/11 18:15:56] === FILA INICIADA (pid 15380); orçamento de 8 h: termina até 14/11 02:15 ===
+[13/11 18:15:56] suspensão automática bloqueada pelo supervisor (SetThreadExecutionState); fechar a tampa do notebook ou acabar a bateria AINDA para o treino
+[13/11 18:16:09] INICIO_TREINO A6_completo (A6): partes 0-3, seed 42, lote 64, máximo 30 épocas e 300 min
+[13/11 18:22:37] A6_completo época 1/30: perda de treino 0.0990 | perda de validação 0.0941 (melhor 0.0941 na época 1; paciência 0/3) | 6.4 min
+[13/11 18:28:30] A6_completo época 2/30: perda de treino 0.0862 | perda de validação 0.0728 (melhor 0.0728 na época 2; paciência 0/3) | 5.9 min
+[13/11 18:34:26] A6_completo época 3/30: perda de treino 0.0628 | perda de validação 0.0564 (melhor 0.0564 na época 3; paciência 0/3) | 5.9 min
+[13/11 18:40:24] A6_completo época 4/30: perda de treino 0.0573 | perda de validação 0.0539 (melhor 0.0539 na época 4; paciência 0/3) | 6.0 min
+[13/11 18:46:24] A6_completo época 5/30: perda de treino 0.0548 | perda de validação 0.0529 (melhor 0.0529 na época 5; paciência 0/3) | 6.0 min
+[13/11 18:49:50] A6_completo época 6/30: perda de treino 0.0528 | perda de validação 0.0536 (melhor 0.0529 na época 5; paciência 1/3) | 3.4 min
+[13/11 18:54:36] A6_completo época 7/30: perda de treino 0.0563 | perda de validação 0.0561 (melhor 0.0529 na época 5; paciência 2/3) | 4.8 min
+[13/11 19:00:32] A6_completo época 8/30: perda de treino 0.0557 | perda de validação 0.0634 (melhor 0.0529 na época 5; paciência 3/3) | 5.9 min
+[13/11 19:00:32] FIM_TREINO A6_completo: 8 épocas; terminou por early stopping (paciência 3)
+[13/11 19:03:58] A6_completo: bootstrap por paciente (avaliar_externo.bootstrap, 1.000 reamostras): 1000 válidas (novo), 1000 (A3); 135 s
+[13/11 19:06:10] === AVALIAÇÃO A6_completo na VALIDAÇÃO (8.158 exames; limiar = F1 máximo na validação; A3 com os limiares do JSON; IC 95% por bootstrap de pacientes) ===
+Treino: 8 épocas, melhor época 5, terminou por early stopping (paciência 3).
+  1dAVb  AUROC 0.710 (0.666-0.746) vs A3 0.972 (0.961-0.981) | dif -0.262 (-0.305 a -0.226; IC abaixo de zero) || AUPRC 0.039 (0.031-0.055) vs A3 0.436 (0.358-0.524) | dif -0.397 (-0.483 a -0.319; IC abaixo de zero)
+  RBBB   AUROC 0.973 (0.959-0.985) vs A3 0.995 (0.993-0.997) | dif -0.023 (-0.035 a -0.011; IC abaixo de zero) || AUPRC 0.723 (0.662-0.791) vs A3 0.851 (0.802-0.894) | dif -0.129 (-0.185 a -0.067; IC abaixo de zero)
+  LBBB   AUROC 0.989 (0.982-0.994) vs A3 0.994 (0.990-0.997) | dif -0.005 (-0.010 a -0.002; IC abaixo de zero) || AUPRC 0.703 (0.619-0.788) vs A3 0.844 (0.783-0.897) | dif -0.141 (-0.217 a -0.074; IC abaixo de zero)
+  SB     AUROC 0.982 (0.974-0.988) vs A3 0.993 (0.990-0.995) | dif -0.011 (-0.018 a -0.005; IC abaixo de zero) || AUPRC 0.514 (0.426-0.619) vs A3 0.618 (0.532-0.709) | dif -0.104 (-0.190 a -0.005; IC abaixo de zero)
+  ST     AUROC 0.988 (0.984-0.990) vs A3 0.995 (0.994-0.996) | dif -0.007 (-0.010 a -0.005; IC abaixo de zero) || AUPRC 0.573 (0.496-0.652) vs A3 0.695 (0.620-0.777) | dif -0.123 (-0.200 a -0.043; IC abaixo de zero)
+  AF     AUROC 0.833 (0.802-0.864) vs A3 0.986 (0.978-0.992) | dif -0.153 (-0.184 a -0.124; IC abaixo de zero) || AUPRC 0.121 (0.093-0.165) vs A3 0.700 (0.624-0.776) | dif -0.579 (-0.647 a -0.500; IC abaixo de zero)
+  MACRO  AUROC 0.912 (0.903-0.921) vs A3 0.989 (0.987-0.991) | dif -0.077 (-0.086 a -0.069; IC abaixo de zero) || AUPRC 0.445 (0.422-0.479) vs A3 0.691 (0.664-0.724) | dif -0.245 (-0.278 a -0.213; IC abaixo de zero)
+  LEITURA (mecânica, sem causa): o treino terminou por early stopping, então a comparação com o A3 usa um modelo no ponto de parada do mesmo critério; as linhas acima com 'IC acima/abaixo de zero' são diferenças medidas (validação, otimista; uma seed).
+[13/11 19:06:10] FIM_AVALIACAO A6_completo: resultados/noite_A6_completo_avaliacao.csv
+[13/11 19:06:26] A5 será lançado: restam 429 min > estimativa 206 min.
+[13/11 19:06:41] INICIO_TREINO A5_completo (A5): partes 0-3, seed 42, lote 64, máximo 20 épocas e 410 min
+[13/11 19:28:56] A5_completo época 1/20: perda de treino 0.0522 | perda de validação 0.0317 (melhor 0.0317 na época 1; paciência 0/3) | 22.2 min
+[13/11 21:34:44] A5_completo época 2/20: perda de treino 0.0316 | perda de validação 0.0319 (melhor 0.0317 na época 1; paciência 1/3) | 125.8 min
+[13/11 21:39:50] AVISO: só 0.5 GiB de RAM livre
+NOTA (13/11 21:40): a época 2 do A5 levou 125,8 min (a época 1: 22,2 min). O Windows registra 'Gatilho crítico da bateria' às 21:21 e 21:23, suspensão curta às 21:21-21:23 e troca para a tomada às 21:23 (agora na tomada, bateria 26%). Causa da lentidão na época 2: NÃO verificada (hipótese: o computador rodou na bateria, com limite de desempenho, até ser ligado na tomada; também havia só 0,5 GiB de RAM livre às 21:39). O treino continuou sem erro; a retomada não foi necessária. Se o A5 parar por limite de tempo ou de épocas, a avaliação sai como NÃO CONCLUSIVO.
+[13/11 22:01:40] A5_completo época 3/20: perda de treino 0.0294 | perda de validação 0.0308 (melhor 0.0308 na época 3; paciência 0/3) | 26.9 min
+[13/11 22:05:12] INTERROMPIDO_PELO_USUARIO A5_completo: o usuário pediu para desligar o notebook; supervisor e trainer encerrados na época 4 (em andamento, ~3 min dentro dela); 3 épocas fechadas (melhor perda de validação 0,0308 na época 3; paciência 0/3). SEM early stopping: o A5 NÃO É CONCLUSIVO e NÃO deve ser comparado com o A3 como resultado final. Checkpoint da época 3 salvo (modelos/noite_backup_A5_completo/ e modelos/A5_completo_melhor.keras, 22:01:40). Retomar: ver 'COMO RETOMAR' abaixo.
+COMO RETOMAR (raiz do repositório, .venv, notebook NA TOMADA): `.venv\Scripts\python.exe noite_fila.py treinar --nome A5_completo --modelo A5 --max-min 300 --max-epocas 20` (o BackupAndRestore volta à época 4 e o estado do early stopping é restaurado do estado em logs/noite_A5_completo_estado.json). Usar `noite_fila.py fila` também retoma, mas reinicia o orçamento de 8 h e roda a avaliação ao fim. NÃO apague modelos/noite_backup_A5_completo/ nem logs/noite_A5_completo_*.
+[13/11 22:07:24] A5_completo_parcial: bootstrap por paciente (avaliar_externo.bootstrap, 1.000 reamostras): 1000 válidas (novo), 1000 (A3); 58 s
+[13/11 22:08:22] === AVALIAÇÃO A5_completo_parcial na VALIDAÇÃO (8.158 exames; limiar = F1 máximo na validação; A3 com os limiares do JSON; IC 95% por bootstrap de pacientes) ===
+Treino: 3 épocas, melhor época 3, terminou por INTERROMPIDO PELO USUÁRIO na época 4 (3 épocas fechadas; melhor checkpoint = época 3): PARCIAL, NÃO CONCLUSIVO.
+  1dAVb  AUROC 0.977 (0.967-0.984) vs A3 0.972 (0.961-0.981) | dif +0.005 (-0.002 a +0.013; IC inclui zero) || AUPRC 0.438 (0.359-0.534) vs A3 0.436 (0.358-0.524) | dif +0.002 (-0.049 a +0.053; IC inclui zero)
+  RBBB   AUROC 0.993 (0.988-0.997) vs A3 0.995 (0.993-0.997) | dif -0.002 (-0.007 a +0.001; IC inclui zero) || AUPRC 0.839 (0.783-0.886) vs A3 0.851 (0.802-0.894) | dif -0.012 (-0.043 a +0.021; IC inclui zero)
+  LBBB   AUROC 0.995 (0.993-0.997) vs A3 0.994 (0.990-0.997) | dif +0.001 (-0.001 a +0.004; IC inclui zero) || AUPRC 0.813 (0.748-0.871) vs A3 0.844 (0.783-0.897) | dif -0.031 (-0.067 a +0.010; IC inclui zero)
+  SB     AUROC 0.994 (0.992-0.996) vs A3 0.993 (0.990-0.995) | dif +0.001 (+0.000 a +0.002; IC acima de zero) || AUPRC 0.645 (0.554-0.735) vs A3 0.618 (0.532-0.709) | dif +0.027 (-0.026 a +0.080; IC inclui zero)
+  ST     AUROC 0.995 (0.994-0.996) vs A3 0.995 (0.994-0.996) | dif +0.000 (-0.000 a +0.001; IC inclui zero) || AUPRC 0.723 (0.647-0.796) vs A3 0.695 (0.620-0.777) | dif +0.027 (-0.008 a +0.058; IC inclui zero)
+  AF     AUROC 0.991 (0.986-0.995) vs A3 0.986 (0.978-0.992) | dif +0.005 (+0.002 a +0.008; IC acima de zero) || AUPRC 0.761 (0.692-0.825) vs A3 0.700 (0.624-0.776) | dif +0.061 (+0.016 a +0.104; IC acima de zero)
+  MACRO  AUROC 0.991 (0.989-0.993) vs A3 0.989 (0.987-0.991) | dif +0.002 (+0.000 a +0.003; IC acima de zero) || AUPRC 0.703 (0.676-0.736) vs A3 0.691 (0.664-0.724) | dif +0.012 (-0.005 a +0.029; IC inclui zero)
+  NÃO CONCLUSIVO: o treino terminou por INTERROMPIDO PELO USUÁRIO na época 4 (3 épocas fechadas; melhor checkpoint = época 3): PARCIAL, NÃO CONCLUSIVO, NÃO por early stopping; não declarar o modelo 'pior' nem 'melhor' que o A3 (pode estar subtreinado).
+[13/11 22:08:22] FIM_AVALIACAO A5_completo_parcial: resultados/noite_A5_completo_parcial_avaliacao.csv
+[13/11 22:08:27] AVALIAÇÃO PARCIAL, NÃO CONCLUSIVA do A5 (melhor checkpoint = época 3, 3 épocas fechadas, interrompido pelo usuário): resultados/noite_A5_completo_parcial_avaliacao.csv; previsões em resultados/A5_completo_parcial_previsoes_validacao.npy. Números acima rotulados 'PARCIAL, NÃO CONCLUSIVO'; não usar como resultado final do A5.
