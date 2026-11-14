@@ -77,7 +77,7 @@ def main(partes):
     for k in notas:
         dif = np.abs(notas[k][comum] - salvas.loc[va.loc[comum, "exam_id"], k].to_numpy()).max()
         print(f"{k}: conferência com as notas salvas nos {comum.sum()} elegíveis: dif. máx {dif:.2e}")
-        assert dif < 1e-4
+        assert dif < 1e-3   # CPU ~5e-7; GPU com TF32 pode dar ~1e-4 (14/11)
 
     t, e = va["timey"].to_numpy(float), va["death"].to_numpy(int)
     linhas = []
