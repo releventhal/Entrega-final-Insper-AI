@@ -16,6 +16,5 @@ python -u parte_b_cnn.py avaliar --partes $P                         # B0, B1, B
 python -u parte_b_alteracoes.py --partes $P                          # B4, B4n, B4p
 python -u parte_b_analises.py --partes $P                            # risco escondido e triagem
 date
-cd /content && zip -j parte_b_$T.zip repo/resultados/parte_b_*${T}* repo/modelos/B3z_${T}_melhor.keras \
-    $(ls repo/resultados/parte_b_caracteristicas_A3_${T}.npz 2>/dev/null) parte_b.log
+cd /content && zip -j parte_b_$T.zip repo/resultados/parte_b_*${T}* repo/modelos/B3z_${T}_melhor.keras parte_b.log
 echo FIM
