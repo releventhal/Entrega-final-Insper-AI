@@ -8,6 +8,7 @@ set -euo pipefail
 P=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
 T=p0-17
 cd "$(dirname "$0")"
+pip install -q wfdb==4.3.0                                           # ecg_dados.py importa wfdb (não vem no Colab)
 date; nvidia-smi --query-gpu=name --format=csv,noheader; git log -1 --oneline
 python -u parte_b_cnn.py preparar --partes $P                        # elegíveis, todo-zero pelo sinal
 python -u parte_b_cnn.py treinar_zero_idade --partes $P --max-epocas 15 --max-min 300   # B3z (prioridade)
