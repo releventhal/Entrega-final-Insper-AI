@@ -1,0 +1,7 @@
+modelo,conjunto,n,obitos,auroc,auroc_ic_inf,auroc_ic_sup,auprc,auprc_ic_inf,auprc_ic_sup,final_pela_regra
+B3z_p0-7,validação em comum,9549,215,0.8053,0.7782,0.8321,0.1052,0.0783,0.1444,False
+B3z_p0-17,validação em comum,9549,215,0.8182,0.7922,0.8445,0.1148,0.0865,0.1534,True
+B0_p0-17,validação em comum,9549,215,0.7792,0.7487,0.8097,0.0707,0.0570,0.0890,False
+B3z_p0-7 - B0_p0-17,validação em comum,9549,215,0.0261,0.0061,0.0479,0.0345,0.0113,0.0690,False
+B3z_p0-17 - B0_p0-17,validação em comum,9549,215,0.0391,0.0195,0.0612,0.0441,0.0216,0.0756,False
+B3z_p0-17 - B3z_p0-7,validação em comum,9549,215,0.0129,0.0003,0.0286,0.0095,-0.0131,0.0311,False
