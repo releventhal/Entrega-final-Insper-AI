@@ -189,17 +189,20 @@ def treinar_zero(a, nome="B2z"):
     print("dados:", rel, flush=True)
     tr = el[el.grupo == "treino"]
     idade = (tr["age"].mean(), tr["age"].std()) if nome == "B3z" else None     # média e desvio só do treino
-    g_tr = GeradorObito(tr, idade=idade, embaralhar=True)
+    g_tr = GeradorObito(tr, idade=idade, embaralhar=True, seed=a.seed)  # a seed muda o embaralhamento...
     g_va = GeradorObito(el[el.grupo == "validação"], idade=idade)
-    m = cnn_do_zero_com_idade() if nome == "B3z" else cnn_do_zero()
-    caminho = a.modelos / f"{nome}_{nome_partes(a.partes)}_melhor.keras"
+    m = cnn_do_zero_com_idade(a.seed) if nome == "B3z" else cnn_do_zero(a.seed)   # ...e os pesos iniciais
+    # seed 42 = nomes de sempre; outra seed (15/11, só para medir estabilidade) ganha o sufixo _s<seed> e nunca
+    # sobrescreve o modelo da seed 42
+    suf = "" if a.seed == E.SEED else f"_s{a.seed}"
+    caminho = a.modelos / f"{nome}_{nome_partes(a.partes)}{suf}_melhor.keras"
     limite = LimiteDeTempo(a.max_min)
     t0 = time.time()
     hist = m.fit(g_tr, validation_data=g_va, epochs=a.max_epocas, verbose=2, callbacks=[
         # para pelo AUROC de validação (a perda quase não muda com 2,6% de óbitos); paciência 3, como no A3
         keras.callbacks.EarlyStopping("val_auroc", mode="max", patience=3, restore_best_weights=True),
         keras.callbacks.ModelCheckpoint(caminho, monitor="val_auroc", mode="max", save_best_only=True),
-        keras.callbacks.CSVLogger(a.saida / f"parte_b_{nome}_{nome_partes(a.partes)}_log_por_epoca.csv"),
+        keras.callbacks.CSVLogger(a.saida / f"parte_b_{nome}_{nome_partes(a.partes)}{suf}_log_por_epoca.csv"),
         limite])
     h = hist.history
     melhor = int(np.argmax(h["val_auroc"]))
@@ -207,7 +210,7 @@ def treinar_zero(a, nome="B2z"):
           f"melhor época {melhor + 1} (val_auroc {h['val_auroc'][melhor]:.4f})", flush=True)
     m = keras.models.load_model(caminho, compile=False)              # o melhor salvo, mesmo se parar pelo tempo
     S = m.predict(g_va, verbose=0)[:, 0]
-    np.savez(a.saida / f"parte_b_{nome}_{nome_partes(a.partes)}_previsoes_validacao.npz", S=S, exam_id=g_va.info["exam_id"].to_numpy(),
+    np.savez(a.saida / f"parte_b_{nome}_{nome_partes(a.partes)}{suf}_previsoes_validacao.npz", S=S, exam_id=g_va.info["exam_id"].to_numpy(),
              epocas=len(h["loss"]), melhor_epoca=melhor + 1, minutos=(time.time() - t0) / 60)
 
 
@@ -293,6 +296,7 @@ if __name__ == "__main__":
     ap.add_argument("--modelos", default=str(RAIZ / "modelos"))
     ap.add_argument("--max-epocas", type=int, default=15)
     ap.add_argument("--max-min", type=float, default=240)
+    ap.add_argument("--seed", type=int, default=E.SEED)   # só treinar_zero*: outra seed = pesos iniciais e embaralhamento
     a = ap.parse_args()
     a.partes = [int(p) for p in a.partes.split(",")]
     a.saida, a.modelos = Path(a.saida), Path(a.modelos)
