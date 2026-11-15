@@ -1,0 +1,39 @@
+Sun Nov 15 07:42:46 PM UTC 2026
+NVIDIA L4
+607320e Parte B: B3z p0-17 CONGELADO (Renata, relatando a confirmacao do Tom); colab_teste_b.sh roda o teste uma vez depois das seeds
+Sun Nov 15 08:24:54 PM UTC 2026
+tail: option used in invalid context -- 3
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794774296.971525   21535 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+I0000 00:00:1794774297.053914   21535 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794774300.270323   21535 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+                      modelo  n_val  obitos_val  auroc  auroc_ic_inf  auroc_ic_sup  auprc  auprc_ic_inf  auprc_ic_sup  auroc_desvio  auprc_desvio partes
+                          B0  18665         450 0.7944        0.7734        0.8132 0.0817        0.0698        0.0962           NaN           NaN  p0-17
+                          B4  18665         450 0.8078        0.7872        0.8270 0.0951        0.0803        0.1150           NaN           NaN  p0-17
+                         B4p  18665         450 0.8176        0.7987        0.8374 0.1099        0.0919        0.1324           NaN           NaN  p0-17
+                     B3z_s42  18665         450 0.8308        0.8125        0.8495 0.1227        0.1010        0.1513           NaN           NaN  p0-17
+                     B3z_s43  18665         450 0.8284        0.8103        0.8466 0.1204        0.1012        0.1473           NaN           NaN  p0-17
+                     B3z_s44  18665         450 0.8300        0.8126        0.8483 0.1208        0.1007        0.1471           NaN           NaN  p0-17
+                B3z_s42 - B0  18665         450 0.0363        0.0244        0.0488 0.0410        0.0235        0.0639           NaN           NaN  p0-17
+                B3z_s42 - B4  18665         450 0.0230        0.0121        0.0345 0.0276        0.0097        0.0480           NaN           NaN  p0-17
+               B3z_s42 - B4p  18665         450 0.0132        0.0034        0.0231 0.0128       -0.0023        0.0295           NaN           NaN  p0-17
+                B3z_s43 - B0  18665         450 0.0340        0.0223        0.0455 0.0387        0.0230        0.0599           NaN           NaN  p0-17
+                B3z_s43 - B4  18665         450 0.0207        0.0099        0.0315 0.0253        0.0081        0.0455           NaN           NaN  p0-17
+               B3z_s43 - B4p  18665         450 0.0108        0.0033        0.0189 0.0104       -0.0051        0.0270           NaN           NaN  p0-17
+                B3z_s44 - B0  18665         450 0.0356        0.0241        0.0476 0.0391        0.0226        0.0604           NaN           NaN  p0-17
+                B3z_s44 - B4  18665         450 0.0222        0.0116        0.0329 0.0257        0.0079        0.0463           NaN           NaN  p0-17
+               B3z_s44 - B4p  18665         450 0.0124        0.0039        0.0210 0.0109       -0.0045        0.0286           NaN           NaN  p0-17
+      B3z (média de 3 seeds)  18665         450 0.8297           NaN           NaN 0.1213           NaN           NaN        0.0012        0.0013  p0-17
+ B3z - B0 (média de 3 seeds)  18665         450 0.0353           NaN           NaN 0.0396           NaN           NaN        0.0012        0.0013  p0-17
+ B3z - B4 (média de 3 seeds)  18665         450 0.0220           NaN           NaN 0.0262           NaN           NaN        0.0012        0.0013  p0-17
+B3z - B4p (média de 3 seeds)  18665         450 0.0121           NaN           NaN 0.0114           NaN           NaN        0.0012        0.0013  p0-17
+  adding: parte_b_B3z_p0-17_s43_log_por_epoca.csv (deflated 48%)
+  adding: parte_b_B3z_p0-17_s43_previsoes_validacao.npz (deflated 39%)
+  adding: parte_b_B3z_p0-17_s44_log_por_epoca.csv (deflated 49%)
+  adding: parte_b_B3z_p0-17_s44_previsoes_validacao.npz (deflated 39%)
+  adding: parte_b_seeds_p0-17.csv (deflated 68%)
+  adding: seed_43.log (deflated 57%)
+  adding: seed_44.log (deflated 57%)
+  adding: seeds.log

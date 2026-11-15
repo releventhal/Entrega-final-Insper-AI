@@ -1,6 +1,6 @@
 # Parte B: rascunho para o paper (Claude da Renata, 15/11)
 
-> **Rascunho de apoio, mesmo formato do `parte_a_rascunho.md` do Tom.** O texto final é da dupla. Cada número traz entre colchetes o arquivo de onde veio. **Tudo aqui é VALIDAÇÃO:** a validação também escolheu a época das CNNs e o modelo final, portanto é **otimista**. O teste da Parte B **não foi aberto**; quando for (uma vez, com Renata e Tom de acordo), os números do teste entram na seção 9 e substituem estes como resultado principal. A fundamentação médica está em `fundamentacao_medica.md`.
+> **Rascunho de apoio, mesmo formato do `parte_a_rascunho.md` do Tom.** O texto final é da dupla. Cada número traz entre colchetes o arquivo de onde veio. As seções 1 a 8 são **validação** (que também escolheu a época das CNNs e o modelo final, portanto otimista). **O resultado principal é o do TESTE, na seção 9** (aberto uma vez em 15/11, com o B3z congelado). A fundamentação médica está em `fundamentacao_medica.md`.
 
 ## 1. Pergunta e desenho
 - **Pergunta:** o ECG prevê morte em até 2 anos **além** do que a idade e o sexo já dizem? Quanto disso são as 6 alterações conhecidas (Parte A)?
@@ -94,12 +94,36 @@ idade 1,85 por década (1,80-1,91); homem 1,63 (1,52-1,74); **ST 2,91 (2,48-3,38
 - **Idade pelo ECG** (mesma CNN, saída numérica, 163.137 pacientes de treino): MAE 8,08 anos (r 0,849) contra 8,43 (r 0,839) do `nn_predicted_age`, nos 23.513 pacientes de validação; diferença −0,35 (IC −0,43 a −0,27) [resultados/parte_b_idade_p0-17.csv]. Não é comparação justa para "superar" Lima et al. (treinamos nesta amostra; para eles o erro é a informação).
 - **B5:** 0,830 na validação completa contra 0,831 do B3z (−0,001; IC −0,010 a +0,009) [CLAUDE.md, log de 14/11]: o pré-treino não ajudou.
 - **Regra do modelo final (registrada em 14/11, antes dos resultados da GPU):** maior AUROC na validação, nos 9.549 pacientes em comum: B3z 18 partes 0,818; B5 0,815; B3z 8 partes 0,805 → **B3z com 18 partes** [resultados/parte_b_comparar.csv]. Status: **candidato** [congelado_candidato_parte_b.json].
-- **Teste:** [a preencher depois de rodar `parte_b_teste.py --conjunto teste` uma vez]
-- **Seeds 43 e 44 do B3z (estabilidade):** [a preencher com resultados/parte_b_seeds_p0-17.csv]
+- **Seeds 43 e 44 do B3z (estabilidade, validação):** AUROC 0,831 / 0,828 / 0,830 (seeds 42 / 43 / 44; média 0,830, desvio 0,001); B3z − B4p +0,013 (+0,003 a +0,023) / +0,011 (+0,003 a +0,019) / +0,012 (+0,004 a +0,021) [resultados/parte_b_seeds_p0-17.csv].
+
+## 9b. TESTE da Parte B (aberto UMA vez, 15/11; B3z p0-17 congelado)
+Congelado depois da confirmação de Renata e Tom [congelado_candidato_parte_b.json, status "congelado"]. B0, B1, B4 e B4p ajustados só no treino. Antes, o mesmo script reproduziu as notas salvas da validação [resultados/parte_b_colab_teste_p0-17.log]. Teste: **36.880 pacientes, 895 óbitos em 2 anos** (46.672 primeiros exames; 94 todo-zero e 9.698 censurados fora). Rótulos e grupo recalculados de forma independente a partir do `exams.csv`: iguais; 0 pacientes em comum com treino/validação.
+
+| Modelo | AUROC (IC 95%) | AUPRC (IC 95%) |
+|---|---|---|
+| B0 | 0,793 (0,779-0,806) | 0,089 (0,079-0,101) |
+| B1 | 0,804 (0,790-0,817) | 0,096 (0,086-0,110) |
+| B4 | 0,804 (0,791-0,817) | 0,101 (0,089-0,115) |
+| B4p | 0,819 (0,806-0,831) | 0,113 (0,100-0,129) |
+| **B3z** | **0,832 (0,820-0,844)** | **0,128 (0,114-0,146)** |
+| B3z − B0 | +0,039 (+0,030 a +0,049) | +0,039 (+0,027 a +0,053) |
+| B3z − B1 | +0,028 (+0,020 a +0,037) | +0,031 (+0,017 a +0,045) |
+| B3z − B4 | +0,028 (+0,019 a +0,036) | +0,027 (+0,015 a +0,040) |
+| **B3z − B4p** | **+0,013 (+0,006 a +0,019)** | **+0,014 (+0,005 a +0,024)** |
+| B1 − B0 | +0,011 (+0,007 a +0,015) | +0,007 (+0,002 a +0,015) |
+| B4 − B0 | +0,012 (+0,008 a +0,016) | +0,012 (+0,004 a +0,022) |
+| B4p − B0 | +0,026 (+0,019 a +0,033) | +0,025 (+0,014 a +0,036) |
+| B4p − B4 | +0,015 (+0,010 a +0,020) | +0,013 (+0,004 a +0,021) |
+
+[resultados/parte_b_teste_p0-17.csv; AUROC recalculado de resultados/parte_b_teste_bruto_p0-17.csv]
+
+- **Risco escondido (teste):** sem nenhuma das 6 no laudo (33.152 pacientes, 659 óbitos): B3z 0,829, B3z − B0 +0,030 (+0,020 a +0,039); laudo "ECG normal" (12.804, 150 óbitos): B3z 0,807, **B3z − B0 +0,023 (+0,006 a +0,040)**, diferente da validação (+0,001; −0,020 a +0,024), com intervalos que se sobrepõem [resultados/parte_b_teste_analises_p0-17.csv].
+- **Triagem (teste):** óbitos nos 5% / 10% / 20% de maior nota: B0 23,2% / 40,1% / 60,9%; B4p 30,5% / 46,6% / 65,5%; **B3z 30,3% / 48,8% / 68,6%**; B3z − B0 nos 10%: +0,087 (+0,056 a +0,120) [idem].
+- **Leitura:** o teste reproduz a validação (0,831 → 0,832), e o ganho além das 6 alterações agora tem IC fora de zero em AUROC e AUPRC.
 
 ## 10. Limitações
-- Tudo acima é validação; a validação escolheu a época e o modelo final.
-- Uma seed no resultado principal (seeds extras em andamento, só para relatar).
+- Seções 1-8 são validação (que escolheu a época e o modelo final); o teste (9b) foi aberto uma vez e confirma.
+- O modelo testado é a seed 42; as seeds 43 e 44 só foram avaliadas na validação.
 - O ganho "além das 6 alterações" é pequeno (+0,013) e só apareceu com as 18 partes.
 - Óbito por cruzamento probabilístico de registros, sem causa da morte; `timey` sem unidade documentada (compatível com anos).
 - Uma população só (atenção primária de Minas Gerais); a Parte B não tem teste externo.
