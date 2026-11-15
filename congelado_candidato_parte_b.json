@@ -1,6 +1,6 @@
 {
-  "status": "candidato",
-  "aviso": "NAO congelado. Congelar = Renata E Tom confirmarem e uma pessoa mudar 'status' para 'congelado' a mao (com data e commit). Ate la, parte_b_teste.py recusa o conjunto 'teste'.",
+  "status": "congelado",
+  "aviso": "CONGELADO em 15/11/2026. Nada (modelo, regras, comparacoes) muda depois disto. O teste roda UMA vez com parte_b_teste.py --conjunto teste --confirmo-congelado.",
   "criado_em": "2026-11-15",
   "criado_por": "Claude da Renata (proposta enviada ao Tom em 15/11; aguardando confirmacao)",
   "modelo_final": {
@@ -14,7 +14,26 @@
     "sha256": "bae64fa994934072434853ce6c5f6dfffd485a1f126336be1d6e8d526ca12a89"
   },
   "dados": {
-    "partes": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+    "partes": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ],
     "split": "por paciente, o de sempre (ecg_dados.tabela_com_grupo, seed 42, 70/10/20)",
     "exame": "primeiro exame de cada paciente (o unico com death/timey)",
     "horizonte_anos": 2,
@@ -23,13 +42,34 @@
     "normalizacao": "por exame e derivacao (a do A2/A3); idade padronizada com media e desvio do treino elegivel"
   },
   "comparacoes_no_teste": {
-    "modelos": ["B0", "B1", "B4", "B4p", "B3z"],
+    "modelos": [
+      "B0",
+      "B1",
+      "B4",
+      "B4p",
+      "B3z"
+    ],
     "ajuste_das_referencias": "B0, B1, B4, B4p: regressao logistica ajustada SO nos pacientes de treino elegiveis (as mesmas funcoes da validacao)",
-    "pares": ["B3z - B0", "B3z - B1", "B3z - B4", "B3z - B4p", "B1 - B0", "B4 - B0", "B4p - B0", "B4p - B4"],
-    "metricas": ["auroc", "auprc"],
+    "pares": [
+      "B3z - B0",
+      "B3z - B1",
+      "B3z - B4",
+      "B3z - B4p",
+      "B1 - B0",
+      "B4 - B0",
+      "B4p - B0",
+      "B4p - B4"
+    ],
+    "metricas": [
+      "auroc",
+      "auprc"
+    ],
     "ic": "95%, bootstrap de pacientes, 1.000 reamostras, seed 42, pareado",
     "analises_extras": "risco escondido (sem nenhuma das 6 alteracoes no laudo; laudo 'ECG normal') e triagem (fracao dos obitos entre os 5, 10 e 20% de maior nota), uma vez"
   },
   "seeds_extras": "B3z seeds 43 e 44: so para relatar estabilidade na validacao; nunca escolhem nem trocam o modelo final",
-  "regra": "o teste roda UMA vez; se algo parecer estranho, registrar e explicar, sem mudar o modelo"
+  "regra": "o teste roda UMA vez; se algo parecer estranho, registrar e explicar, sem mudar o modelo",
+  "congelado_em": "2026-11-15",
+  "congelado_por": "Claude da Renata, a pedido da Renata no chat ('o tom confirmou, pode congelar e rodar o teste'); a confirmacao do Tom foi relatada pela Renata, nao vista diretamente",
+  "congelado_commit_base": "400ed101d7965c1147f23b9d597d72523220bb02"
 }
