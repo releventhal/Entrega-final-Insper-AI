@@ -20,3 +20,6 @@ ptbxl/
 modelos/*
 !modelos/A3_melhor.keras
 !modelos/B3z_p0-17_melhor.keras
+
+# Caracteristicas do A3 com as 18 partes (77 MB, refeitas por parte_b_cnn.py caracteristicas)
+resultados/parte_b_caracteristicas_A3_p0-17.npz
