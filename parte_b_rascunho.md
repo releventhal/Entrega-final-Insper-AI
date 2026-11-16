@@ -26,6 +26,7 @@
 [parte_b_cnn.py; parte_b_alteracoes.py; parte_b_idade.py; CLAUDE.md, log de 14/11]
 
 ## 3. Resultado principal (validação, 18 partes)
+> **Atenção:** a época do B3z (e do B5) foi escolhida pelo AUROC **desta mesma validação**, e B0, B1, B4 e B4p não tiveram nenhuma escolha nela. Por isso as diferenças "B3z − X" desta seção são levemente otimistas a favor do B3z. **O número que vale é o do teste (seção 9b).**
 
 | Modelo | AUROC (IC 95%) | AUPRC (IC 95%) |
 |---|---|---|
@@ -92,7 +93,7 @@ idade 1,85 por década (1,80-1,91); homem 1,63 (1,52-1,76); **ST 2,88 (2,49-3,37
 - SB com OR < 1 e ST com OR alto: explicação **não verificada** (hipóteses em fundamentacao_medica.md).
 
 ## 9. Idade pelo ECG, pré-treino e o modelo final
-- **Idade pelo ECG** (mesma CNN, saída numérica, 163.137 pacientes de treino): MAE 8,08 anos (r 0,849) contra 8,43 (r 0,839) do `nn_predicted_age`, nos 23.513 pacientes de validação; diferença −0,35 (IC −0,43 a −0,27) [resultados/parte_b_idade_p0-17.csv]. Não é comparação justa para "superar" Lima et al. (treinamos nesta amostra; para eles o erro é a informação).
+- **Idade pelo ECG** (mesma CNN, saída numérica, 163.137 pacientes de treino): MAE 8,08 anos (r 0,849) contra 8,43 (r 0,839) do `nn_predicted_age`, nos 23.513 pacientes de validação (a mesma validação que parou o treino da CNN de idade, então o MAE dela é levemente otimista); diferença −0,35 (IC −0,43 a −0,27) [resultados/parte_b_idade_p0-17.csv]. Não é comparação justa para "superar" Lima et al. (treinamos nesta amostra; para eles o erro é a informação).
 - **B5:** nos 9.549 pacientes de validação em comum, 0,815 contra 0,818 do B3z (−0,003; IC −0,018 a +0,011) [resultados/parte_b_comparar.csv]: o pré-treino não ajudou. (O par "−0,001; −0,010 a +0,009" na validação completa, citado antes a partir do log de 14/11, não está em nenhum arquivo de resultado: **não conferido**.)
 - **Regra do modelo final (registrada em 14/11, antes dos resultados da GPU):** maior AUROC na validação, nos 9.549 pacientes em comum: B3z 18 partes 0,818; B5 0,815; B3z 8 partes 0,805 → **B3z com 18 partes** [resultados/parte_b_comparar.csv]. Status: **congelado** em 15/11 [congelado_candidato_parte_b.json].
 - **Seeds 43 e 44 do B3z (estabilidade, validação):** AUROC 0,831 / 0,828 / 0,830 (seeds 42 / 43 / 44; média 0,830, desvio 0,001); B3z − B4p +0,013 (+0,003 a +0,023) / +0,011 (+0,003 a +0,019) / +0,012 (+0,004 a +0,021) [resultados/parte_b_seeds_p0-17.csv].
@@ -128,4 +129,6 @@ Congelado depois da confirmação de Renata e Tom [congelado_candidato_parte_b.j
 - O ganho "além das 6 alterações" é pequeno (+0,013) e só apareceu com as 18 partes.
 - Óbito por cruzamento probabilístico de registros, sem causa da morte; `timey` sem unidade documentada (compatível com anos).
 - Uma população só (atenção primária de Minas Gerais); a Parte B não tem teste externo.
+- B4p e B3 usam notas/características do A3 nos pacientes de **treino** da Parte B, e o A3 treinou com exames das partes 0 a 3 do grupo treino (notas "dentro da amostra"). A checagem de 12/11 (8 partes, primeiro exame nas partes 4 a 7) não mostrou efeito, mas ~9% daqueles pacientes tinham outro exame nas partes 0 a 3, e ela **não foi refeita com as 18 partes**. O B3z não depende do A3.
+- A confirmação do Tom para congelar o B3z chegou relatada pela Renata (registrada assim no JSON e no CLAUDE.md).
 - Rótulos do laudo: processo descrito para a coorte CODE (Paixão et al. 2021); que a CODE-15% seguiu o mesmo processo é provável, não verificado.

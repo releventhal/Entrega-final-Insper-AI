@@ -2,12 +2,15 @@ r"""Checagem do B4p apontada pelo Claude do Tom (12/11). SÓ TREINO E VALIDAÇÃ
 
 O B4p (idade + sexo + as 6 notas do A3 congelado) é ajustado nos pacientes de treino da Parte B (partes 0 a 7).
 Os exames das partes 0 a 3 do grupo treino foram usados no treino do próprio A3, então ali as notas do A3 podem ser
-mais confiantes do que em pacientes novos. Aqui o B4 e o B4p são reajustados SÓ com os pacientes de treino das
-partes 4 a 7 (que o A3 nunca viu) e avaliados nos mesmos 9.549 pacientes de validação, com as mesmas 1.000
+mais confiantes do que em pacientes novos. Aqui o B4 e o B4p são reajustados SÓ com os pacientes de treino cujo
+PRIMEIRO exame está nas partes 4 a 7 e avaliados nos mesmos 9.549 pacientes de validação, com as mesmas 1.000
 reamostragens pareadas por paciente de parte_b_cnn.bootstrap (seed 42).
 
 Uso: .venv\Scripts\python parte_b_b4p_checagem.py   (~2 min; grava resultados/parte_b_b4p_checagem_p0-7.csv)
 Resultado de 12/11: B4p 0,8022 -> B4p_47 0,8024 (diferença +0,0003, IC -0,0006 a 0,0011).
+Ressalva (revisão do Claude do Tom, 16/11): "partes 4 a 7" é a parte do primeiro exame; ~9% desses pacientes
+(3.559 de 39.734, antes do horizonte e dos todo-zero) têm OUTRO exame nas partes 0 a 3, que o A3 usou no treino.
+Então não é verdade que o A3 "nunca viu" todos eles. Checagem não refeita com as 18 partes.
 """
 import numpy as np
 import pandas as pd
