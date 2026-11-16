@@ -1,0 +1,41 @@
+numero,onde_aparece,valor_citado,valor_no_arquivo,origem,status
+AUROC B3z p0-17 validacao,CLAUDE.md log 14/11; parte_b_rascunho.md:38; fundamentacao_medica.md:51,"0,831 (0,813-0,850)","0.8308 (0.8125-0.8495)",resultados/parte_b_cnn_p0-17.csv + recalculado de parte_b_cnn_p0-17_previsoes_validacao.csv (0.8308),OK
+AUROC B0 p0-17 validacao,CLAUDE.md; parte_b_rascunho.md:32,"0,794 (0,773-0,813)","0.7944 (0.7734-0.8132)",parte_b_cnn_p0-17.csv + recalculado (0.7944),OK
+B3z - B0 p0-17,CLAUDE.md; parte_b_rascunho.md:42,"+0,036 (0,024 a 0,049)","0.0363 (0.0244-0.0488)",parte_b_cnn_p0-17.csv,OK
+B3z - B4p p0-17 AUROC,CLAUDE.md; parte_b_rascunho.md:45; fundamentacao_medica.md:51,"+0,013 (0,003 a 0,023)","0.0132 (0.0034-0.0231)",parte_b_alteracoes_p0-17.csv,OK
+B3z - B4p p0-17 AUPRC,parte_b_rascunho.md:45,"+0,013 (-0,002 a +0,029)","0.0128 (-0.0023-0.0295)",parte_b_alteracoes_p0-17.csv,"OK (IC inclui zero; texto do fundamentacao_medica.md:51 nao menciona)"
+B4p p0-17 validacao,parte_b_rascunho.md:35,"0,818 (0,799-0,837)","0.8176 (0.7987-0.8374)",parte_b_alteracoes_p0-17.csv + recalculado (0.8176),OK
+B4 - B0 p0-17,parte_b_rascunho.md:46,"+0,013 (+0,007 a +0,019)","0.0133 (0.0075-0.0195)",parte_b_alteracoes_p0-17.csv,"ARREDONDAMENTO (0,0075->0,008; 0,0195->0,020; CLAUDE.md diz 0,008 a 0,020)"
+B5 validacao,CLAUDE.md log 14/11; parte_b_rascunho.md:95,"0,830","0.8296",recalculado de parte_b_B5_p0-17_previsoes_validacao.npz + y de parte_b_cnn_p0-17_previsoes_validacao.csv,OK
+B5 - B3z,CLAUDE.md log 14/11,"-0,001 (-0,010 a 0,009)",nao ha CSV com esse par na validacao completa,parte_b_comparar.csv so tem B5-B3z nos 9.549 comuns (-0.0032; -0.0176 a 0.0109),NAO ENCONTRADO NO ARQUIVO
+MAE idade nossa vs nn_predicted_age,CLAUDE.md; parte_b_rascunho.md:94,"8,08 (r 0,849) vs 8,43 (r 0,839); dif -0,35 (-0,43 a -0,27)","8.0752 vs 8.4283; dif -0.3531 (-0.4285 a -0.2733)",parte_b_idade_p0-17.csv + recalculado de parte_b_idade_p0-17_previsoes_validacao.csv (n 23.513),"OK (mesma validacao usada no early stopping da CNN de idade)"
+Elegiveis treino p0-17,parte_b_rascunho.md:10; CLAUDE.md,"129.221 (3.356 obitos)","129221 / 3356",parte_b_cnn_p0-17.csv; recalculado de exams.csv + parte_b_todo_zero_p0-17.npy (129221 / 3356),OK
+Elegiveis treino p0-17 sem excluir todo-zero,CLAUDE.md secao 0 (tabular),"129 mil / 3.368","129439 / 3368",parte_b_horizonte.csv,"OK, mas e o conjunto tabular (sem exclusao); nao misturar com 129.221 / 3.356"
+Elegiveis validacao p0-17,parte_b_rascunho.md:10,"18.665 (450)","18665 / 450",parte_b_cnn_p0-17.csv,OK
+Elegiveis validacao tabular,CLAUDE.md secao 0 (08/11),"18.711 (450)","18711 / 450",parte_b_horizonte.csv,"OK (outro conjunto: sem exclusao de todo-zero)"
+B3z p0-7 validacao,CLAUDE.md log 09/11; parte_b_rascunho.md:56,"0,805 (0,777-0,834)","0.8053 (0.7772-0.8337)",parte_b_cnn_p0-7.csv + recalculado (0.8053),OK
+B0 p0-7 validacao,CLAUDE.md,"0,779","0.7792",parte_b_cnn_p0-7.csv + recalculado (0.7792),OK
+B3z - B0 p0-7,CLAUDE.md,"+0,026 (0,005 a 0,046)","0.0261 (0.0050-0.0458)",parte_b_cnn_p0-7.csv,OK
+B4p p0-7,CLAUDE.md log 12/11,"0,802","0.8022",parte_b_alteracoes_p0-7.csv,OK
+B4p_47 checagem,CLAUDE.md log 12/11; parte_b_b4p_checagem.py:10,"0,8024 (dif +0,0003; -0,0006 a 0,0011)","0.8024 (0.0003; -0.0006-0.0011)",parte_b_b4p_checagem_p0-7.csv,"OK (mas premissa 'A3 nunca viu' falha em 9,0% dos pacientes; ver achado M2)"
+Regra do modelo final (9.549 comuns),parte_b_rascunho.md:96,"B3z p0-17 0,818; B5 0,815; B3z p0-7 0,805","0.8182; 0.8150; 0.8053",parte_b_comparar.csv (final_pela_regra=True em B3z_p0-17),OK
+Seeds 42/43/44,parte_b_rascunho.md:97,"0,831 / 0,828 / 0,830; media 0,830 (desvio 0,001)","0.8308 / 0.8284 / 0.8300; media 0.8297 (0.0012)",parte_b_seeds_p0-17.csv,OK
+OR SB p0-17,parte_b_rascunho.md:89,"0,66 (0,31-0,73)","0.6574 (0.3120-0.7325) no CSV; convergido (tol 1e-8): 0.434 (Wald 0.295-0.637)",parte_b_alteracoes_or_p0-17.csv; recalculo C:/ecg_paper/rev/or_sb.py,ERRO (regressao nao convergiu; ver A1)
+OR RBBB p0-17,parte_b_rascunho.md:89,"1,12 (0,97-1,36)","1.1203 no CSV; convergido 1.172 (Wald 1.005-1.367)",idem,ERRO (A1; com o ajuste convergido o IC de Wald nao inclui 1)
+OR 1dAVb p0-17,parte_b_rascunho.md:89,"1,16 (0,98-1,47)","1.1588 no CSV; convergido 1.201 (Wald 0.989-1.459)",idem,ERRO (A1)
+OR ST / AF / LBBB p0-17,parte_b_rascunho.md:89,"2,91 / 2,53 / 1,53","CSV 2.9077 / 2.5285 / 1.5301; convergido 2.877 / 2.447 / 1.508",idem,"ERRO pequeno (A1)"
+OR p0-7 citadas,fundamentacao_medica.md:42-43,"FA 2,59; BRE 1,57; BAV 1,49; BRD 1,33; ST 2,59; SB 0,40","CSV p0-7: 2.5902; 1.5664; 1.4916; 1.3306; 2.5881; 0.3956",parte_b_alteracoes_or_p0-7.csv,"BATE COM O CSV, mas e o resultado de 8 partes e o CSV tem o mesmo problema de convergencia (hipotese, nao recalculado para p0-7)"
+Simpson 8+ mais jovem,CLAUDE.md secao 3.5,"4,6%","0.0457 (tabela inteira, 43.121 pacientes)",recalculado de exams.csv,"OK para a tabela inteira (populacao nao dita no texto)"
+Simpson 8+ mais jovem,CLAUDE.md secao 0 (08/11),"4,7%","0.0468 (treino+validacao, 34.555)",parte_b_simpson_direto.csv + recalculado,OK
+AUPRC floresta 5 folds,CLAUDE.md:79/86/499; roteiro_slides.md:70-71,"0,558","0.557483",resultados/sgpu_rf_A0e1_groupkfold_resumo.csv,"DIVERGENTE (arquivo do Tom, fora do escopo da Renata)"
+Teste B3z,parte_b_rascunho.md:108; CLAUDE.md,"0,832 (0,820-0,844)","0.8320 (0.8196-0.8437)",parte_b_teste_p0-17.csv (lido; nada recalculado),OK
+Teste B0,parte_b_rascunho.md:104,"0,793 (0,779-0,806)","0.7928 (0.7789-0.8060)",parte_b_teste_p0-17.csv,OK
+Teste B4,parte_b_rascunho.md:106,"0,804 (0,791-0,817)","0.8045 (0.7910-0.8172)",parte_b_teste_p0-17.csv,"ARREDONDAMENTO (0,8045)"
+Teste B4p,parte_b_rascunho.md:107,"0,819 (0,806-0,831)","0.8190 (0.8059-0.8314)",parte_b_teste_p0-17.csv,OK
+Teste B3z - B0,parte_b_rascunho.md:109,"+0,039 (+0,030 a +0,049)","0.0392 (0.0302-0.0485)",parte_b_teste_p0-17.csv,"OK (0,0485 -> 0,049 ou 0,048)"
+Teste B3z - B4p,parte_b_rascunho.md:112,"+0,013 (+0,006 a +0,019); AUPRC +0,014 (+0,005 a +0,024)","0.0130 (0.0064-0.0193); 0.0144 (0.0051-0.0236)",parte_b_teste_p0-17.csv,OK
+Teste n e obitos,parte_b_rascunho.md:100,"36.880 / 895 (46.672 - 94 - 9.698)","36880 / 895; log: 46672, 94, 9698",parte_b_teste_p0-17.csv; resultados/parte_b_colab_teste_p0-17.log:126,OK
+Teste laudo ECG normal,parte_b_rascunho.md:120,"+0,023 (+0,006 a +0,040); 12.804 / 150","0.0234 (0.0064-0.0404); 12804 / 150",parte_b_teste_analises_p0-17.csv,OK
+Teste triagem 10%,parte_b_rascunho.md:121,"B0 40,1%; B4p 46,6%; B3z 48,8%; dif +0,087 (0,056 a 0,120)","0.4011; 0.4659; 0.4883; 0.0872 (0.0555-0.1200)",parte_b_teste_analises_p0-17.csv,OK
+Tempo B3z p0-17,CLAUDE.md log 14/11; parte_b_rascunho.md:23,"10 epocas em 51,6 min, melhor 7","npz: epocas 10, melhor 7, 52.2 min",parte_b_B3z_p0-17_previsoes_validacao.npz,"DIVERGENCIA PEQUENA (51,6 x 52,2; provavelmente com/sem o predict final)"
+SHA256 B3z,congelado_candidato_parte_b.json,85d064773eef...,85d064773eefa3f4... (igual),recalculado de modelos/B3z_p0-17_melhor.keras,OK

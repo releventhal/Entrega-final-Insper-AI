@@ -1,0 +1,5 @@
+REVISAO DOS COMMITS DA RENATA 16/11/2026 (sessao nova do Claude do Tom; so leitura, exceto arquivos de relatorio)
+T0 = 2026-11-16 14:43:00. Rascunho ate 15:13. Corte duro 15:58.
+Commit revisado: 06f0af4d5546f282a208f1705aa3ba0e71e6f570 (HEAD = origin/main apos fetch; arvore limpa salvo logs/ e revisao/).
+Obs.: revisao/status.txt e de outra sessao de revisao (geral), nao foi tocado.
+Relatorio, CSV de numeros, registro em CLAUDE.md e decisoes_pendentes.md: 14:51:06. Commit local a seguir, sem push.

@@ -92,3 +92,9 @@ Organizado pelo Claude do Tom em 08/11/2026. **Nada aqui foi decidido.** Cada it
 - **Pontos de operação refeitos** (`resultados/sessao2_pontos_operacao.{csv,md}`, `figuras/sessao2_pontos_operacao.png`): legenda fora dos eixos (antes cobria a barra do A6 em 1dAVb) e o A5 deixou de ser o parcial de 13/11 (época 3). Proposta: usar a figura `sessao2_` no lugar da `sgpu_`.
 - **TensorFlow em scripts que não precisam dele:** `import ecg_dados` leva ~27 s porque importa `keras.utils.Sequence` no topo (base das classes dos geradores). Não mudado: o módulo é compartilhado com a Parte B e a correção (separar constantes e geradores, ou importar o Keras só dentro de uma fábrica de classes) mexe em código que a Renata usa. Proposta, se valer a pena: mover `ROTULOS`, `SEED`, `DADOS` e `tabela_com_grupo` para um módulo leve e manter `ecg_dados` reexportando tudo (sem mudar nenhum import existente).
 - **Modelos abertos:** a CODE-15 está no pré-treino do ECG-JEPA e do ST-MEM (confirmado nos papers, `literatura_modelos_abertos.md`); o PTB-XL está no pré-treino do ECG-FM. Proposta: se algum deles entrar, só como comparação descritiva e declarando o vazamento.
+
+## 15. Revisão dos commits da Renata (16/11, Claude do Tom; só leitura)
+**Nada decidido.** Detalhe em `revisao/revisao_commits_renata_16nov.md`. Vazamento não encontrado; teste da Parte B aberto uma vez, depois do congelamento.
+- **ALTO, a decidir:** refazer as razões de chance do B4 com ajuste convergido (`parte_b_alteracoes.py:76`, `tol=1e-8`; CPU, minutos) antes de citar qualquer OR no paper ou nos slides (SB 0,66 no CSV × 0,43 convergido; RBBB passa a ter IC sem o 1).
+- **Tom:** confirmar por escrito que autorizou o congelamento do B3z (o JSON registra a confirmação como relatada pela Renata).
+- **Texto:** ajustes sugeridos na seção 5 do relatório (status "congelado", "o teste reproduz a validação", B4p "partes 4-7", época do B3z escolhida na validação).
