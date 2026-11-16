@@ -1,0 +1,77 @@
+item,valor_no_paper,valor_no_arquivo,arquivo_origem,status
+A3 validação: AUROC macro,"0,989","0,9892",resultados/avaliacao_validacao_A3.csv,bate
+A3 validação: AUPRC macro,"0,691","0,6908",resultados/avaliacao_validacao_A3.csv,bate
+A3 validação: F1 macro,"0,709","0,7087",resultados/avaliacao_validacao_A3.csv,bate
+A5: AUROC macro,"0,989","0,9890",resultados/noite_A5_completo_avaliacao.csv,bate
+A5: AUPRC macro,"0,705","0,7045",resultados/noite_A5_completo_avaliacao.csv,bate
+A5: F1 macro,"0,728","0,7281",resultados/noite_A5_completo_avaliacao.csv,bate
+AUPRC A5 − A3 (IC),"+0,014 (−0,006 a +0,035)","0,0137 (−0,0062 a 0,0355)",resultados/noite_A5_completo_avaliacao.csv,bate
+A6: AUROC macro,"0,912","0,9123",resultados/noite_A6_completo_avaliacao.csv,bate
+A6: AUPRC macro,"0,445","0,4454",resultados/noite_A6_completo_avaliacao.csv,bate
+A6: F1 macro,"0,500","0,4998",resultados/noite_A6_completo_avaliacao.csv,bate
+Média A3+A6: AUROC macro,"0,986","0,9857",resultados/sgpu_ensemble_A3_A6.csv,bate
+Média A3+A6: AUPRC macro,"0,676","0,6762",resultados/sgpu_ensemble_A3_A6.csv,bate
+AUPRC (A3+A6) − A3 (IC),"−0,015 (−0,029 a −0,001)","−0,0147 (−0,0292 a −0,0014)",resultados/sgpu_ensemble_A3_A6.csv,bate
+Floresta A0e-1 split único: AUROC,"0,976","0,9761",resultados/experimentos.csv,bate
+Floresta A0e-1 split único: AUPRC,"0,567","0,5672",resultados/experimentos.csv,bate
+Floresta A0e-1 5 folds: AUROC,"0,975","0,9750",resultados/sgpu_rf_A0e1_groupkfold_resumo.csv,bate
+Floresta A0e-1 5 folds: AUPRC,"0,557","0,5575",resultados/sgpu_rf_A0e1_groupkfold_resumo.csv,bate
+Média de 3 seeds (ensemble) − A3 seed 42: AUROC,"+0,0012","0,0012",resultados/robustez_01_ensemble_diferencas.csv,bate
+Média de 3 seeds (ensemble) − A3 seed 42: AUPRC (IC),"+0,020 (+0,011 a +0,030)","0,0200 (0,0106 a 0,0298)",resultados/robustez_01_ensemble_diferencas.csv,bate
+Estresse recorte 25%: queda AUROC,"0,0055","0,0055",resultados/robustez_02_estresse.csv,bate
+Estresse recorte 25%: F1 macro,"0,004","0,0043",resultados/robustez_02_estresse.csv,bate
+"Estresse ruído 1,0: queda AUROC","0,007","0,0070",resultados/robustez_02_estresse.csv,bate
+"Estresse ruído 1,0: F1 macro","0,461","0,4610",resultados/robustez_02_estresse.csv,bate
+Interno: exames,16.109,16109,resultados/avaliacao_interno_20261108_466e7a3.csv + bruto_interno_20261108_466e7a3.log,bate
+Interno: pacientes,14.360,14360,resultados/avaliacao_interno_20261108_466e7a3.csv + bruto_interno_20261108_466e7a3.log,bate
+Interno: AUROC macro,"0,989","0,9888",resultados/avaliacao_interno_20261108_466e7a3.csv + bruto_interno_20261108_466e7a3.log,bate
+Interno: AUPRC macro,"0,710","0,7096",resultados/avaliacao_interno_20261108_466e7a3.csv + bruto_interno_20261108_466e7a3.log,bate
+PTB-XL: exames,21.799,21799,resultados/avaliacao_ptbxl_20261108_466e7a3.csv + bruto_ptbxl_20261108_466e7a3.log,bate
+PTB-XL: pacientes,18.869,18869,resultados/avaliacao_ptbxl_20261108_466e7a3.csv + bruto_ptbxl_20261108_466e7a3.log,bate
+PTB-XL: AUROC macro,"0,970","0,9702",resultados/avaliacao_ptbxl_20261108_466e7a3.csv + bruto_ptbxl_20261108_466e7a3.log,bate
+PTB-XL: AUPRC macro,"0,788","0,7879",resultados/avaliacao_ptbxl_20261108_466e7a3.csv + bruto_ptbxl_20261108_466e7a3.log,bate
+PTB-XL: AUROC SB,"0,921","0,9205",resultados/avaliacao_ptbxl_20261108_466e7a3.csv + bruto_ptbxl_20261108_466e7a3.log,bate
+Validação: AUROC SB,"0,993","0,9926",resultados/avaliacao_validacao_A3.csv,bate
+PTB-XL: AUROC 1dAVb,"0,924","0,9243",resultados/avaliacao_ptbxl_20261108_466e7a3.csv + bruto_ptbxl_20261108_466e7a3.log,bate
+Validação: AUROC 1dAVb,"0,978","0,9723 (0,9779 é o do teste interno)",resultados/avaliacao_validacao_A3.csv,não bate
+CODE-TEST: exames,827,827,resultados/avaliacao_code_test_20261108_466e7a3.csv + bruto_code_test_20261108_466e7a3.log,bate
+CODE-TEST: AUROC macro,"0,998","0,9975",resultados/avaliacao_code_test_20261108_466e7a3.csv + bruto_code_test_20261108_466e7a3.log,bate
+CODE-TEST: AUPRC macro,"0,916","0,9164",resultados/avaliacao_code_test_20261108_466e7a3.csv + bruto_code_test_20261108_466e7a3.log,bate
+SB validação: % positivos com FC < 50,"88,8%","88,79% (103 de 116 com FC)",resultados/posterior_testes/a_fc_estimada.csv (recalculado),bate
+"SB PTB-XL: % positivos com FC 50-59,9","29,9%","29,92% (190 de 635 com FC)",resultados/posterior_testes/a_fc_estimada.csv (recalculado),bate
+SB PTB-XL: AUROC só positivos FC < 50,"0,997","0,9966",resultados/posterior_testes/a_fc_estimada.csv + bruto_ptbxl_20261108_466e7a3.npz (recalculado),bate
+SB PTB-XL: AUROC só positivos FC ≥ 50,"0,761","0,7612",resultados/posterior_testes/a_fc_estimada.csv + bruto_ptbxl_20261108_466e7a3.npz (recalculado),bate
+Parte B validação: pacientes / óbitos,18.665 / 450,18665 / 450,resultados/parte_b_cnn_p0-17.csv,bate
+Parte B teste: pacientes / óbitos,36.880 / 895,36880 / 895,resultados/parte_b_teste_p0-17.csv,bate
+Validação AUROC B0,"0,794","0,7944",resultados/parte_b_cnn_p0-17.csv,bate
+Validação AUROC B1,"0,803","0,8034",resultados/parte_b_cnn_p0-17.csv,bate
+Validação AUROC B4,"0,808","0,8078",resultados/parte_b_alteracoes_p0-17.csv,bate
+Validação AUROC B4p,"0,818","0,8176",resultados/parte_b_alteracoes_p0-17.csv,bate
+Validação AUROC B3z,"0,831","0,8308",resultados/parte_b_cnn_p0-17.csv,bate
+Validação AUROC B5,"0,830","0,8296",resultados/parte_b_B5_p0-17_previsoes_validacao.npz + parte_b_cnn_p0-17_previsoes_validacao.csv (recalculado; nenhum CSV traz este valor),bate
+Validação B3z − B0 (IC),"+0,036 (+0,024 a +0,049)","0,0363 (0,0244 a 0,0488)",resultados/parte_b_cnn_p0-17.csv,bate
+Validação B3z − B4p (IC),"+0,013 (+0,003 a +0,023)","0,0132 (0,0034 a 0,0231)",resultados/parte_b_alteracoes_p0-17.csv,bate
+Validação AUPRC B3z − B4p: IC inclui zero,sim,"0,0128 (−0,0023 a 0,0295)",resultados/parte_b_alteracoes_p0-17.csv,bate
+Validação captura 10%: B3z,"47,8%","47,78%",resultados/parte_b_analises_p0-17.csv,bate
+Validação captura 10%: B0,"37,1%","37,11%",resultados/parte_b_analises_p0-17.csv,bate
+Validação ECG normal: pacientes / óbitos,6.594 / 103,6594 / 103,resultados/parte_b_analises_p0-17.csv,bate
+Validação ECG normal: B3z − B0 (IC),"+0,001 (−0,020 a +0,024)","0,0011 (−0,0199 a 0,0238)",resultados/parte_b_analises_p0-17.csv,bate
+Teste AUROC B0,"0,793","0,7928",resultados/parte_b_teste_p0-17.csv,bate
+Teste AUROC B3z,"0,832","0,8320",resultados/parte_b_teste_p0-17.csv,bate
+Teste B3z − B0 (IC),"+0,039 (+0,030 a +0,049)","0,0392 (0,0302 a 0,0485)",resultados/parte_b_teste_p0-17.csv,bate
+Teste B3z − B4p (IC),"+0,013 (+0,006 a +0,019)","0,0130 (0,0064 a 0,0193)",resultados/parte_b_teste_p0-17.csv,bate
+Teste AUPRC B3z − B4p (IC),"+0,014 (+0,005 a +0,024)","0,0144 (0,0051 a 0,0236)",resultados/parte_b_teste_p0-17.csv,bate
+Teste captura 10%: B3z,"48,8%","48,83%",resultados/parte_b_teste_analises_p0-17.csv,bate
+Teste captura 10%: B4p,"46,6%","46,59%",resultados/parte_b_teste_analises_p0-17.csv,bate
+Teste captura 10%: B0,"40,1%","40,11%",resultados/parte_b_teste_analises_p0-17.csv,bate
+Teste sem nenhuma das 6: B3z − B0 (IC),"+0,030 (+0,020 a +0,039)","0,0296 (0,0200 a 0,0390)",resultados/parte_b_teste_analises_p0-17.csv,bate
+Teste ECG normal: pacientes / óbitos,12.804 / 150,12804 / 150,resultados/parte_b_teste_analises_p0-17.csv,bate
+Teste ECG normal: B3z − B0 (IC),"+0,023 (+0,006 a +0,040)","0,0234 (0,0064 a 0,0404)",resultados/parte_b_teste_analises_p0-17.csv,bate
+Idade pelo ECG: MAE nossa CNN,"8,08","8,0752",resultados/parte_b_idade_p0-17.csv,bate
+Idade pelo ECG: MAE nn_predicted_age,"8,43","8,4283",resultados/parte_b_idade_p0-17.csv,bate
+Idade pelo ECG: diferença (IC),"−0,35 (−0,43 a −0,27)","−0,3531 (−0,4285 a −0,2733)",resultados/parte_b_idade_p0-17.csv,bate
+Validação B1 − B0 (IC),"+0,009 (+0,003 a +0,015)","0,0090 (0,0030 a 0,0154)",resultados/parte_b_cnn_p0-17.csv,bate
+8 partes: AUROC B3z,"0,805","0,8053",resultados/parte_b_cnn_p0-7.csv,bate
+8 partes: AUROC B0,"0,779","0,7792",resultados/parte_b_cnn_p0-7.csv,bate
+8 partes: B3z − B4p (IC inclui zero),"+0,003 (inclui zero)","0,0031 (−0,0142 a 0,0197)",resultados/parte_b_alteracoes_p0-7.csv,bate
+Desvio entre 3 seeds do B3z (AUROC),"0,001","0,0012",resultados/parte_b_seeds_p0-17.csv,bate
