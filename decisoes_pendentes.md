@@ -84,7 +84,7 @@ Organizado pelo Claude do Tom em 08/11/2026. **Nada aqui foi decidido.** Cada it
 - **A6 (CNN+LSTM):** early stopping completo, abaixo do A3 em tudo (AUPRC macro 0,445). Proposta: fica como resultado negativo no apêndice.
 - **Ensemble A3 + A6 (exploratório):** AUPRC macro 0,676 vs 0,691 (IC da diferença −0,029 a −0,001). Proposta: descartar.
 - **Pontos de operação** (`resultados/sgpu_pontos_operacao.md`): úteis para o slide de "o que isso significa na prática", sempre com o aviso de que são de validação e com o limiar escolhido nela. Se quiserem números honestos, o mesmo cálculo teria que ser feito nas notas já salvas do teste (`resultados/bruto_*.npz`) com o limiar fixado na validação; **não feito** (regra da sessão: teste não aberto).
-- **Floresta A0e-1 em 5 folds por paciente:** AUROC 0,975 ± 0,001 e AUPRC 0,558 ± 0,020, iguais ao split único: o baseline oficial da escadinha não depende do sorteio do split.
+- **Floresta A0e-1 em 5 folds por paciente:** AUROC 0,975 ± 0,001 e AUPRC 0,557 ± 0,020 (corrigido de 0,558 em 16/11), iguais ao split único: o baseline oficial da escadinha não depende do sorteio do split.
 
 ## 14. Sessão 2 de 14/11 (Claude do Tom; só validação; acrescentado à tarde)
 **Nada decidido.** Pontos novos:
@@ -98,3 +98,4 @@ Organizado pelo Claude do Tom em 08/11/2026. **Nada aqui foi decidido.** Cada it
 - **ALTO, a decidir:** refazer as razões de chance do B4 com ajuste convergido (`parte_b_alteracoes.py:76`, `tol=1e-8`; CPU, minutos) antes de citar qualquer OR no paper ou nos slides (SB 0,66 no CSV × 0,43 convergido; RBBB passa a ter IC sem o 1).
 - **Tom:** confirmar por escrito que autorizou o congelamento do B3z (o JSON registra a confirmação como relatada pela Renata).
 - **Texto:** ajustes sugeridos na seção 5 do relatório (status "congelado", "o teste reproduz a validação", B4p "partes 4-7", época do B3z escolhida na validação).
+- **Correções feitas em 16/11 (Claude do Tom, sessão de correção; só CPU, nenhum teste aberto, nada treinado):** (1) OR do B4 refeitas com ajuste convergido (newton-cholesky, tol 1e-8, 8 iterações) em `parte_b_alteracoes_or_p0-17.csv` e `_p0-7.csv`; AUROC de B0/B4/B4n iguais aos salvos; com 18 partes o IC do RBBB passou a excluir 1 e o do 1dAVb continua incluindo 1. (2) Checagem do B4p com 18 partes **não feita**: as características do A3 das partes 8 a 17 (`parte_b_caracteristicas_A3_p0-17.npz`) não estão neste computador nem no git. (3) Textos: rascunho ("congelado", "ECG normal" não reproduz, OR novas, B5), fundamentação (OR de 18 partes; BAV com IC incluindo 1), Simpson com a população, 0,557. **Ainda a decidir:** refazer a checagem do B4p onde existir o `.npz` de 18 partes (Renata).

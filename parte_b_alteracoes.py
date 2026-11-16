@@ -19,6 +19,7 @@ no treino, com IC 95% por bootstrap de pacientes do treino. Idade em décadas.
 Mesmos dados do parte_b_cnn.py (partes 0 a 7, primeiro exame de cada paciente, regra do horizonte de 2 anos,
 exames todo-zero fora pelo sinal, grupo teste cortado na carga e nunca lido).
 Uso: .venv\\Scripts\\python parte_b_alteracoes.py [--partes 0,1,...,17]   (padrão: partes 0 a 7)
+     .venv\\Scripts\\python parte_b_alteracoes.py --so-or [--partes ...]  (só as OR, sem HDF5; ver so_or)
 """
 import argparse
 import json
@@ -68,15 +69,25 @@ def matriz(d, modelo):
     return d[cols].astype(float).to_numpy()
 
 
+def ajuste_convergido(X, y, max_iter=100):
+    """Logística sem penalização ajustada até convergir (16/11: o lbfgs com tol padrão parava na iteração 21 sem
+    convergir e dava SB 0,66 em vez de ~0,43). Devolve (coeficientes, nº de iterações); falha se não convergir."""
+    lr = LogisticRegression(penalty=None, solver="newton-cholesky", tol=1e-8, max_iter=max_iter).fit(X, y)
+    assert lr.n_iter_[0] < max_iter, f"não convergiu em {max_iter} iterações"
+    return lr.coef_[0], int(lr.n_iter_[0])
+
+
 def razoes_de_chance(tr, seed=E.SEED):
     """OR de cada variável do B4 (idade por década), sem penalização, IC 95% por bootstrap de pacientes do treino."""
+    tr = tr.sort_values("exam_id")      # o bootstrap não depende da ordem de leitura dos HDF5
     X = tr[["age", "is_male"] + R].astype(float).copy()
     X["age"] = X["age"] / 10
     X, y = X.to_numpy(), tr["y"].to_numpy()
-    ajuste = lambda X, y: LogisticRegression(penalty=None, max_iter=5000).fit(X, y).coef_[0]
-    coef = ajuste(X, y)
+    coef, it = ajuste_convergido(X, y)
     rng = np.random.default_rng(seed)
-    boot = np.array([ajuste(X[i], y[i]) for i in (rng.integers(0, len(y), len(y)) for _ in range(N_BOOT_OR))])
+    ajustes = [ajuste_convergido(X[i], y[i]) for i in (rng.integers(0, len(y), len(y)) for _ in range(N_BOOT_OR))]
+    boot = np.array([c for c, _ in ajustes])
+    print(f"OR: iterações do ajuste {it}; bootstrap {N_BOOT_OR} ajustes, máx {max(i for _, i in ajustes)} iterações (limite 100)")
     lo, hi = np.percentile(boot, [2.5, 97.5], axis=0)
     nomes = ["idade (por 10 anos)", "sexo masculino"] + R
     pos = [None, int(tr["is_male"].sum())] + [int(tr[r].sum()) for r in R]
@@ -146,7 +157,37 @@ def main(partes=PARTES_B):
     print(orr.round(3).to_string(index=False))
 
 
+def so_or(partes):
+    """Refaz só as OR sem os HDF5: mesmos elegíveis de parte_b_cnn.carregar, montados pelo exams.csv (trace_file) e pelo
+    cache de exames todo-zero já salvo. Confere a montagem refazendo os AUROC de B0/B4/B4n contra o CSV salvo."""
+    from parte_b_cnn import HORIZONTE
+    from parte_b_tabular import rotular
+    tag = nome_partes(partes)
+    t = E.tabela_com_grupo()
+    info = t[t["trace_file"].isin([f"exams_part{p}.hdf5" for p in partes]) & t["grupo"].isin(["treino", "validação"])
+             & t["death"].notna()].copy()
+    info["death"] = info["death"].astype(bool)
+    zerados = set(np.load(SAIDA / f"parte_b_todo_zero_{tag}.npy").tolist())
+    el, _ = rotular(info[~info["exam_id"].isin(zerados)], HORIZONTE)
+    for c in R + ["normal_ecg"]:
+        el[c] = el[c].astype(bool)
+    tr, va = el[el.grupo == "treino"], el[el.grupo == "validação"]
+    salvo = pd.read_csv(SAIDA / f"parte_b_alteracoes_{tag}.csv").set_index("modelo")
+    assert (len(tr), int(tr.y.sum())) == (salvo.n_treino.iloc[0], salvo.obitos_treino.iloc[0])
+    for m in ("B0", "B4", "B4n"):
+        esc = StandardScaler().fit(matriz(tr, m))
+        lr = LogisticRegression(max_iter=2000, random_state=E.SEED).fit(esc.transform(matriz(tr, m)), tr["y"])
+        auc = roc_auc_score(va["y"], lr.predict_proba(esc.transform(matriz(va, m)))[:, 1])
+        print(f"{m}: AUROC refeito {auc:.4f}, salvo {salvo.loc[m, 'auroc']:.4f}")
+        assert round(auc, 4) == salvo.loc[m, "auroc"], "elegíveis diferentes dos do CSV salvo"
+    orr = razoes_de_chance(tr)
+    orr.to_csv(SAIDA / f"parte_b_alteracoes_or_{tag}.csv", index=False, float_format="%.4f")
+    print(orr.round(3).to_string(index=False))
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--partes", default=",".join(map(str, PARTES_B)))
-    main([int(p) for p in ap.parse_args().partes.split(",")])
+    ap.add_argument("--so-or", action="store_true", help="refaz só as razões de chance, sem HDF5 (ver so_or)")
+    a = ap.parse_args()
+    (so_or if a.so_or else main)([int(p) for p in a.partes.split(",")])

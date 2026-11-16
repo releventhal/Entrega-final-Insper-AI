@@ -86,14 +86,15 @@
 - Curvas quase iguais por quartil, porque a vantagem do B3z está no topo (5-10%). O Q4 do B3z tem mais óbitos (600 contra 573) e idade média menor (73,4 contra 76,2) [idem].
 
 ## 8. Razões de chance das alterações (B4 sem penalização, ajustado por idade e sexo, treino com 18 partes; IC por 500 bootstraps)
-idade 1,85 por década (1,80-1,91); homem 1,63 (1,52-1,74); **ST 2,91 (2,48-3,38); AF 2,53 (2,13-2,88); LBBB 1,53 (1,25-1,79)**; 1dAVb 1,16 (0,98-1,47); RBBB 1,12 (0,97-1,36); SB 0,66 (0,31-0,73) [resultados/parte_b_alteracoes_or_p0-17.csv].
-- **Comparação com a coorte CODE inteira** (Paixão et al., *Hearts* 2021, 1,56 milhão de pacientes, Cox ajustado por idade, sexo e comorbidades): FA HR 2,10; BRE 1,69; BRD 1,32; BAV 1º grau com pior sobrevida [fundamentacao_medica.md]. A ordem FA > BRE > BRD bate; medidas diferentes (OR em 2 anos × HR em todo o seguimento) e sem ajuste por comorbidades.
+idade 1,85 por década (1,80-1,91); homem 1,63 (1,52-1,76); **ST 2,88 (2,49-3,37); AF 2,45 (2,14-2,78); LBBB 1,51 (1,29-1,80)**; RBBB 1,17 (1,01-1,35); 1dAVb 1,20 (0,98-1,41); SB 0,43 (0,28-0,59) [resultados/parte_b_alteracoes_or_p0-17.csv, refeito em 16/11 com ajuste convergido (newton-cholesky, tol 1e-8, 8 iterações; bootstrap: no máximo 8). A versão anterior parava na iteração 21 sem convergir e dava SB 0,66 e RBBB 1,12 (0,97-1,36)].
+- IC que incluem 1: só o do 1dAVb. O do RBBB passou a excluir 1 (por pouco: 1,01).
+- **Comparação com a coorte CODE inteira** (Paixão et al., *Hearts* 2021, 1,56 milhão de pacientes, Cox ajustado por idade, sexo e comorbidades): FA HR 2,10; BRE 1,69; BRD 1,32; BAV 1º grau com pior sobrevida [fundamentacao_medica.md]. A ordem FA > BRE > BRD bate (AF 2,45 > LBBB 1,51 > RBBB 1,17); no BAV de 1º grau a nossa associação é fraca (OR 1,20, IC inclui 1). Medidas diferentes (OR em 2 anos × HR em todo o seguimento) e sem ajuste por comorbidades.
 - SB com OR < 1 e ST com OR alto: explicação **não verificada** (hipóteses em fundamentacao_medica.md).
 
 ## 9. Idade pelo ECG, pré-treino e o modelo final
 - **Idade pelo ECG** (mesma CNN, saída numérica, 163.137 pacientes de treino): MAE 8,08 anos (r 0,849) contra 8,43 (r 0,839) do `nn_predicted_age`, nos 23.513 pacientes de validação; diferença −0,35 (IC −0,43 a −0,27) [resultados/parte_b_idade_p0-17.csv]. Não é comparação justa para "superar" Lima et al. (treinamos nesta amostra; para eles o erro é a informação).
-- **B5:** 0,830 na validação completa contra 0,831 do B3z (−0,001; IC −0,010 a +0,009) [CLAUDE.md, log de 14/11]: o pré-treino não ajudou.
-- **Regra do modelo final (registrada em 14/11, antes dos resultados da GPU):** maior AUROC na validação, nos 9.549 pacientes em comum: B3z 18 partes 0,818; B5 0,815; B3z 8 partes 0,805 → **B3z com 18 partes** [resultados/parte_b_comparar.csv]. Status: **candidato** [congelado_candidato_parte_b.json].
+- **B5:** nos 9.549 pacientes de validação em comum, 0,815 contra 0,818 do B3z (−0,003; IC −0,018 a +0,011) [resultados/parte_b_comparar.csv]: o pré-treino não ajudou. (O par "−0,001; −0,010 a +0,009" na validação completa, citado antes a partir do log de 14/11, não está em nenhum arquivo de resultado: **não conferido**.)
+- **Regra do modelo final (registrada em 14/11, antes dos resultados da GPU):** maior AUROC na validação, nos 9.549 pacientes em comum: B3z 18 partes 0,818; B5 0,815; B3z 8 partes 0,805 → **B3z com 18 partes** [resultados/parte_b_comparar.csv]. Status: **congelado** em 15/11 [congelado_candidato_parte_b.json].
 - **Seeds 43 e 44 do B3z (estabilidade, validação):** AUROC 0,831 / 0,828 / 0,830 (seeds 42 / 43 / 44; média 0,830, desvio 0,001); B3z − B4p +0,013 (+0,003 a +0,023) / +0,011 (+0,003 a +0,019) / +0,012 (+0,004 a +0,021) [resultados/parte_b_seeds_p0-17.csv].
 
 ## 9b. TESTE da Parte B (aberto UMA vez, 15/11; B3z p0-17 congelado)
@@ -119,7 +120,7 @@ Congelado depois da confirmação de Renata e Tom [congelado_candidato_parte_b.j
 
 - **Risco escondido (teste):** sem nenhuma das 6 no laudo (33.152 pacientes, 659 óbitos): B3z 0,829, B3z − B0 +0,030 (+0,020 a +0,039); laudo "ECG normal" (12.804, 150 óbitos): B3z 0,807, **B3z − B0 +0,023 (+0,006 a +0,040)**, diferente da validação (+0,001; −0,020 a +0,024), com intervalos que se sobrepõem [resultados/parte_b_teste_analises_p0-17.csv].
 - **Triagem (teste):** óbitos nos 5% / 10% / 20% de maior nota: B0 23,2% / 40,1% / 60,9%; B4p 30,5% / 46,6% / 65,5%; **B3z 30,3% / 48,8% / 68,6%**; B3z − B0 nos 10%: +0,087 (+0,056 a +0,120) [idem].
-- **Leitura:** o teste reproduz a validação (0,831 → 0,832), e o ganho além das 6 alterações agora tem IC fora de zero em AUROC e AUPRC.
+- **Leitura:** o AUROC geral do teste reproduz o da validação (0,831 → 0,832), e o ganho além das 6 alterações agora tem IC fora de zero em AUROC e AUPRC. O subgrupo com laudo "ECG normal" **não** reproduz: B3z − B0 +0,001 na validação e +0,023 no teste (intervalos que se sobrepõem).
 
 ## 10. Limitações
 - Seções 1-8 são validação (que escolheu a época e o modelo final); o teste (9b) foi aberto uma vez e confirma.
