@@ -23,3 +23,10 @@ modelos/*
 
 # Caracteristicas do A3 com as 18 partes (77 MB, refeitas por parte_b_cnn.py caracteristicas)
 resultados/parte_b_caracteristicas_A3_p0-17.npz
+
+# Organizacao (17/11): logs novos, status local, caches
+logs/
+revisao/status.txt
+*.pyc
+.DS_Store
+Thumbs.db
